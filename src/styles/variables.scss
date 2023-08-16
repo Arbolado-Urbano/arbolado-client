@@ -3,3 +3,13 @@ $color-turquoise: #5cba9d;
 $color-white: #fff;
 
 $font-raleway: 'Raleway', sans-serif;
+
+// Bootstrap variables override
+$primary: $color-turquoise;
+$font-family-sans-serif: $font-raleway;
+$h1-font-size: rem(29px);
+$h2-font-size: rem(16px);
+$small-font-size: 65%;
+
+// Fontawesome variables override
+$fa-font-path: '@fortawesome/fontawesome-free/webfonts';

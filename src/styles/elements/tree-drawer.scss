@@ -1,0 +1,25 @@
+.tree-drawer {
+  background-color: $color-white;
+  display: block;
+  height: 100%;
+  inset: 0;
+  overflow: auto;
+  position: fixed;
+  transition: transform .5s ease-in-out;
+  z-index: 10;
+}
+
+.tree-drawer:not(.show) {
+  transform: translateX(-100%);
+}
+
+.tree-drawer__close {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+}
+
+.tree-drawer__link {
+  font-size: rem(20px);
+  min-width: rem(45px);
+}

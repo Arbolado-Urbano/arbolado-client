@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <base href=".">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arbolado Urbano</title>
+    <link rel="stylesheet" href="/src/styles/_index.scss">
+    <!-- Google Adsense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body>
+    <div class="container-fluid h-100">
+      <div class="row h-100">
+
+        <aside class="col-12 col-lg-4 col-xl-3 py-4">
+          <div class="d-flex align-items-center mb-4 justify-content-center">
+            <img class="img-fluid me-4" src="/imgs/logo-blanco.png" alt="">
+            <h1 class="main-title">
+              Arbolado<br>
+              Urbano
+            </h1>
+          </div>
+    
+          <arbolado-form js-arbolado-form>
+            <form js-form novalidate>
+              <input type="hidden" name="radio" value="1000" js-input="radio">
+              <div class="row">
+                <div class="col-12">
+                  <div class="mb-3">
+                    <h2>
+                      ¿Dónde?
+                    </h2>
+                    <div class="form-check form-check-inline">
+                      <input type="radio" id="marker-all" name="marker" class="form-check-input" value="" js-input="marker-all">
+                      <label class="form-check-label" for="marker-all">
+                        En todo el mapa
+                      </label>
+                    </div>
+                    <div class="custom-control custom-radio form-check-inline" data-bs-toggle="tooltip" data-bs-title="Hacé click en el mapa para colocar una marca.">
+                      <input type="radio" id="marker-point" name="marker" class="form-check-input" value="1" disabled js-input="marker-point">
+                      <label class="form-check-label" for="marker-point">
+                        Marcar en el mapa
+                      </label>
+                    </div>
+                  </div>
+                </div>
+            
+                <div class="col-12">
+                  <div class="mb-3">
+                    <h2>
+                      ¿Qué especie?
+                    </h2>
+                    <arbolado-species-select name="species" js-input="species">
+                      <div class="btn-group dropdown w-100">
+                        <button type="button" class="form-select text-start species-select__btn" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="species-dropdown" js-species-select-btn>
+                          Todas
+                        </button>
+                        <div id="species-dropdown" class="dropdown-menu w-100 px-2 pb-0 mt-2" role="menu" js-species-dropdown>
+                          <input class="form-control w-100" type="text" placeholder="Buscar" js-species-select-input autocomplete="off">
+                          <ul class="species-select__list mt-2 mb-0 p-0" js-species-select-list></ul>
+                        </div>
+                      </div>
+                      <template js-template="species-select-item">
+                        <li class="dropdown-item px-2" js-species-select-item>
+                          <button type="button" class="species-select__item__btn" js-species-select-item-btn>
+                            <span js-scientific-name></span>
+                            <small class="muted-text" js-common-name></small>
+                          </button>
+                        </li>
+                      </template>
+                    </arbolado-species-select>
+                  </div>
+                </div>
+            
+                <div class="col-12 accordion-collapse collapse" id="filters">
+                  <div class="mb-3">
+                    <h2>
+                      Sabores
+                    </h2>
+                    <div class="form-check form-switch">
+                      <input type="checkbox" class="form-check-input" id="input-flavors" name="flavors" js-input="flavors">
+                      <label class="form-check-label" for="input-flavors">
+                        Frutales y medicinales
+                      </label>
+                    </div>
+                  </div>
+            
+                  <div class="mb-3">
+                    <h2>
+                      Origen
+                    </h2>
+                    <div class="custom-control custom-radio form-check-inline">
+                      <input type="radio" id="rorigen-nativas" name="origin" class="form-check-input" value="Nativo/Autóctono" js-input="origin-native">
+                      <label class="form-check-label" for="rorigen-nativas">
+                        Nativas
+                      </label>
+                    </div>
+                    <div class="custom-control custom-radio form-check-inline">
+                      <input type="radio" id="rorigen-exoticas" name="origin" class="form-check-input" value="Exótico" js-input="origin-exotic">
+                      <label class="form-check-label" for="rorigen-exoticas">
+                        Exóticas
+                      </label>
+                    </div>
+                    <button type="button" class="btn btn-link py-0 d-none" js-clear-origin>
+                      <span class="visually-hidden">
+                        Borrar selección de origen
+                      </span>
+                      <i class="fa-solid fa-trash-alt"></i>
+                    </button>
+                  </div>
+            
+                  <div class="mb-3">
+                    <div class="regiones">
+                      <h2>
+                        Región de origen
+                      </h2>
+                      <div class="form-check form-switch form-check-inline">
+                        <input type="checkbox" class="form-check-input" id="borigen_pampeana" name="pampeana" value="1" js-input="pampeana">
+                        <label class="form-check-label" for="borigen_pampeana">
+                          Pampeana
+                        </label>
+                      </div>
+                      <div class="form-check form-switch form-check-inline">
+                        <input type="checkbox" class="form-check-input" id="borigen_nea" name="nea" value="1" js-input="nea">
+                        <label class="form-check-label" for="borigen_nea">
+                          NEA
+                        </label>
+                      </div>
+                      <div class="form-check form-switch form-check-inline">
+                        <input type="checkbox" class="form-check-input" id="borigen_noa" name="noa" value="1" js-input="noa">
+                        <label class="form-check-label" for="borigen_noa">
+                          NOA
+                        </label>
+                      </div>
+                      <div class="form-check form-switch form-check-inline">
+                        <input type="checkbox" class="form-check-input" id="borigen_cuyana" name="cuyana" value="1" js-input="cuyana">
+                        <label class="form-check-label" for="borigen_cuyana">
+                          Cuyana
+                        </label>
+                      </div>
+                      <div class="form-check form-switch form-check-inline">
+                        <input type="checkbox" class="form-check-input" id="borigen_patagonica" name="patagonica" value="1" js-input="patagonica">
+                        <label class="form-check-label" for="borigen_patagonica">
+                          Patagónica
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <button type="button" class="btn btn-secondary collapsed" data-bs-toggle="collapse" data-bs-target="#filters" aria-expanded="false" aria-controls="filters">
+                    <span class="collapsed-hide">Ocultar</span>
+                    <span class="collapsed-show">Mostrar</span>
+                    filtros
+                  </button>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary btn-lg btn-block mt-4 w-100" js-search-btn>
+                Buscar
+              </button>
+            </form>
+          </arbolado-form>
+    
+          <div class="row mt-4">
+            <div class="col-12 col-sm-6 col-md-12 col-xl-6">
+              <a class="btn btn-light btn-small btn-block mb-2 w-100" href="https://www.facebook.com/arboladomapa" target="_blank">
+                <i class="fa-brands fa-facebook"></i>
+                Seguinos
+              </a>
+            </div>
+            <div class="col-12 col-sm-6 col-md-12 col-xl-6">
+              <button class="btn btn-light btn-small btn-block mb-2 w-100" data-bs-toggle="modal" data-bs-target="#about-modal">
+                Sobre el mapa
+              </button>
+            </div>
+          </div>
+    
+          <!-- ADS -->
+    
+          <div class="row text-center mt-4">
+            <p class="col-12 text-muted">
+              Este mapa cuenta con<br>
+              la valiosa colaboración de:
+            </p>
+            <a class="col-6 col-sm-4" href="https://www.facebook.com/LaCiudadNosRegalaSabores" target="_blank">
+              <img class="img-fluid" src="imgs/colaborador-lcnrs.png" alt="La ciudad nos regala sabores">
+            </a>
+            <a class="col-6 col-sm-4" href="https://www.facebook.com/elrenacerdelalaguna/" target="_blank">
+              <img class="img-fluid" src="imgs/colaborador-laguna-fvet.png" alt="El Renacer de la Laguna - FVET - UBA">
+            </a>
+            <a class="col-6 col-sm-4 mx-auto" href="https://www.facebook.com/AsociacionRiberaNorte/" target="_blank">
+              <img class="img-fluid" src="imgs/colaborador-arn.png" alt="Asociación Ribera Norte">
+            </a>
+          </div>
+        </aside>
+
+        <main class="col-12 col-lg-8 col-xl-9 p-0">
+          
+          <arbolado-map id="map" js-arbolado-map class="map-container"></arbolado-map>
+    
+          <div class="floating-content">
+            <button type="button" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#add-tree-modal">
+              <i class="fa-solid fa-plus-square"></i>
+              Agregar árbol
+            </button>
+
+            <arbolado-address-lookup class="address-search">
+              <div class="address-search__input-wrapper">
+                <div class="address-search__icon d-none" js-address-lookup-loading>
+                  <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-link address-search__icon p-0 text-decoration-none" js-address-lookup-btn>
+                  <i class="fa-solid fa-search"></i>
+                </button>
+                <input type="text" class="form-control address-search__input" value="" placeholder="Buscá un lugar" js-address-lookup-input>
+              </div>
+              <ol class="address-search__list list-unstyled mt-1 d-none" js-address-lookup-results>
+                <template js-template="address-lookup-item">
+                  <li class="address-search__item">
+                    <button type="button" class="btn btn-link address-search__item__btn text-truncate w-100" js-address-lookup-item-btn>
+                    </button>
+                  </li>
+                </template>
+              </ol>
+            </arbolado-address-lookup>
+          </div>
+    
+          <button type="button" class="btn btn-primary rounded-circle scroll-top-btn d-lg-none">
+            <i class="fa-solid fa-chevron-up"></i>
+            <span class="visually-hidden">Volver arriba</span>
+          </button>
+        </main>
+
+      </div>
+    </div>
+
+    <!-- Loading indicator -->
+    <arbolado-loader js-loader class="loader" aria-hidden="true">
+      <div class="spinner-border loader__spinner me-4" role="status">
+      </div>
+      <span class="loader__text">
+        Cargando
+      </span>
+    </arbolado-loader>
+
+    <!-- Tree Drawer -->
+    <arbolado-tree-drawer class="col-12 col-xl-5 col-xxl-4 p-4 tree-drawer" tabindex="-1" role="alert" js-tree-drawer>
+      <button type="button" class="btn-close tree-drawer__close" aria-label="Cerrar" js-close>
+      </button>
+      <h1>
+        <span js-tree-data="nombre_cientifico">
+        </span>
+        <br>
+        <small js-tree-data="nombre_comun">
+        </small>
+      </h1>
+      <p>
+        <span js-tree-data="tipo">
+        </span>
+        <br>
+        Familia: <span js-tree-data="familia"></span>
+        <br>
+        Origen: <span js-tree-data="origen"></span>
+        <br>
+        <span>
+          Procedencia: <span js-tree-data="procedencia_exotica"></span>
+        </span>
+        <span>
+          Región de origen: <span js-tree-data="regiones"></span>
+        </span>
+        <br>
+        <span>
+          Altura: <span js-tree-data="altura"></span>m
+        </span>
+      </p>
+      <p>
+        <i class="fa-solid fa-map-marker-alt"></i>
+        <span js-tree-data="espacio_verde"></span>
+        <span js-tree-data="calle">
+        </span>
+      </p>
+      <div class="card border-primary mb-4">
+        <div class="card-header bg-primary">
+          <h4>
+            Fuentes
+          </h4>
+        </div>
+        <div class="card-body">
+          <p>
+            Dato aportado por
+            <strong js-tree-data="nombre">
+            </strong>
+          </p>
+          <p>
+            <small>
+              <span js-tree-data="fecha_creacion"></span>
+              <br>
+              <span js-tree-data="descripcion"></span>
+            </small>
+          </p>
+          <a js-tree-data="url" href="" target="_blank" class="tree-drawer__link badge badge-pill badge-secondary me-2">
+            <i class="fa-solid fa-link"></i>
+          </a>
+          <a js-tree-data="facebook" href="" target="_blank" class="tree-drawer__link badge badge-pill badge-secondary me-2">
+            <i class="fa-brands fa-facebook-f"></i>
+          </a>
+          <a js-tree-data="instagram" href="" target="_blank" class="tree-drawer__link badge badge-pill badge-secondary me-2">
+            <i class="fa-brands fa-instagram"></i>
+          </a>
+          <a js-tree-data="twitter" href="" target="_blank" class="tree-drawer__link badge badge-pill badge-secondary me-2">
+            <i class="fa-brands fa-twitter"></i>
+          </a>
+        </div>
+      </div>
+      <div class="card">
+        <iframe js-tree-data="streetview" src="" allowfullscreen="" width="100%" height="400" frameborder="0">
+        </iframe>
+      </div>
+      <div class="autor card my-4">
+        <div class="card-header">
+          <h4>
+            Este árbol
+          </h4>
+        </div>
+        <div class="card-body">
+          <p>
+            El siguiente código sirve para identificar a este árbol:
+            <kbd class="me-1" js-tree-data="id"></kbd>
+            <a js-tree-data="link" href="/arbol" target="_blank">
+              <i class="fa-solid fa-external-link-alt"></i>
+            </a>
+          </p>
+          <p>
+            Podés usarlo para reportar datos incorrectos enviando el código con
+            los comentarios que quieras hacer por medio de
+            <a class="text-primary" href="https://www.facebook.com/arboladomapa/" target="_blank">
+              <i class="fa-brands fa-facebook-square"></i>
+              /arboladomapa
+            </a>
+            <br>
+            ¡Gracias!
+          </p>
+        </div>
+      </div>
+    </arbolado-tree-drawer>
+
+    <!-- Overlay used only by the tree drawer for now -->
+    <div class="overlay" js-overlay></div>
+
+    <!-- About Modal -->
+    <div id="about-modal" class="modal fade" tabindex="-1" aria-hidden="true" aria-label="Acerca del proyecto" role="dialog">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4>
+              ¿Qué es esto?
+            </h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
+            </button>
+           </div>
+          <div class="modal-body">
+            <p>
+              Este mapa surge gracias a la publicación de una información increíble:
+              el
+              <a href="https://data.buenosaires.gob.ar/dataset?q=arbolado" target="_blank">
+                censo del arbolado de la Ciudad de Buenos Aires
+              </a>
+              realizado durante el año 2011 y publicado en 2013.
+            </p>
+            <p>
+              El objetivo inicial fue simplificar el acceso a esta valiosa
+              información pero rápidamente se expandió para incluir otros censos.
+              Hoy en día el sitio ayuda a visualizar la posición de miles de árboles
+              ubicados en varias ciudades. La mayor cantidad se concetra en la
+              Ciudad de Buenos Aires, pero también existen registros en Rosario, La
+              Plata y Montevideo entre otras esperando que colabore con el
+              conocimiento y el cuidado de nuestro arbolado urbano.
+            </p>
+            <a href="http://martinsimonyan.com/arboles-de-buenos-aires/" class="btn btn-secondary" target="_blank">
+              Más información
+              <i class="fa-solid fa-caret-right"></i>
+            </a>
+            <hr>
+            <h5>
+              ¿Con qué seguir?
+            </h5>
+            <p>
+              Podés dejar tu opinión y tus idas para seguir mejorando esta
+              herramienta. Estas son algunas de las ideas que están en curso:
+            </p>
+              <ul>
+                <li>
+                  permitir seleccionar el radio de búsqueda
+                </li>
+                <li>
+                  buscar por barrio o comuna
+                </li>
+                <li>
+                  incorporar a otras ciudades
+                </li>
+                <li>
+                  incorporar otras fuentes y no tan sólo las del censo del GCBA y
+                  poder buscar filtrando por fuente
+                </li>
+                <li>
+                  permitir interacción con usuarios para que carguen ejemplares,
+                  fotografías y reporten errores
+                </li>
+              </ul>
+            <hr>
+            <p class="text-center">
+              <a href="https://github.com/suberek/arboles" target="_blank">
+                <i class="fa-brands fa-github"></i>
+                Ver en GitHub
+              </a>
+            </p>
+            <p class="text-center">
+              <a href="https://www.facebook.com/arboladomapa" target="_blank">
+                <i class="fa-brands fa-facebook"></i>
+                Seguir en Facebook
+              </a>
+            </p>
+            <p class="text-center">
+              <a href="https://www.instagram.com/arbolado.urbano/" target="_blank">
+                <i class="fa-brands fa-instagram"></i>
+                Seguir en Instagram
+              </a>
+            </p>
+            <p class="text-center">
+              <a href="https://twitter.com/arboladomapa" target="_blank">
+                <i class="fa-brands fa-twitter"></i>
+                Seguir en Twitter
+              </a>
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Gracias por leer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty trees Modal -->
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" aria-labelledby="no-results-title" role="dialog" js-no-results-modal>
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 id="no-results-title">
+              No hay resultados para mostrar
+            </h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
+            </button>
+           </div>
+          <div class="modal-body">
+            <p>
+              Tu búsqueda no arrojó resultados.
+            </p>
+            <p>
+              Probá buscando la especie que te interesa en toda la ciudad, o
+              cambiando la zona de búsqueda marcando otro lugar en el mapa.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add tree Modal -->
+    <div id="add-tree-modal" class="modal fade" tabindex="-1" aria-hidden="true" aria-labelledby="add-tree-title" role="dialog">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 id="add-tree-title">
+              Agregar árbol
+            </h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
+            </button>
+           </div>
+          <div class="modal-body">
+            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdT1-TNDDN7Gau_798r4EIMCqKLR58VHfsPpP6LrHUg7SEIXw/viewform?embedded=true" class="w-100" height="500" frameborder="0">
+              Cargando...
+            </iframe>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
