@@ -1,6 +1,8 @@
 import * as L from 'leaflet'
 import 'leaflet.markercluster'
 
+import Tree from '../types/Tree'
+
 const environment = {
   highlightColor: '#5cba9d',
   mapDisableClusteringAt: 21,
@@ -87,10 +89,18 @@ export default class MapElement extends HTMLElement {
   }
   
   /**
-   * Displays the given trees on the map (discarding previous values)
-   * @param trees - Array with the trees to display info
+   * Displays the given tree on the map if there are no trees currently being displayed
+   * @param tree - the tree to display
    */
-  public displayTrees(trees: any[]): void {
+  public displayTree(tree: Tree) {
+    if (!this.treeMarkers.getLayers().length) this.displayTrees([tree])
+  }
+  
+  /**
+   * Displays the given trees on the map (discarding previous values)
+   * @param trees - Array with the trees to display
+   */
+  public displayTrees(trees: Tree[]): void {
     this.treeMarkers.clearLayers() // Remove all previous trees
     for (const tree of trees) {
       // Select the tree's icon or use the default if none

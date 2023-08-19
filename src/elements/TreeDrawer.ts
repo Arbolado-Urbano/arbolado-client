@@ -1,25 +1,25 @@
 import Tree from '../types/Tree'
 type TreeData = {
-  id: HTMLElement,
-  nombre_cientifico: HTMLElement,
-  nombre_comun: HTMLElement,
-  tipo: HTMLElement,
-  familia: HTMLElement,
-  origen: HTMLElement,
-  procedencia_exotica: HTMLElement,
-  regiones: HTMLElement,
-  altura: HTMLElement,
-  espacio_verde: HTMLElement,
-  calle: HTMLElement,
-  nombre: HTMLElement,
-  fecha_creacion: HTMLElement,
-  descripcion: HTMLElement,
-  url: HTMLAnchorElement,
-  facebook: HTMLAnchorElement,
-  instagram: HTMLAnchorElement,
-  twitter: HTMLAnchorElement,
-  streetview: HTMLIFrameElement,
-  link: HTMLAnchorElement,
+  id: { element: HTMLElement, label?: string },
+  nombre_cientifico: { element: HTMLElement, label?: string },
+  nombre_comun: { element: HTMLElement, label?: string },
+  tipo: { element: HTMLElement, label?: string },
+  familia: { element: HTMLElement, label?: string },
+  origen: { element: HTMLElement, label?: string },
+  procedencia_exotica: { element: HTMLElement, label?: string },
+  regiones: { element: HTMLElement, label?: string },
+  altura: { element: HTMLElement, label?: string },
+  espacio_verde: { element: HTMLElement, label?: string  },
+  calle: { element: HTMLElement, label?: string  },
+  nombre: { element: HTMLElement, label?: string },
+  fecha_creacion: { element: HTMLElement, label?: string  },
+  descripcion: { element: HTMLElement, label?: string  },
+  url: { element: HTMLAnchorElement, label?: string  },
+  facebook: { element: HTMLAnchorElement, label?: string  },
+  instagram: { element: HTMLAnchorElement, label?: string  },
+  twitter: { element: HTMLAnchorElement, label?: string  },
+  streetview: { element: HTMLIFrameElement, label?: string  },
+  link: { element: HTMLAnchorElement, label?: string  },
 }
 type treeDataKey = keyof TreeData
 
@@ -43,26 +43,26 @@ export default class TreeModal extends HTMLElement {
     this.closeBtn.addEventListener('click', () => this.close())
 
     this.treeData = {
-      id: this.querySelector('[js-tree-data="id"]') as HTMLElement,
-      nombre_cientifico: this.querySelector('[js-tree-data="nombre_cientifico"]') as HTMLElement,
-      nombre_comun: this.querySelector('[js-tree-data="nombre_comun"]') as HTMLElement,
-      tipo: this.querySelector('[js-tree-data="tipo"]') as HTMLElement,
-      familia: this.querySelector('[js-tree-data="familia"]') as HTMLElement,
-      origen: this.querySelector('[js-tree-data="origen"]') as HTMLElement,
-      procedencia_exotica: this.querySelector('[js-tree-data="procedencia_exotica"]') as HTMLElement,
-      regiones: this.querySelector('[js-tree-data="regiones"]') as HTMLElement,
-      altura: this.querySelector('[js-tree-data="altura"]') as HTMLElement,
-      espacio_verde: this.querySelector('[js-tree-data="espacio_verde"]') as HTMLElement,
-      calle: this.querySelector('[js-tree-data="calle"]') as HTMLElement,
-      nombre: this.querySelector('[js-tree-data="nombre"]') as HTMLElement,
-      fecha_creacion: this.querySelector('[js-tree-data="fecha_creacion"]') as HTMLElement,
-      descripcion: this.querySelector('[js-tree-data="descripcion"]') as HTMLElement,
-      url: this.querySelector('[js-tree-data="url"]') as HTMLAnchorElement,
-      facebook: this.querySelector('[js-tree-data="facebook"]') as HTMLAnchorElement,
-      instagram: this.querySelector('[js-tree-data="instagram"]') as HTMLAnchorElement,
-      twitter: this.querySelector('[js-tree-data="twitter"]') as HTMLAnchorElement,
-      streetview: this.querySelector('[js-tree-data="streetview"]') as HTMLIFrameElement,
-      link: this.querySelector('[js-tree-data="link"]') as HTMLAnchorElement,
+      id: { element: this.querySelector('[js-tree-data="id"]') as HTMLElement },
+      nombre_cientifico: { element: this.querySelector('[js-tree-data="nombre_cientifico"]') as HTMLElement },
+      nombre_comun: { element: this.querySelector('[js-tree-data="nombre_comun"]') as HTMLElement },
+      tipo: { element: this.querySelector('[js-tree-data="tipo"]') as HTMLElement },
+      familia: { element: this.querySelector('[js-tree-data="familia"]') as HTMLElement, label: 'Familia:' },
+      origen: { element: this.querySelector('[js-tree-data="origen"]') as HTMLElement, label: 'Origen:' },
+      procedencia_exotica: { element: this.querySelector('[js-tree-data="procedencia_exotica"]') as HTMLElement, label: 'Procedencia:' },
+      regiones: { element: this.querySelector('[js-tree-data="regiones"]') as HTMLElement, label: 'Región de origen:' },
+      altura: { element: this.querySelector('[js-tree-data="altura"]') as HTMLElement, label: 'Altura:' },
+      espacio_verde: { element: this.querySelector('[js-tree-data="espacio_verde"]') as HTMLElement },
+      calle: { element: this.querySelector('[js-tree-data="calle"]') as HTMLElement },
+      nombre: { element: this.querySelector('[js-tree-data="nombre"]') as HTMLElement, label: 'Dato aprotado por' },
+      fecha_creacion: { element: this.querySelector('[js-tree-data="fecha_creacion"]') as HTMLElement },
+      descripcion: { element: this.querySelector('[js-tree-data="descripcion"]') as HTMLElement },
+      url: { element: this.querySelector('[js-tree-data="url"]') as HTMLAnchorElement },
+      facebook: { element: this.querySelector('[js-tree-data="facebook"]') as HTMLAnchorElement },
+      instagram: { element: this.querySelector('[js-tree-data="instagram"]') as HTMLAnchorElement },
+      twitter: { element: this.querySelector('[js-tree-data="twitter"]') as HTMLAnchorElement },
+      streetview: { element: this.querySelector('[js-tree-data="streetview"]') as HTMLIFrameElement },
+      link: { element: this.querySelector('[js-tree-data="link"]') as HTMLAnchorElement },
     }
     this.loadTreeFromURL()
     window.addEventListener('popstate', () => this.loadTreeFromURL())
@@ -72,13 +72,16 @@ export default class TreeModal extends HTMLElement {
   }
 
   private setTreeValue(name: treeDataKey, value?: string, attribute?: string) {
-    const element = this.treeData[name]
-    element.classList.remove('d-none')
+    const treeData = this.treeData[name]
+    treeData.element.classList.remove('d-none')
     if (value) {
-      if (attribute) element.setAttribute(attribute, value)
-      else element.innerText = value
+      if (attribute) treeData.element.setAttribute(attribute, value)
+      else {
+        if (name === 'nombre') treeData.element.innerHTML = `${treeData.label || ''} <strong>${value}</strong>`
+        else treeData.element.innerText = `${treeData.label || ''} ${value}`
+      }
     } else {
-      element.classList.add('d-none')
+      treeData.element.classList.add('d-none')
     }
   }
 
@@ -103,12 +106,22 @@ export default class TreeModal extends HTMLElement {
     }
   }
 
+  private formatDate(dateString: string) {
+    const date = new Date(dateString)
+    const day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()
+    const month = date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1
+    return `${day}/${month}/${date.getFullYear()}`
+  }
+
   async displayTree(treeId: string, updateURL: boolean = true) {
     const tree: Tree = await window.Arbolado.fetchJson(`${import.meta.env.VITE_API_URL}/arboles/${treeId}`)
     // If there's no streetview URL for the tree, use its coordinates
     if (!tree.streetview) {
       tree.streetview = `${this.streetViewUrl}&location=${tree.lat},${tree.lng}`
     }
+
+    if (tree.fecha_creacion) tree.fecha_creacion = this.formatDate(tree.fecha_creacion)
+    if (tree.altura) tree.altura += ' m'
 
     const treeLink = `/arbol/${tree.id}`
     
@@ -144,6 +157,8 @@ export default class TreeModal extends HTMLElement {
       const url = `${window.location.protocol}//${window.location.host}${treeLink}`
       history.pushState(null, '', url)
     }
+
+    window.Arbolado.emitEvent(this, 'arbolado/tree:displayed', { tree })
   }
 
   private hasFocus(within: boolean = false) {

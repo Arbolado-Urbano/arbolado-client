@@ -1,5 +1,8 @@
 declare type Tree = {
   id: string
+  lat: number
+  lng: number
+  icono: string
   nombre_cientifico: string
   nombre_comun: string
   tipo: string
@@ -19,8 +22,6 @@ declare type Tree = {
   instagram?: string
   twitter?: string
   streetview?: string
-  lat?: string
-  lng?: string
 }
 
 export default Tree

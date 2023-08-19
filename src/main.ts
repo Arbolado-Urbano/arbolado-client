@@ -33,6 +33,7 @@ window.Arbolado.ready(() => {
   searchForm.addEventListener('arbolado/marker:remove', () => mapElement.removeMarker())
   mapElement.addEventListener('arbolado/maker:set', (event) => searchForm.setMarker((event as CustomEvent).detail.latLng))
   mapElement.addEventListener('arbolado/tree:selected', (event) => treeDrawer.displayTree((event as CustomEvent).detail.id))
+  treeDrawer.addEventListener('arbolado/tree:displayed', (event) => mapElement.displayTree((event as CustomEvent).detail.tree))
 
   // Init Bootstrap's tooltips
   document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((element) => new bootstrap.Tooltip(element))

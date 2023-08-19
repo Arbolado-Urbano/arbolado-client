@@ -249,34 +249,20 @@
     </arbolado-loader>
 
     <!-- Tree Drawer -->
-    <arbolado-tree-drawer class="col-12 col-xl-5 col-xxl-4 p-4 tree-drawer" tabindex="-1" role="alert" js-tree-drawer>
+    <arbolado-tree-drawer class="col-12 col-lg-7 col-xl-6 col-xxl-5 p-4 tree-drawer" tabindex="-1" role="alert" js-tree-drawer>
       <button type="button" class="btn-close tree-drawer__close" aria-label="Cerrar" js-close>
       </button>
-      <h1>
-        <span js-tree-data="nombre_cientifico">
-        </span>
-        <br>
-        <small js-tree-data="nombre_comun">
-        </small>
+      <h1 class="d-grid">
+        <span js-tree-data="nombre_cientifico"></span>
+        <small js-tree-data="nombre_comun"></small>
       </h1>
-      <p>
-        <span js-tree-data="tipo">
-        </span>
-        <br>
-        Familia: <span js-tree-data="familia"></span>
-        <br>
-        Origen: <span js-tree-data="origen"></span>
-        <br>
-        <span>
-          Procedencia: <span js-tree-data="procedencia_exotica"></span>
-        </span>
-        <span>
-          Región de origen: <span js-tree-data="regiones"></span>
-        </span>
-        <br>
-        <span>
-          Altura: <span js-tree-data="altura"></span>m
-        </span>
+      <p class="d-grid">
+        <span js-tree-data="tipo"></span>
+        <span js-tree-data="familia"></span>
+        <span js-tree-data="origen"></span>
+        <span js-tree-data="procedencia_exotica"></span>
+        <span js-tree-data="regiones"></span>
+        <span js-tree-data="altura"></span>
       </p>
       <p>
         <i class="fa-solid fa-map-marker-alt"></i>
@@ -292,14 +278,11 @@
         </div>
         <div class="card-body">
           <p>
-            Dato aportado por
-            <strong js-tree-data="nombre">
-            </strong>
+            <span js-tree-data="nombre"></span>
           </p>
           <p>
-            <small>
+            <small class="d-grid">
               <span js-tree-data="fecha_creacion"></span>
-              <br>
               <span js-tree-data="descripcion"></span>
             </small>
           </p>
