@@ -11,9 +11,9 @@ const environment = {
 }
 
 export default class MapElement extends HTMLElement {
-  public map: L.Map // Map reference
-  public mapFitToBoundsOptions: L.FitBoundsOptions = { maxZoom: 15, padding: [15, 15] } // To zoom into search results
-  public options: L.MapOptions = { // Map options
+  private map: L.Map // Map reference
+  private mapFitToBoundsOptions: L.FitBoundsOptions = { maxZoom: 15, padding: [15, 15] } // To zoom into search results
+  private options: L.MapOptions = { // Map options
     center: L.latLng(-34.618, -58.44), // BsAs
     layers: [
       L.tileLayer(
@@ -32,7 +32,7 @@ export default class MapElement extends HTMLElement {
     minZoom: 5,
     zoom: 12,
   }
-  public clusterOptions = {
+  private clusterOptions = {
     disableClusteringAtZoom: environment.mapDisableClusteringAt,
     maxClusterRadius: 100, // px
     polygonOptions: {
@@ -46,9 +46,10 @@ export default class MapElement extends HTMLElement {
     spiderfyDistanceMultiplier: 2,
     zoomToBoundsOnClick: true,
   }
-  public marker?: L.Marker // Marker
-  public circle?: L.Circle // Circle around marker indicating search radius
-  public treeMarkers: L.MarkerClusterGroup // Trees from search result
+  private markerPopupTemplate: HTMLTemplateElement
+  private marker?: L.Marker // Marker
+  private circle?: L.Circle // Circle around marker indicating search radius
+  private treeMarkers: L.MarkerClusterGroup // Trees from search result
   private icons: { [key: string]: L.Icon } = {
     default: new L.Icon({
       iconAnchor: [15, 31],
@@ -65,6 +66,9 @@ export default class MapElement extends HTMLElement {
     this.map.on('click', (event: any) => {
       this.setMarker(event.latlng)
     })
+
+    // Init the "search" popup for the map marker
+    this.markerPopupTemplate = this.querySelector('[js-template="marker-popup"]') as HTMLTemplateElement
 
     // Look for a marker on the query params. If there's one set it.
     const marker = window.Arbolado.queryParams.get('user_latlng')
@@ -101,6 +105,8 @@ export default class MapElement extends HTMLElement {
    * @param trees - Array with the trees to display
    */
   public displayTrees(trees: Tree[]): void {
+    window.Arbolado.setLoading(true)
+    this.marker?.closePopup() // Close the marker popup just in case it was open
     this.treeMarkers.clearLayers() // Remove all previous trees
     for (const tree of trees) {
       // Select the tree's icon or use the default if none
@@ -127,6 +133,7 @@ export default class MapElement extends HTMLElement {
     if ((this.map) && (this.treeMarkers.getLayers().length)) {
       this.map.fitBounds(this.treeMarkers.getBounds(), this.mapFitToBoundsOptions)
     }
+    window.Arbolado.setLoading(false)
   }
 
   /**
@@ -147,6 +154,21 @@ export default class MapElement extends HTMLElement {
     window.Arbolado.emitEvent(this, 'arbolado/maker:set', { latLng })
     // Re-center the map around the marker
     map.panTo(latLng)
+  }
+
+  private createMarkerPopup() {
+    const markerPopupContent = this.markerPopupTemplate.content.cloneNode(true) as HTMLElement
+    markerPopupContent.querySelector('[js-marker-popup-search]')?.addEventListener('click', () => {
+      this.marker?.closePopup()
+      // Emit an event when the user clicks the search button from marker so the search form can be notified and perform the search
+      window.Arbolado.emitEvent(this, 'arbolado/marker:search')
+    })
+    markerPopupContent.querySelector('[js-marker-popup-clear]')?.addEventListener('click', () => {
+      this.removeMarker()
+      // Emit an event when the user clears the map marker so the search form can be notified and update its UI
+      window.Arbolado.emitEvent(this, 'arbolado/marker:removed')
+    })
+    return markerPopupContent
   }
 
   /**
@@ -185,6 +207,7 @@ export default class MapElement extends HTMLElement {
           // Update the selected coordinates
           this.latlngUpdated(this.map, newLatlng)
         })
+        this.marker.on('click', () => this.marker?.bindPopup(this.createMarkerPopup()))
       } else {
         // If a marker already exists, move it and its circle
         this.marker.setLatLng([latLng.lat, latLng.lng])
@@ -198,6 +221,8 @@ export default class MapElement extends HTMLElement {
 
       // Update the selected coordinates
       this.latlngUpdated(this.map, latLng)
+
+      this.marker.bindPopup(this.createMarkerPopup()).openPopup()
     }
   }
 

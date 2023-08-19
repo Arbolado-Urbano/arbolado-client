@@ -81,7 +81,7 @@ export default class SearchForm extends HTMLElement {
     this.pampeana.checked = window.Arbolado.queryParams.get('borigen_pampeana') !== null
     this.patagonica.checked = window.Arbolado.queryParams.get('borigen_patagonica') !== null
 
-    let latLng = window.Arbolado.queryParams.get('user_latlng')
+    const latLng = window.Arbolado.queryParams.get('user_latlng')
     if (latLng) {
       try {
         const [lat, lng] = latLng.split(' ').map(Number)
@@ -120,7 +120,7 @@ export default class SearchForm extends HTMLElement {
     }
   }
 
-  private async search(updateURL: boolean = true) {
+  public async search(updateURL: boolean = true) {
     // Validate the form
     if (!window.Arbolado.validateForm(this.form)) return
 
@@ -167,9 +167,15 @@ export default class SearchForm extends HTMLElement {
     if (!trees?.length) this.noResultsModal.show()
   }
 
-  setMarker(latLng: LatLng) {
+  public setMarker(latLng: LatLng) {
     this.markerAll.checked = false
     this.markerPoint.checked = true
     this.latLng = latLng
+  }
+
+  public removeMarker() {
+    this.markerAll.checked = true
+    this.markerPoint.checked = false
+    this.latLng = undefined
   }
 }

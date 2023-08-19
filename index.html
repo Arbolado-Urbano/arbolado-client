@@ -199,7 +199,21 @@
 
         <main class="col-12 col-lg-8 col-xl-9 p-0">
           
-          <arbolado-map id="map" js-arbolado-map class="map-container"></arbolado-map>
+          <arbolado-map id="map" js-arbolado-map class="map-container">
+            <template js-template="marker-popup">
+              <div class="d-grid gap-1">
+                <button type="button" class="btn btn-primary" js-marker-popup-search>
+                  <i class="fas fa-search fa-lg fa-fw" aria-hidden="true"></i>
+                  Buscar
+                  <br>
+                  <small>en esta zona</small>
+                </button>
+                <button type="button" class="btn btn-outline-dark" js-marker-popup-clear>
+                  <i class="fas fa-trash fa-fw" aria-hidden="true"></i>
+                </button>
+              </div>
+            </template>
+          </arbolado-map>
     
           <div class="floating-content">
             <button type="button" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#add-tree-modal">
