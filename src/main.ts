@@ -8,10 +8,12 @@ import SearchForm from './elements/SearchForm'
 import TreeDrawer from './elements/TreeDrawer'
 import SpeciesSelect from './elements/SpeciesSelect'
 import AddresLookup from './elements/AddressLookup'
+import GoogleAds from './elements/GoogleAds'
 
 declare global {
   interface Window {
     Arbolado: Arbolado,
+    adsbygoogle: any,
   }
 }
 
@@ -24,6 +26,7 @@ customElements.define('arbolado-species-select', SpeciesSelect)
 customElements.define('arbolado-form', SearchForm)
 customElements.define('arbolado-tree-drawer', TreeDrawer)
 customElements.define('arbolado-address-lookup', AddresLookup)
+customElements.define('arbolado-google-ads', GoogleAds)
 
 window.Arbolado.ready(() => {
   const searchForm = document.querySelector('[js-arbolado-form]') as SearchForm
