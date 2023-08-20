@@ -44,7 +44,7 @@ export default class SpeciesSelect extends HTMLElement {
   private async loadSpecies() {
     if (this.status === 'loaded') return
     this.status = 'loading'
-    await window.Arbolado.fetchJson(`${import.meta.env.VITE_API_URL}/especies`).then((species) => {
+    await window.Arbolado.fetchJson(`${import.meta.env.VITE_API_URL}/especies`, 'GET', undefined, undefined, false).then((species) => {
       this.renderSpecies([this.allSpeciesElement, ...species])
       this.status = 'loaded'
       window.Arbolado.emitEvent(this, 'arbolado/species:loaded')
@@ -180,6 +180,7 @@ export default class SpeciesSelect extends HTMLElement {
 
   private renderSpecies(species: Species[]) {
     this.species = species
+    this.listElement.innerHTML = ''
     this.filtered = [...this.species]
     this.filtered.map((species, index) => this.addSpeciesOption(species, index))
   }
