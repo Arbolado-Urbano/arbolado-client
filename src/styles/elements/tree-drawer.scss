@@ -6,7 +6,7 @@
   overflow: auto;
   position: fixed;
   transition: transform .5s ease-in-out;
-  z-index: 10;
+  z-index: 9999;
 }
 
 .tree-drawer:not(.show) {
