@@ -123,33 +123,12 @@
                   </div>
             
                   <div class="mb-3">
-                    <h2>
-                      Origen
-                    </h2>
-                    <div class="custom-control custom-radio form-check-inline">
-                      <input type="radio" id="rorigen-nativas" name="origin" class="form-check-input" value="Nativo/Autóctono" js-input="origin-native">
-                      <label class="form-check-label" for="rorigen-nativas">
-                        Nativas
-                      </label>
-                    </div>
-                    <div class="custom-control custom-radio form-check-inline">
-                      <input type="radio" id="rorigen-exoticas" name="origin" class="form-check-input" value="Exótico" js-input="origin-exotic">
-                      <label class="form-check-label" for="rorigen-exoticas">
-                        Exóticas
-                      </label>
-                    </div>
-                    <button type="button" class="btn btn-link py-0 d-none" js-clear-origin>
-                      <span class="visually-hidden">
-                        Borrar selección de origen
-                      </span>
-                      <i class="fa-solid fa-trash-alt"></i>
-                    </button>
-                  </div>
-            
-                  <div class="mb-3">
                     <div class="regiones">
                       <h2>
                         Región de origen
+                        <a href="#" id="origen" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Por el momento el mapa permite filtrar especies para las distintas regiones de origen sólo dentro de Argentina, ¡esperamos ampliar esta sección pronto!">
+                          <i class="fas fa-question-circle"></i>
+                        </a>
                       </h2>
                       <div class="form-check form-switch form-check-inline">
                         <input type="checkbox" class="form-check-input" id="borigen_pampeana" name="pampeana" value="1" js-input="pampeana">
@@ -205,14 +184,11 @@
               Este mapa cuenta con<br>
               la valiosa colaboración de:
             </p>
-            <a class="col-6 col-sm-4" href="https://www.facebook.com/LaCiudadNosRegalaSabores" target="_blank">
+            <a class="col-6" href="https://www.facebook.com/LaCiudadNosRegalaSabores" target="_blank">
               <img class="img-fluid" src="imgs/colaborador-lcnrs.png" alt="La ciudad nos regala sabores">
             </a>
-            <a class="col-6 col-sm-4" href="https://www.facebook.com/elrenacerdelalaguna/" target="_blank">
+            <a class="col-6" href="https://www.facebook.com/elrenacerdelalaguna/" target="_blank">
               <img class="img-fluid" src="imgs/colaborador-laguna-fvet.png" alt="El Renacer de la Laguna - FVET - UBA">
-            </a>
-            <a class="col-6 col-sm-4 mx-auto" href="https://www.facebook.com/AsociacionRiberaNorte/" target="_blank">
-              <img class="img-fluid" src="imgs/colaborador-arn.png" alt="Asociación Ribera Norte">
             </a>
           </div>
         </aside>

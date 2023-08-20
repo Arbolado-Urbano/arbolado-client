@@ -12,8 +12,6 @@ export default class SearchForm extends HTMLElement {
   private flavors: HTMLInputElement
   private markerAll: HTMLInputElement
   private markerPoint: HTMLInputElement
-  private originNative: HTMLInputElement
-  private originExotic: HTMLInputElement
   private cuyana: HTMLInputElement
   private nea: HTMLInputElement
   private noa: HTMLInputElement
@@ -21,7 +19,6 @@ export default class SearchForm extends HTMLElement {
   private patagonica: HTMLInputElement
   private species: SpeciesSelect
   private radio: HTMLInputElement
-  private clearOriginBtn: HTMLButtonElement
   
   constructor() {
     super()
@@ -33,20 +30,12 @@ export default class SearchForm extends HTMLElement {
     this.flavors = this.querySelector('[js-input="flavors"]') as HTMLInputElement
     this.markerAll = this.querySelector('[js-input="marker-all"]') as HTMLInputElement
     this.markerPoint = this.querySelector('[js-input="marker-point"]') as HTMLInputElement
-    this.originNative = this.querySelector('[js-input="origin-native"]') as HTMLInputElement
-    this.originExotic = this.querySelector('[js-input="origin-exotic"]') as HTMLInputElement
     this.cuyana = this.querySelector('[js-input="cuyana"]') as HTMLInputElement
     this.nea = this.querySelector('[js-input="nea"]') as HTMLInputElement
     this.noa = this.querySelector('[js-input="noa"]') as HTMLInputElement
     this.pampeana = this.querySelector('[js-input="pampeana"]') as HTMLInputElement
     this.patagonica = this.querySelector('[js-input="patagonica"]') as HTMLInputElement
     this.species = this.querySelector('[js-input="species"]') as SpeciesSelect
-    // Clear origin button
-    this.clearOriginBtn = this.querySelector('[js-clear-origin]') as HTMLButtonElement
-    this.clearOriginBtn.addEventListener('click', () => this.clearOrigin())
-    // When an origin is selected display the clear origin button
-    this.originNative.addEventListener('change', () => this.clearOriginBtn.classList.remove('d-none'))
-    this.originExotic.addEventListener('change', () => this.clearOriginBtn.classList.remove('d-none'))
     // Emit an event when the user selects "En todo el mapa" so the map can be notified and removes the marker
     this.markerAll.addEventListener('change', () => window.Arbolado.emitEvent(this, 'arbolado/marker:remove'))
     // Submit handler
@@ -73,8 +62,6 @@ export default class SearchForm extends HTMLElement {
     this.flavors.checked = window.Arbolado.queryParams.get('user_sabores') !== null
     this.markerAll.checked = window.Arbolado.queryParams.get('user_latlng') === null
     this.markerPoint.checked = window.Arbolado.queryParams.get('user_latlng') !== null
-    this.originNative.checked = window.Arbolado.queryParams.get('user_origen') === 'Nativo/Autóctono'
-    this.originExotic.checked = window.Arbolado.queryParams.get('user_origen') === 'Exótico'
     this.cuyana.checked = window.Arbolado.queryParams.get('borigen_cuyana') !== null
     this.nea.checked = window.Arbolado.queryParams.get('borigen_nea') !== null
     this.noa.checked = window.Arbolado.queryParams.get('borigen_noa') !== null
@@ -103,12 +90,6 @@ export default class SearchForm extends HTMLElement {
   private getLatLngString() {
     if (!this.latLng) return ''
     else return `${this.latLng.lat} ${this.latLng.lng}`
-  }
-
-  private clearOrigin() {
-    this.originNative.checked = false
-    this.originExotic.checked = false
-    this.clearOriginBtn.classList.add('d-none')
   }
 
   // If checked => the query param "name" will be set with the value "value", otherwise the param will be deleted
@@ -147,8 +128,6 @@ export default class SearchForm extends HTMLElement {
     this.setQueryParam('borigen_noa', this.noa.checked)
     this.setQueryParam('borigen_pampeana', this.pampeana.checked)
     this.setQueryParam('borigen_patagonica', this.patagonica.checked)
-    this.setQueryParam('user_origen', this.originExotic.checked, this.originExotic.value)
-    this.setQueryParam('user_origen', this.originNative.checked, this.originNative.value)
     if (this.markerPoint.checked) window.Arbolado.queryParams.set('radio', this.radio.value)
     
     const searchQueryParams = new URLSearchParams(window.Arbolado.queryParams)
