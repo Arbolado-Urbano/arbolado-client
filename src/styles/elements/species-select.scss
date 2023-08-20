@@ -1,9 +1,14 @@
 .species-select__item__btn {
+  align-items: baseline;
   background-color: transparent;
   border: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .25rem;
   padding: 0;
   text-align: left;
   width: 100%;
+  white-space: normal;
 }
 
 .species-select__list {

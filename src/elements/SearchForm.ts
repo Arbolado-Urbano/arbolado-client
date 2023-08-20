@@ -94,7 +94,7 @@ export default class SearchForm extends HTMLElement {
     }
 
     // Check if there's a species selected on the URL
-    const species = await this.species.loadSpeciesFromURL()
+    const species = await this.species.setSpeciesFromURL()
 
     // If we have coordinates or a species selected on the URL perform the search
     if ((this.latLng) || (species)) this.search(false)

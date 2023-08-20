@@ -2,7 +2,7 @@ import Species from '../types/Species'
 
 export default class SpeciesSelect extends HTMLElement {
   private species: Species[] = []
-  private loaded: boolean = false
+  private status: string = 'idle'
   public value: Species | null = null
   private filtered: Species[] = []
   private btnElement: HTMLButtonElement
@@ -13,21 +13,18 @@ export default class SpeciesSelect extends HTMLElement {
   constructor() {
     super()
     this.handleKeyDown = this.handleKeyDown.bind(this)
-    this.loadSpecies = this.loadSpecies.bind(this)
+    this.renderSpecies = this.renderSpecies.bind(this)
     this.addSpeciesOption = this.addSpeciesOption.bind(this)
     this.handleInput = this.handleInput.bind(this)
     this.selectSpeciesFromURL = this.selectSpeciesFromURL.bind(this)
+    this.loadSpecies = this.loadSpecies.bind(this)
 
     this.inputElement = this.querySelector('[js-species-select-input]') as HTMLInputElement
     this.listElement = this.querySelector('[js-species-select-list]') as HTMLElement
     this.btnElement = this.querySelector('[js-species-select-btn]') as HTMLButtonElement
 
-    // Get the list of all species from the API
-    window.Arbolado.fetchJson(`${import.meta.env.VITE_API_URL}/especies`).then((species) => {
-      this.loadSpecies([this.allSpeciesElement, ...species])
-      this.loaded = true
-      window.Arbolado.emitEvent(this, 'arbolado/species:loaded')
-    })
+    // Load the species list on first interaction
+    this.btnElement.addEventListener('click', this.loadSpecies, { once: true })
     // When the dropdown opens focus on the input field
     this.btnElement.addEventListener('shown.bs.dropdown', () => this.inputElement.focus())
     // Filter the list when the user types in the text input
@@ -43,25 +40,36 @@ export default class SpeciesSelect extends HTMLElement {
     this.resetFilter()
   }
 
-  public async loadSpeciesFromURL(): Promise<Species | null> {
+  // Load the list of all species from the API
+  private async loadSpecies() {
+    if (this.status === 'loaded') return
+    this.status = 'loading'
+    await window.Arbolado.fetchJson(`${import.meta.env.VITE_API_URL}/especies`).then((species) => {
+      this.renderSpecies([this.allSpeciesElement, ...species])
+      this.status = 'loaded'
+      window.Arbolado.emitEvent(this, 'arbolado/species:loaded')
+    })
+  }
+
+  public async setSpeciesFromURL(): Promise<Species | null> {
     return new Promise((resolve) => {
-      if (!this.loaded) {
-        this.addEventListener('arbolado/species:loaded', () => resolve(this.selectSpeciesFromURL()))
+      const path = window.location.pathname.split('/')
+      if (path[1] !== 'especie') return resolve(null)
+      const speciesURL = path[2]
+      if (!speciesURL) return resolve(null)
+      if (this.status === 'idle') this.loadSpecies()
+      if (this.status === 'loading') {
+        this.addEventListener('arbolado/species:loaded', () => resolve(this.selectSpeciesFromURL(speciesURL)))
       } else {
-        resolve(this.selectSpeciesFromURL())
+        resolve(this.selectSpeciesFromURL(speciesURL))
       }
     })
   }
 
-  private selectSpeciesFromURL() {
-    const path = window.location.pathname.split('/')
-    if (path[1] === 'especie') {
-      const speciesURL = path[2]
-      const species = this.species.find((species) => species.url === speciesURL) || null
-      this.selectSpecies(species?.id)
-      return this.value
-    }
-    return null
+  private selectSpeciesFromURL(speciesURL: string) {
+    const species = this.species.find((species) => species.url === speciesURL) || null
+    this.selectSpecies(species?.id)
+    return this.value
   }
 
   private selectSpecies(id?: number) {
@@ -167,10 +175,10 @@ export default class SpeciesSelect extends HTMLElement {
   private resetFilter() {
     this.inputElement.value = ''
     this.listElement.innerHTML = ''
-    this.loadSpecies(this.species)
+    this.renderSpecies(this.species)
   }
 
-  private loadSpecies(species: Species[]) {
+  private renderSpecies(species: Species[]) {
     this.species = species
     this.filtered = [...this.species]
     this.filtered.map((species, index) => this.addSpeciesOption(species, index))
