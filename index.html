@@ -11,8 +11,8 @@
     <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
     <script type="module" src="/src/main.ts"></script>
   </head>
-  <body>
-    <nav class="navbar navbar-expand-lg bg-light">
+  <body class="d-flex flex-column">
+    <nav class="navbar navbar-expand-lg bg-light sticky-top">
       <div class="container-fluid">
         <div class="navbar-header">
           <h1 class="main-title">
@@ -51,7 +51,7 @@
     </nav>
     <div class="container-fluid h-100">
       <div class="row h-100">
-        <aside class="col-12 col-lg-4 col-xl-3 py-4">
+        <aside class="col-12 col-lg-4 col-xl-3 py-4 order-1 order-lg-0">
           <arbolado-form js-arbolado-form>
             <form js-form novalidate>
               <input type="hidden" name="radio" value="1000" js-input="radio">
@@ -184,11 +184,11 @@
               Este mapa cuenta con<br>
               la valiosa colaboración de:
             </p>
-            <a class="col-6" href="https://www.facebook.com/LaCiudadNosRegalaSabores" target="_blank">
-              <img class="img-fluid" src="imgs/colaborador-lcnrs.png" alt="La ciudad nos regala sabores">
+            <a class="col-6 p-4" href="https://www.facebook.com/LaCiudadNosRegalaSabores" target="_blank">
+              <img class="img-fluid" src="/imgs/colaborador-lcnrs.png" alt="La ciudad nos regala sabores">
             </a>
-            <a class="col-6" href="https://www.facebook.com/elrenacerdelalaguna/" target="_blank">
-              <img class="img-fluid" src="imgs/colaborador-laguna-fvet.png" alt="El Renacer de la Laguna - FVET - UBA">
+            <a class="col-6 p-4" href="https://www.facebook.com/elrenacerdelalaguna/" target="_blank">
+              <img class="img-fluid" src="/imgs/colaborador-laguna-fvet.png" alt="El Renacer de la Laguna - FVET - UBA">
             </a>
           </div>
         </aside>
@@ -239,11 +239,6 @@
               </ol>
             </arbolado-address-lookup>
           </div>
-    
-          <button type="button" class="btn btn-primary rounded-circle scroll-top-btn d-lg-none">
-            <i class="fa-solid fa-chevron-up"></i>
-            <span class="visually-hidden">Volver arriba</span>
-          </button>
         </main>
 
       </div>

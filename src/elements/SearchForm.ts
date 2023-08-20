@@ -144,6 +144,7 @@ export default class SearchForm extends HTMLElement {
     const trees = await window.Arbolado.fetchJson(requestUrl)
     window.Arbolado.emitEvent(this, 'arbolado/results:updated', { trees })
     if (!trees?.length) this.noResultsModal.show()
+    else window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
   }
 
   public setMarker(latLng: LatLng) {

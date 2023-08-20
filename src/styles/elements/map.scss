@@ -4,3 +4,10 @@
   position: relative;
   z-index: 1;
 }
+
+@include media-breakpoint-down(lg) {
+  .map-container {
+    height: 600px;
+  }
+}
+
