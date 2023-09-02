@@ -16,7 +16,7 @@
       <div class="container-fluid">
         <div class="navbar-header">
           <h1 class="main-title">
-            <a class="navbar-brand" href="/">
+            <a class="navbar-brand pt-2 d-block" href="/">
               <img src="/imgs/logo.png" alt="" width="50" height="50">
               Arbolado Urbano
             </a>
@@ -164,30 +164,30 @@
                   </div>
                 </div>
                 <div class="col-12">
-                  <button type="button" class="btn btn-secondary collapsed" data-bs-toggle="collapse" data-bs-target="#filters" aria-expanded="false" aria-controls="filters">
+                  <button type="button" class="btn btn-outline-secondary collapsed" data-bs-toggle="collapse" data-bs-target="#filters" aria-expanded="false" aria-controls="filters">
                     <span class="collapsed-hide">Ocultar</span>
                     <span class="collapsed-show">Mostrar</span>
                     filtros
                   </button>
                 </div>
               </div>
-              <button type="submit" class="btn btn-primary btn-lg btn-block mt-4 w-100" js-search-btn>
+              <button type="submit" class="btn btn-primary btn-block mt-4 w-100 text-white" js-search-btn>
                 Buscar
               </button>
             </form>
           </arbolado-form>
     
-          <arbolado-google-ads></arbolado-google-ads>
+          <arbolado-google-ads class="mt-4 d-block"></arbolado-google-ads>
     
-          <div class="row text-center mt-4">
+          <div class="row text-center mt-4" id="colaboran">
             <p class="col-12 text-muted">
               Este mapa cuenta con<br>
               la valiosa colaboración de:
             </p>
-            <a class="col-6 p-4" href="https://www.facebook.com/LaCiudadNosRegalaSabores" target="_blank">
+            <a class="col-6 p-4" href="https://www.instagram.com/laciudadnosregalasabores/" target="_blank">
               <img class="img-fluid" src="/imgs/colaborador-lcnrs.png" alt="La ciudad nos regala sabores">
             </a>
-            <a class="col-6 p-4" href="https://www.facebook.com/elrenacerdelalaguna/" target="_blank">
+            <a class="col-6 p-4" href="https://www.instagram.com/elrenacerdelalaguna/" target="_blank">
               <img class="img-fluid" src="/imgs/colaborador-laguna-fvet.png" alt="El Renacer de la Laguna - FVET - UBA">
             </a>
           </div>
@@ -212,7 +212,7 @@
           </arbolado-map>
     
           <div class="floating-content">
-            <button type="button" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#add-tree-modal">
+            <button type="button" class="btn btn-secondary mb-2" data-bs-toggle="modal" data-bs-target="#add-tree-modal">
               <i class="fa-solid fa-plus-square"></i>
               Agregar árbol
             </button>

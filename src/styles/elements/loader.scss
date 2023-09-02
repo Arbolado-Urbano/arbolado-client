@@ -1,4 +1,4 @@
-$loader-bg: rgba(25, 25, 25, .4);
+$loader-bg: rgba(255, 255, 255, .8);
 
 .loader {
   align-items: center;
@@ -18,8 +18,9 @@ $loader-bg: rgba(25, 25, 25, .4);
 }
 
 .loader__spinner {
-  height: 60px;
-  width: 60px;
+  height: 32px;
+  width: 32px;
+  color: $color-turquoise;
 
   @include media-breakpoint-down('sm') {
     height: 40px;
@@ -28,7 +29,8 @@ $loader-bg: rgba(25, 25, 25, .4);
 }
 
 .loader__text {
-  font-size: rem(96px);
+  color: $color-turquoise;
+  font-size: rem(32px);
   font-weight: 300;
 
   @include media-breakpoint-down('sm') {

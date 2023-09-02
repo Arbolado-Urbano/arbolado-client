@@ -22,9 +22,7 @@ export default class MapElement extends HTMLElement {
           accessToken: environment.mapboxToken,
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
           subdomains: 'abcd',
-          maxZoom: 21,
-          tileSize: 512,
-          zoomOffset: -1,
+          maxZoom: 21
         },
       ),
     ],
