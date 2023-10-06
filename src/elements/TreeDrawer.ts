@@ -111,7 +111,7 @@ export default class TreeModal extends HTMLElement {
   
   private setTreeSources(tree: Tree) {
     const sourcesElement = this.querySelector('[js-sources]') as HTMLDivElement
-    sourcesElement.innerText = ''
+    sourcesElement.innerHTML = ''
     for (const record of tree.records) {
       const { fecha_creacion } = record
       const { id, descripcion, email, nombre, facebook, instagram, twitter, url } = record.source
@@ -150,7 +150,7 @@ export default class TreeModal extends HTMLElement {
       else instagramElement.href = instagram
       if (!twitter) twitterElement.remove()
       else twitterElement.href = twitter
-      sourcesElement?.appendChild(sourceElement)
+      sourcesElement.appendChild(sourceElement)
     }
   }
 
