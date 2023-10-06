@@ -110,7 +110,8 @@ export default class TreeModal extends HTMLElement {
   }
   
   private setTreeSources(tree: Tree) {
-    const sourcesElement = this.querySelector('[js-sources]')
+    const sourcesElement = this.querySelector('[js-sources]') as HTMLDivElement
+    sourcesElement.innerText = ''
     for (const record of tree.records) {
       const { fecha_creacion } = record
       const { id, descripcion, email, nombre, facebook, instagram, twitter, url } = record.source
