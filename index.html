@@ -271,7 +271,6 @@
         <span js-tree-data="familia"></span>
         <span js-tree-data="origen"></span>
         <span js-tree-data="procedencia_exotica"></span>
-        <span js-tree-data="regiones"></span>
         <span js-tree-data="altura"></span>
       </p>
       <p>
@@ -282,32 +281,18 @@
       </p>
       <div class="card border-primary mb-4">
         <div class="card-header bg-primary">
-          <h4>
+          <h4 class="mb-0">
             Fuentes
           </h4>
         </div>
         <div class="card-body">
-          <p>
-            <span js-tree-data="nombre"></span>
-          </p>
+          <div class="accordion" js-sources></div>
           <p>
             <small class="d-grid">
               <span js-tree-data="fecha_creacion"></span>
               <span js-tree-data="descripcion"></span>
             </small>
           </p>
-          <a js-tree-data="url" href="" target="_blank" class="tree-drawer__link badge badge-pill badge-secondary me-2">
-            <i class="fa-solid fa-link"></i>
-          </a>
-          <a js-tree-data="facebook" href="" target="_blank" class="tree-drawer__link badge badge-pill badge-secondary me-2">
-            <i class="fa-brands fa-facebook-f"></i>
-          </a>
-          <a js-tree-data="instagram" href="" target="_blank" class="tree-drawer__link badge badge-pill badge-secondary me-2">
-            <i class="fa-brands fa-instagram"></i>
-          </a>
-          <a js-tree-data="twitter" href="" target="_blank" class="tree-drawer__link badge badge-pill badge-secondary me-2">
-            <i class="fa-brands fa-twitter"></i>
-          </a>
         </div>
       </div>
       <div class="card">
@@ -340,6 +325,34 @@
           </p>
         </div>
       </div>
+      <template js-template="source-accordion">
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" aria-expanded="false" aria-controls="" js-accordion-btn>
+            </button>
+          </h2>
+          <div id="" class="accordion-collapse collapse" js-accordion>
+            <div class="accordion-body" js-accordion-body>
+              <p js-source-description></p>
+              <a js-source-email href="" target="_blank" class="tree-drawer__link badge badge-pill badge-secondary me-2">
+                <i class="fa-solid text-dark fa-mail"></i>
+              </a>
+              <a js-source-url href="" target="_blank" class="tree-drawer__link badge badge-pill badge-secondary me-2">
+                <i class="fa-solid text-dark fa-link"></i>
+              </a>
+              <a js-source-facebook href="" target="_blank" class="tree-drawer__link badge badge-pill badge-secondary me-2">
+                <i class="fa-brands text-dark fa-facebook-f"></i>
+              </a>
+              <a js-source-instagram href="" target="_blank" class="tree-drawer__link badge badge-pill badge-secondary me-2">
+                <i class="fa-brands text-dark fa-instagram"></i>
+              </a>
+              <a js-source-twitter href="" target="_blank" class="tree-drawer__link badge badge-pill badge-secondary me-2">
+                <i class="fa-brands text-dark fa-twitter"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </template>
     </arbolado-tree-drawer>
 
     <!-- Overlay used only by the tree drawer for now -->

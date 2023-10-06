@@ -109,15 +109,15 @@ export default class MapElement extends HTMLElement {
     for (const tree of trees) {
       // Select the tree's icon or use the default if none
       let icon = this.icons.default
-      if (tree.icono) {
-        if (!this.icons[tree.icono]) {
-          this.icons[tree.icono] = new L.Icon({
+      if (tree.species.icono) {
+        if (!this.icons[tree.species.icono]) {
+          this.icons[tree.species.icono] = new L.Icon({
             iconAnchor: [15, 31],
             iconSize: [30, 34],
-            iconUrl: `/imgs/markers/${tree.icono}`,
+            iconUrl: `/imgs/markers/${tree.species.icono}`,
           })
         }
-        icon = this.icons[tree.icono]
+        icon = this.icons[tree.species.icono]
       }
       // Add a tree marker for the tree to the treeMarkers
       this.treeMarkers.addLayer(
@@ -228,7 +228,7 @@ export default class MapElement extends HTMLElement {
    * Emits an event with the id of a tree
    * @param id - ID to emit
    */
-  public selectTree(id: string): void {
+  public selectTree(id: number): void {
     // Emit the selected tree's ID
     window.Arbolado.emitEvent(this, 'arbolado/tree:selected', { id })
   }

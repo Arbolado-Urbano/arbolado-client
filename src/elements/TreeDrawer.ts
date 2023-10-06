@@ -29,12 +29,15 @@ export default class TreeModal extends HTMLElement {
   private closeBtn: HTMLButtonElement
   private treeData: TreeData
   private previousUrl?: string
+  private sourceAccordionTemplate: HTMLTemplateElement
   
   constructor() {
     super()
     this.close = this.close.bind(this)
     this.handleFocusOut = this.handleFocusOut.bind(this)
     this.handleKeyDown = this.handleKeyDown.bind(this)
+
+    this.sourceAccordionTemplate = this.querySelector('[js-template="source-accordion"]') as HTMLTemplateElement
     
     const { VITE_GOOGLE_MAPS_STREET_VIEW_URL, VITE_GOOGLE_MAPS_API_KEY } = import.meta.env
     this.streetViewUrl = `${VITE_GOOGLE_MAPS_STREET_VIEW_URL}&key=${VITE_GOOGLE_MAPS_API_KEY}`
@@ -54,7 +57,7 @@ export default class TreeModal extends HTMLElement {
       altura: { element: this.querySelector('[js-tree-data="altura"]') as HTMLElement, label: 'Altura:' },
       espacio_verde: { element: this.querySelector('[js-tree-data="espacio_verde"]') as HTMLElement },
       calle: { element: this.querySelector('[js-tree-data="calle"]') as HTMLElement },
-      nombre: { element: this.querySelector('[js-tree-data="nombre"]') as HTMLElement, label: 'Dato aprotado por' },
+      nombre: { element: this.querySelector('[js-tree-data="nombre"]') as HTMLElement, label: 'Datos aprotados por' },
       fecha_creacion: { element: this.querySelector('[js-tree-data="fecha_creacion"]') as HTMLElement },
       descripcion: { element: this.querySelector('[js-tree-data="descripcion"]') as HTMLElement },
       url: { element: this.querySelector('[js-tree-data="url"]') as HTMLAnchorElement },
@@ -105,6 +108,50 @@ export default class TreeModal extends HTMLElement {
       this.close(false)
     }
   }
+  
+  private setTreeSources(tree: Tree) {
+    const sourcesElement = this.querySelector('[js-sources]')
+    for (const record of tree.records) {
+      const { fecha_creacion } = record
+      const { id, descripcion, email, nombre, facebook, instagram, twitter, url } = record.source
+      const sourceElement = this.sourceAccordionTemplate.content.cloneNode(true) as HTMLElement
+      const accordionBtn = sourceElement.querySelector('[js-accordion-btn]') as HTMLButtonElement
+      const accordion = sourceElement.querySelector('[js-accordion]') as HTMLDivElement
+      const accordionBody = sourceElement.querySelector('[js-accordion-body]') as HTMLDivElement
+      accordion.id = `tree-source-accordion-${id}`
+      accordionBtn.innerText = `${this.formatDate(fecha_creacion)} - ${nombre}`
+      accordionBtn.setAttribute('aria-controls', `#${accordion.id}`)
+      accordionBtn.addEventListener('click', () => {
+        if (accordion.classList.contains('show')) {
+          accordion.classList.remove('show')
+          accordionBtn.classList.add('collapsed')
+          accordionBtn.setAttribute('aria-expanded', 'false')
+        } else {
+          accordion.classList.add('show')
+          accordionBtn.classList.remove('collapsed')
+          accordionBtn.setAttribute('aria-expanded', 'true')
+        }
+      })
+      const descriptionElement = accordionBody.querySelector('[js-source-description]') as HTMLParagraphElement
+      const emailElement = accordionBody.querySelector('[js-source-email]') as HTMLAnchorElement
+      const urlElement = accordionBody.querySelector('[js-source-url]') as HTMLAnchorElement
+      const facebookElement = accordionBody.querySelector('[js-source-facebook]') as HTMLAnchorElement
+      const instagramElement = accordionBody.querySelector('[js-source-instagram]') as HTMLAnchorElement
+      const twitterElement = accordionBody.querySelector('[js-source-twitter]') as HTMLAnchorElement
+      descriptionElement.innerText = descripcion
+      if (!email) emailElement.remove()
+      else emailElement.href = email
+      if (!url) urlElement.remove()
+      else urlElement.href = url
+      if (!facebook) facebookElement.remove()
+      else facebookElement.href = facebook
+      if (!instagram) instagramElement.remove()
+      else instagramElement.href = instagram
+      if (!twitter) twitterElement.remove()
+      else twitterElement.href = twitter
+      sourcesElement?.appendChild(sourceElement)
+    }
+  }
 
   private formatDate(dateString: string) {
     const date = new Date(dateString)
@@ -120,31 +167,23 @@ export default class TreeModal extends HTMLElement {
       tree.streetview = `${this.streetViewUrl}&location=${tree.lat},${tree.lng}`
     }
 
-    if (tree.fecha_creacion) tree.fecha_creacion = this.formatDate(tree.fecha_creacion)
-    if (tree.altura) tree.altura += ' m'
+    if (tree.records[0].altura) tree.records[0].altura += ' m'
 
     const treeLink = `/arbol/${tree.id}`
     
-    this.setTreeValue('nombre_cientifico', tree.nombre_cientifico)
-    this.setTreeValue('nombre_comun', tree.nombre_comun)
-    this.setTreeValue('tipo', tree.tipo)
-    this.setTreeValue('familia', tree.familia)
-    this.setTreeValue('origen', tree.origen)
-    this.setTreeValue('procedencia_exotica', tree.procedencia_exotica)
-    this.setTreeValue('regiones', tree.regiones)
-    this.setTreeValue('altura', tree.altura)
+    this.setTreeValue('nombre_cientifico', tree.species.nombre_cientifico)
+    this.setTreeValue('nombre_comun', tree.species.nombre_comun)
+    this.setTreeValue('tipo', tree.species.type.tipo)
+    this.setTreeValue('familia', tree.species.family.familia)
+    this.setTreeValue('origen', tree.species.origen)
+    this.setTreeValue('procedencia_exotica', tree.species.procedencia_exotica)
+    this.setTreeValue('altura', tree.records[0].altura)
     this.setTreeValue('espacio_verde', tree.espacio_verde ? `Espacio verde: ${tree.espacio_verde}` : undefined)
     this.setTreeValue('calle', `${tree.calle || ''} ${tree.calle_altura ? tree.calle_altura : 's/n'}`)
-    this.setTreeValue('nombre', tree.nombre)
-    this.setTreeValue('fecha_creacion', tree.fecha_creacion)
-    this.setTreeValue('descripcion', tree.descripcion)
-    this.setTreeValue('id', tree.id)
-    this.setTreeValue('url', tree.url || '', 'href')
-    this.setTreeValue('facebook', tree.facebook || '', 'href')
-    this.setTreeValue('instagram', tree.instagram || '', 'href')
-    this.setTreeValue('twitter', tree.twitter || '', 'href')
+    this.setTreeValue('id', tree.id.toString())
     this.setTreeValue('link', treeLink, 'href')
     this.setTreeValue('streetview', tree.streetview, 'src')
+    this.setTreeSources(tree)
 
     // Open the drawer
     this.classList.add('show')
