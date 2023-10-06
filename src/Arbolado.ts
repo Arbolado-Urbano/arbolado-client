@@ -42,7 +42,9 @@ export default class Arbolado {
   async fetch(url: string, method: string = 'GET', body?: BodyInit, headers?: HeadersInit, loadingIndicator: boolean = true) {
     if (loadingIndicator) this.setLoading(true)
     try {
-      return await fetch(url, { method, headers, body })
+      const response = await fetch(url, { method, headers, body })
+      if ((response.status >= 400)) throw response
+      return response
     } catch (error) {
       console.error(error)
     } finally {

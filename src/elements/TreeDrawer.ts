@@ -161,7 +161,8 @@ export default class TreeModal extends HTMLElement {
   }
 
   async displayTree(treeId: string, updateURL: boolean = true) {
-    const tree: Tree = await window.Arbolado.fetchJson(`${import.meta.env.VITE_API_URL}/arboles/${treeId}`)
+    const tree: Tree | undefined = await window.Arbolado.fetchJson(`${import.meta.env.VITE_API_URL}/arboles/${treeId}`)
+    if (!tree) return
     // If there's no streetview URL for the tree, use its coordinates
     if (!tree.streetview) {
       tree.streetview = `${this.streetViewUrl}&location=${tree.lat},${tree.lng}`
