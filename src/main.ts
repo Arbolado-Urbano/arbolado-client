@@ -32,7 +32,7 @@ window.Arbolado.ready(() => {
   const searchForm = document.querySelector('[js-arbolado-form]') as SearchForm
   const mapElement = document.querySelector('[js-arbolado-map]') as MapElement
   const treeDrawer = document.querySelector('[js-tree-drawer]') as TreeDrawer
-  searchForm.addEventListener('arbolado/results:updated', (event) => mapElement.displayTrees((event as CustomEvent).detail.trees))
+  document.addEventListener('arbolado/results:updated', (event) => mapElement.displayTrees((event as CustomEvent).detail.trees))
   searchForm.addEventListener('arbolado/marker:remove', () => mapElement.removeMarker())
   mapElement.addEventListener('arbolado/maker:set', (event) => searchForm.setMarker((event as CustomEvent).detail.latLng))
   mapElement.addEventListener('arbolado/tree:selected', (event) => treeDrawer.displayTree((event as CustomEvent).detail.id))
@@ -44,4 +44,7 @@ window.Arbolado.ready(() => {
   document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((element) => new bootstrap.Tooltip(element))
   // Init Bootstrap's popovers
   document.querySelectorAll('[data-bs-toggle="popover"]').forEach(element => new bootstrap.Popover(element))
+
+  // Check to see if a source is selected on the URL
+  window.Arbolado.loadSourceFromURL()
 })

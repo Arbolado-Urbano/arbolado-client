@@ -105,4 +105,16 @@ export default class Arbolado {
       document.body.classList.remove('disable-scroll')
     }
   }
+
+  loadSourceFromURL() {
+    const path = window.location.pathname.split('/')
+    if (path[1] !== 'fuente') return
+    const fuenteUrl = path[2]
+    if (!fuenteUrl) return
+    window.Arbolado.fetchJson(`${import.meta.env.VITE_API_URL}/fuentes/${fuenteUrl}`, 'GET').then((trees) => {
+      if (!trees?.length) return
+      window.Arbolado.emitEvent(document, 'arbolado/results:updated', { trees })
+      window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
+    })
+  }
 }

@@ -142,7 +142,7 @@ export default class SearchForm extends HTMLElement {
     // Make the search
     let requestUrl = `${import.meta.env.VITE_API_URL}/arboles?${searchQueryParams.toString()}`
     const trees = await window.Arbolado.fetchJson(requestUrl)
-    window.Arbolado.emitEvent(this, 'arbolado/results:updated', { trees })
+    window.Arbolado.emitEvent(document, 'arbolado/results:updated', { trees })
     if (!trees?.length) this.noResultsModal.show()
     else window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
   }
