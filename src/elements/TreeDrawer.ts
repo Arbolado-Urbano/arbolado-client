@@ -114,7 +114,7 @@ export default class TreeModal extends HTMLElement {
     sourcesElement.innerHTML = ''
     for (const record of tree.records) {
       const { fecha_creacion } = record
-      const { id, descripcion, email, nombre, facebook, instagram, twitter, url } = record.source
+      const { id, descripcion, nombre, facebook, instagram, twitter, url } = record.source
       const sourceElement = this.sourceAccordionTemplate.content.cloneNode(true) as HTMLElement
       const accordionBtn = sourceElement.querySelector('[js-accordion-btn]') as HTMLButtonElement
       const accordion = sourceElement.querySelector('[js-accordion]') as HTMLDivElement
@@ -134,14 +134,11 @@ export default class TreeModal extends HTMLElement {
         }
       })
       const descriptionElement = accordionBody.querySelector('[js-source-description]') as HTMLParagraphElement
-      const emailElement = accordionBody.querySelector('[js-source-email]') as HTMLAnchorElement
       const urlElement = accordionBody.querySelector('[js-source-url]') as HTMLAnchorElement
       const facebookElement = accordionBody.querySelector('[js-source-facebook]') as HTMLAnchorElement
       const instagramElement = accordionBody.querySelector('[js-source-instagram]') as HTMLAnchorElement
       const twitterElement = accordionBody.querySelector('[js-source-twitter]') as HTMLAnchorElement
       descriptionElement.innerText = descripcion
-      if (!email) emailElement.remove()
-      else emailElement.href = email
       if (!url) urlElement.remove()
       else urlElement.href = url
       if (!facebook) facebookElement.remove()

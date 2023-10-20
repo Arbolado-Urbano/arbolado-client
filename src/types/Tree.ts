@@ -27,7 +27,6 @@ declare type Tree = {
     source: {
       id: number
       nombre: string
-      email: string
       descripcion: string
       facebook?: string
       instagram?: string
