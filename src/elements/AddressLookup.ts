@@ -1,5 +1,3 @@
-import { LatLng, LatLngBounds } from 'leaflet'
-
 import NominatimResponse from '../types/NominatimResponse'
 import MapElement from './MapElement'
 
@@ -43,7 +41,7 @@ export default class AddresLookup extends HTMLElement {
     this.toggleLoading(true)
     const bounds = this.mapElement.getMapBounds(); // Get the current map bounds
     // Search withing the map bounds
-    const results = await this.addressLookup(this.inputElement.value, bounds)
+    const results = await window.Arbolado.addressLookup(this.inputElement.value, bounds)
     // Load the search results
     if (results.length) {
       this.resultsElement.classList.remove('d-none')
@@ -69,28 +67,5 @@ export default class AddresLookup extends HTMLElement {
     this.mapElement.setMarker(address.latlng)
     this.inputElement.value = address.displayName
     this.resultsElement.classList.add('d-none')
-  }
-
-  // Looks up an address or place and returns its coordinates.
-  private async addressLookup(query: string, bounds: LatLngBounds): Promise<NominatimResponse[]> {
-    const { VITE_NOMINATIM_URL } = import.meta.env
-    const data = new URLSearchParams({
-      'accept-language': 'es',
-      addressdetails: '1',
-      bounded: '1',
-      format: 'json',
-      q: query,
-      viewbox: bounds.toBBoxString(),
-    })
-    const url = `${VITE_NOMINATIM_URL}?${data.toString()}`
-    const response = await window.Arbolado.fetchJson(url, 'GET', undefined, undefined, false)
-    return response.map((item: any) => {
-      return {
-        latlng: new LatLng(item.lat, item.lon),
-        displayName: item.display_name,
-        type: item.type,
-        address: item.address,
-      }
-    })
   }
 }

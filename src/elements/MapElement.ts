@@ -11,7 +11,7 @@ const environment = {
 }
 
 export default class MapElement extends HTMLElement {
-  private map: L.Map // Map reference
+  private map!: L.Map // Map reference
   private mapFitToBoundsOptions: L.FitBoundsOptions = { maxZoom: 15, padding: [15, 15] } // To zoom into search results
   private options: L.MapOptions = { // Map options
     center: L.latLng(-34.618, -58.44), // BsAs
@@ -28,7 +28,7 @@ export default class MapElement extends HTMLElement {
     ],
     maxZoom: 21,
     minZoom: 5,
-    zoom: 12,
+    zoom: 13,
   }
   private clusterOptions = {
     disableClusteringAtZoom: environment.mapDisableClusteringAt,
@@ -44,10 +44,10 @@ export default class MapElement extends HTMLElement {
     spiderfyDistanceMultiplier: 2,
     zoomToBoundsOnClick: true,
   }
-  private markerPopupTemplate: HTMLTemplateElement
+  private markerPopupTemplate!: HTMLTemplateElement
   private marker?: L.Marker // Marker
   private circle?: L.Circle // Circle around marker indicating search radius
-  private treeMarkers: L.MarkerClusterGroup // Trees from search result
+  private treeMarkers!: L.MarkerClusterGroup // Trees from search result
   private icons: { [key: string]: L.Icon } = {
     default: new L.Icon({
       iconAnchor: [15, 31],
@@ -58,8 +58,15 @@ export default class MapElement extends HTMLElement {
 
   constructor() {
     super()
+    this.initMap()
+  }
+
+  private async initMap() {
     this.treeMarkers = L.markerClusterGroup(this.clusterOptions)
-    this.map = L.map('map', this.options)
+    const options = { ...this.options }
+    const center = await this.getLocationFromURL()
+    if (center) options.center = center
+    this.map = L.map('map', options)
     this.map.addLayer(this.treeMarkers)
     this.map.on('click', (event: any) => {
       this.setMarker(event.latlng)
@@ -81,6 +88,15 @@ export default class MapElement extends HTMLElement {
         window.Arbolado.pushQueryParams()
       }
     }
+  }
+  
+  private async getLocationFromURL(): Promise<L.LatLng | undefined> {
+    const path = window.location.pathname.split('/')
+    if (path[1] !== 'ubicacion') return undefined
+    const ubicacion = path[2]
+    if (!ubicacion) return undefined
+    const results = await window.Arbolado.addressLookup(ubicacion)
+    return results[0]?.latlng
   }
 
   /**

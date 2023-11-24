@@ -1,3 +1,6 @@
+import { LatLng, LatLngBounds } from 'leaflet'
+import NominatimResponse from './types/NominatimResponse'
+
 export default class Arbolado {
   overlay: HTMLElement 
   queryParams: URLSearchParams
@@ -115,6 +118,29 @@ export default class Arbolado {
       if (!trees?.length) return
       window.Arbolado.emitEvent(document, 'arbolado/results:updated', { trees })
       window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
+    })
+  }
+
+  // Looks up an address or place and returns its coordinates.
+  async addressLookup(query: string, bounds?: LatLngBounds): Promise<NominatimResponse[]> {
+    const { VITE_NOMINATIM_URL } = import.meta.env
+    const data = new URLSearchParams({
+      'accept-language': 'es',
+      addressdetails: '1',
+      bounded: '1',
+      format: 'json',
+      q: query,
+    })
+    if (bounds) data.set('viewbox', bounds.toBBoxString())
+    const url = `${VITE_NOMINATIM_URL}?${data.toString()}`
+    const response = await window.Arbolado.fetchJson(url, 'GET', undefined, undefined, false)
+    return response.map((item: any) => {
+      return {
+        latlng: new LatLng(item.lat, item.lon),
+        displayName: item.display_name,
+        type: item.type,
+        address: item.address,
+      }
     })
   }
 }
