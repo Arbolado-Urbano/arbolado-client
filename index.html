@@ -39,14 +39,21 @@
         <div class="collapse navbar-collapse" id="main-menu">
           <ul class="navbar-nav ms-auto my-2 my-lg-0">
             <li class="nav-item">
-              <a class="nav-link" href="./notas/" target="_blank">
+              <a class="nav-link" href="/notas" target="_blank">
                 <i class="fas fw fa-solid fa-file-pen"></i>
                 Notas
               </a>
-            </li><li class="nav-item">
-              <button class="nav-link" type="button" data-bs-toggle="modal" data-bs-target="#about-modal">
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" type="button" data-bs-toggle="modal" data-bs-target="#instructions-modal">
                 <i class="fas fw fa-question-circle"></i>
-                Sobre el mapa
+                Ayuda
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" type="button" data-bs-toggle="modal" data-bs-target="#about-modal">
+                <i class="fas fw fa-circle-info"></i>
+                Proyecto
               </button>
             </li>
             <li class="nav-item">
@@ -601,7 +608,7 @@
     </div>
 
     <!-- Instructions Modal -->
-    <div class="modal" tabindex="-1" aria-hidden="true" aria-labelledby="instructions-title" role="dialog" js-instructions-modal>
+    <div id="instructions-modal" class="modal" tabindex="-1" aria-hidden="true" aria-labelledby="instructions-title" role="dialog">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
@@ -612,14 +619,15 @@
             </button>
            </div>
           <div class="modal-body">
-            Para empezar hacé click en el mapa para colocar una marca y buscar por zona o en el botón de filtros para seleccionar una especie.
+            Para empezar podés:
+            <ul>
+              <li>Hacer click en el mapa para colocar una marca <i class="fa-solid fa-map-marker-alt"></i> y buscar por zona</li>
+              <li>Hacer click en el botón de filtros <i class="fa-solid fa-sliders"></i> para seleccionar una especie</li>
+            </ul>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">
               Cerrar
-            </button>
-            <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" js-instructions-close-hard>
-              No volver a mostrar
             </button>
           </div>
         </div>

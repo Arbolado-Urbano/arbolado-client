@@ -46,12 +46,5 @@ window.Arbolado.ready(async () => {
   document.querySelectorAll('[data-bs-toggle="popover"]').forEach(element => new bootstrap.Popover(element))
 
   // Check to see if a source is selected on the URL
-  if (!await window.Arbolado.loadSourceFromURL()) {
-    // Display instructions modal
-    const InstructionsModalHardCloseBtn = document.querySelector('[js-instructions-close-hard]') as HTMLButtonElement
-    InstructionsModalHardCloseBtn.addEventListener('click', () => localStorage.setItem('hide-instructions', 'true'))
-    if (localStorage.getItem('hide-instructions') !== 'true') {
-      (new bootstrap.Modal(document.querySelector('[js-instructions-modal]') as HTMLElement)).show()
-    }
-  }
+  await window.Arbolado.loadSourceFromURL()
 })
