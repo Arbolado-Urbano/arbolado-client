@@ -19,6 +19,7 @@ export default class SearchForm extends HTMLElement {
   private patagonica: HTMLInputElement
   private species: SpeciesSelect
   private radio: HTMLInputElement
+  private filtersSidebar: bootstrap.Offcanvas
   
   constructor() {
     super()
@@ -36,6 +37,7 @@ export default class SearchForm extends HTMLElement {
     this.pampeana = this.querySelector('[js-input="pampeana"]') as HTMLInputElement
     this.patagonica = this.querySelector('[js-input="patagonica"]') as HTMLInputElement
     this.species = this.querySelector('[js-input="species"]') as SpeciesSelect
+    this.filtersSidebar = new bootstrap.Offcanvas(document.querySelector('[js-filters-menu]') as HTMLElement)
     // Emit an event when the user selects "En todo el mapa" so the map can be notified and removes the marker
     this.markerAll.addEventListener('change', () => window.Arbolado.emitEvent(this, 'arbolado/marker:remove'))
     // Submit handler
@@ -138,6 +140,9 @@ export default class SearchForm extends HTMLElement {
     } else {
       if (updateURL) window.Arbolado.pushURL('')
     }
+
+    // Close the filters sidebar
+    this.filtersSidebar.hide()
 
     // Make the search
     let requestUrl = `${import.meta.env.VITE_API_URL}/arboles?${searchQueryParams.toString()}`

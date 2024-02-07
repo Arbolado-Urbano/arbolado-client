@@ -67,149 +67,8 @@
     </nav>
     <div class="container-fluid h-100">
       <div class="row h-100">
-        <aside class="col-12 col-lg-4 col-xl-3 py-4 order-1 order-lg-0">
-          <arbolado-form js-arbolado-form>
-            <form js-form novalidate>
-              <input type="hidden" name="radio" value="1000" js-input="radio">
-              <div class="row">
-                <div class="col-12">
-                  <div class="mb-3">
-                    <h2>
-                      ¿Dónde?
-                    </h2>
-                    <div class="form-check form-check-inline">
-                      <input type="radio" id="marker-all" name="marker" class="form-check-input" value="" js-input="marker-all">
-                      <label class="form-check-label" for="marker-all">
-                        En todo el mapa
-                      </label>
-                    </div>
-                    <div class="custom-control custom-radio form-check-inline" data-bs-toggle="tooltip" data-bs-title="Hacé click en el mapa para colocar una marca.">
-                      <input type="radio" id="marker-point" name="marker" class="form-check-input" value="1" disabled js-input="marker-point">
-                      <label class="form-check-label" for="marker-point">
-                        Marcar en el mapa
-                      </label>
-                    </div>
-                  </div>
-                </div>
-            
-                <div class="col-12">
-                  <div class="mb-3">
-                    <h2>
-                      ¿Qué especie?
-                    </h2>
-                    <arbolado-species-select name="species" js-input="species">
-                      <div class="btn-group dropdown w-100">
-                        <button type="button" class="form-select text-start species-select__btn" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="species-dropdown" js-species-select-btn>
-                          Todas
-                        </button>
-                        <div id="species-dropdown" class="dropdown-menu w-100 px-2 pb-0 mt-2" role="menu" js-species-dropdown>
-                          <input class="form-control w-100" type="text" placeholder="Buscar" js-species-select-input autocomplete="off">
-                          <ul class="species-select__list mt-2 mb-0 p-0" js-species-select-list>
-                            <div class="text-center my-5">
-                              <div class="spinner-border spinner-border-lg text-primary" role="status">
-                                <span class="visually-hidden">Cargando...</span>
-                              </div>
-                            </div>
-                          </ul>
-                        </div>
-                      </div>
-                      <template js-template="species-select-item">
-                        <li class="dropdown-item px-2" js-species-select-item>
-                          <button type="button" class="species-select__item__btn" js-species-select-item-btn>
-                            <span js-scientific-name></span>
-                            <small class="muted-text" js-common-name></small>
-                          </button>
-                        </li>
-                      </template>
-                    </arbolado-species-select>
-                  </div>
-                </div>
-            
-                <div class="col-12 accordion-collapse collapse" id="filters">
-                  <div class="mb-3">
-                    <h2>
-                      Sabores
-                    </h2>
-                    <div class="form-check form-switch">
-                      <input type="checkbox" class="form-check-input" id="input-flavors" name="flavors" js-input="flavors">
-                      <label class="form-check-label" for="input-flavors">
-                        Frutales y medicinales
-                      </label>
-                    </div>
-                  </div>
-            
-                  <div class="mb-3">
-                    <div class="regiones">
-                      <h2>
-                        Región de origen
-                        <a href="#" id="origen" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Por el momento el mapa permite filtrar especies para las distintas regiones de origen sólo dentro de Argentina, ¡esperamos ampliar esta sección pronto!">
-                          <i class="fas fa-question-circle"></i>
-                        </a>
-                      </h2>
-                      <div class="form-check form-switch form-check-inline">
-                        <input type="checkbox" class="form-check-input" id="borigen_pampeana" name="pampeana" value="1" js-input="pampeana">
-                        <label class="form-check-label" for="borigen_pampeana">
-                          Pampeana
-                        </label>
-                      </div>
-                      <div class="form-check form-switch form-check-inline">
-                        <input type="checkbox" class="form-check-input" id="borigen_nea" name="nea" value="1" js-input="nea">
-                        <label class="form-check-label" for="borigen_nea">
-                          NEA
-                        </label>
-                      </div>
-                      <div class="form-check form-switch form-check-inline">
-                        <input type="checkbox" class="form-check-input" id="borigen_noa" name="noa" value="1" js-input="noa">
-                        <label class="form-check-label" for="borigen_noa">
-                          NOA
-                        </label>
-                      </div>
-                      <div class="form-check form-switch form-check-inline">
-                        <input type="checkbox" class="form-check-input" id="borigen_cuyana" name="cuyana" value="1" js-input="cuyana">
-                        <label class="form-check-label" for="borigen_cuyana">
-                          Cuyana
-                        </label>
-                      </div>
-                      <div class="form-check form-switch form-check-inline">
-                        <input type="checkbox" class="form-check-input" id="borigen_patagonica" name="patagonica" value="1" js-input="patagonica">
-                        <label class="form-check-label" for="borigen_patagonica">
-                          Patagónica
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-12">
-                  <button type="button" class="btn btn-outline-secondary collapsed" data-bs-toggle="collapse" data-bs-target="#filters" aria-expanded="false" aria-controls="filters">
-                    <span class="collapsed-hide">Ocultar</span>
-                    <span class="collapsed-show">Mostrar</span>
-                    filtros
-                  </button>
-                </div>
-              </div>
-              <button type="submit" class="btn btn-primary btn-block mt-4 w-100 text-white" js-search-btn>
-                Buscar
-              </button>
-            </form>
-          </arbolado-form>
-    
-          <arbolado-google-ads class="mt-4 d-block"></arbolado-google-ads>
-    
-          <div class="row text-center mt-4" id="colaboran">
-            <p class="col-12 text-muted">
-              Este mapa cuenta con<br>
-              la valiosa colaboración de:
-            </p>
-            <a class="col-6 p-4" href="https://www.instagram.com/laciudadnosregalasabores/" target="_blank">
-              <img class="img-fluid" src="/imgs/colaborador-lcnrs.png" alt="La ciudad nos regala sabores">
-            </a>
-            <a class="col-6 p-4" href="https://www.instagram.com/elrenacerdelalaguna/" target="_blank">
-              <img class="img-fluid" src="/imgs/colaborador-laguna-fvet.png" alt="El Renacer de la Laguna - FVET - UBA">
-            </a>
-          </div>
-        </aside>
 
-        <main class="col-12 col-lg-8 col-xl-9 p-0 position-relative">
+        <main class="p-0 position-relative">
           
           <arbolado-map id="map" js-arbolado-map class="map-container">
             <template js-template="marker-popup">
@@ -217,21 +76,30 @@
                 <button type="button" class="btn btn-primary" js-marker-popup-search>
                   <i class="fas fa-search fa-lg fa-fw"></i>
                   Buscar
-                  <br>
-                  <small>en esta zona</small>
+                </button>
+                <button type="button" class="btn btn-secondary w-100" data-bs-toggle="offcanvas" data-bs-target="#filters-menu">
+                  <i class="fas fa-sliders"></i>
+                  Filtrar
                 </button>
                 <button type="button" class="btn btn-outline-dark" js-marker-popup-clear>
                   <i class="fas fa-trash fa-fw"></i>
+                  Remover
                 </button>
               </div>
             </template>
           </arbolado-map>
     
           <div class="floating-content">
-            <button type="button" class="btn btn-secondary mb-2" data-bs-toggle="modal" data-bs-target="#add-tree-modal">
-              <i class="fa-solid fa-plus-square"></i>
-              Agregar árbol
-            </button>
+            <div class="d-flex gap-1 mb-2">
+              <button type="button" class="btn btn-secondary w-100" data-bs-toggle="modal" data-bs-target="#add-tree-modal">
+                <i class="fa-solid fa-plus-square"></i>
+                Agregar árbol
+              </button>
+              <button id="filters-menu-btn" type="button" class="btn btn-secondary w-100" data-bs-toggle="offcanvas" data-bs-target="#filters-menu">
+                <i class="fas fa-sliders"></i>
+                Filtros
+              </button>
+            </div>
 
             <arbolado-address-lookup class="address-search">
               <div class="address-search__input-wrapper">
@@ -256,6 +124,144 @@
             </arbolado-address-lookup>
           </div>
         </main>
+
+        <aside class="offcanvas offcanvas-end" tabindex="-1" id="filters-menu" aria-labelledby="filters-menu-btn" js-filters-menu>
+          <div class="py-4">
+            <button type="button" class="btn-close position-absolute top-0 end-0 me-2 mt-2" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            <arbolado-form js-arbolado-form>
+              <form js-form novalidate>
+                <input type="hidden" name="radio" value="1000" js-input="radio">
+                <div class="row">
+                  <div class="col-12">
+                    <div class="mb-3">
+                      <h2>
+                        ¿Dónde?
+                      </h2>
+                      <div class="form-check form-check-inline">
+                        <input type="radio" id="marker-all" name="marker" class="form-check-input" value="" js-input="marker-all">
+                        <label class="form-check-label" for="marker-all">
+                          En todo el mapa
+                        </label>
+                      </div>
+                      <div class="custom-control custom-radio form-check-inline" data-bs-toggle="tooltip" data-bs-title="Hacé click en el mapa para colocar una marca.">
+                        <input type="radio" id="marker-point" name="marker" class="form-check-input" value="1" disabled js-input="marker-point">
+                        <label class="form-check-label" for="marker-point">
+                          Marcar en el mapa
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+              
+                  <div class="col-12">
+                    <div class="mb-3">
+                      <h2>
+                        ¿Qué especie?
+                      </h2>
+                      <arbolado-species-select name="species" js-input="species">
+                        <div class="btn-group dropdown w-100">
+                          <button type="button" class="form-select text-start species-select__btn" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="species-dropdown" js-species-select-btn>
+                            Todas
+                          </button>
+                          <div id="species-dropdown" class="dropdown-menu w-100 px-2 pb-0 mt-2" role="menu" js-species-dropdown>
+                            <input class="form-control w-100" type="text" placeholder="Buscar" js-species-select-input autocomplete="off">
+                            <ul class="species-select__list mt-2 mb-0 p-0" js-species-select-list>
+                              <div class="text-center my-5">
+                                <div class="spinner-border spinner-border-lg text-primary" role="status">
+                                  <span class="visually-hidden">Cargando...</span>
+                                </div>
+                              </div>
+                            </ul>
+                          </div>
+                        </div>
+                        <template js-template="species-select-item">
+                          <li class="dropdown-item px-2" js-species-select-item>
+                            <button type="button" class="species-select__item__btn" js-species-select-item-btn>
+                              <span js-scientific-name></span>
+                              <small class="muted-text" js-common-name></small>
+                            </button>
+                          </li>
+                        </template>
+                      </arbolado-species-select>
+                    </div>
+                  </div>
+              
+                  <div class="col-12">
+                    <div class="mb-3">
+                      <h2>
+                        Sabores
+                      </h2>
+                      <div class="form-check form-switch">
+                        <input type="checkbox" class="form-check-input" id="input-flavors" name="flavors" js-input="flavors">
+                        <label class="form-check-label" for="input-flavors">
+                          Frutales y medicinales
+                        </label>
+                      </div>
+                    </div>
+              
+                    <div class="mb-3">
+                      <div class="regiones">
+                        <h2>
+                          Región de origen
+                          <a href="#" id="origen" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Por el momento el mapa permite filtrar especies para las distintas regiones de origen sólo dentro de Argentina, ¡esperamos ampliar esta sección pronto!">
+                            <i class="fas fa-question-circle"></i>
+                          </a>
+                        </h2>
+                        <div class="form-check form-switch form-check-inline">
+                          <input type="checkbox" class="form-check-input" id="borigen_pampeana" name="pampeana" value="1" js-input="pampeana">
+                          <label class="form-check-label" for="borigen_pampeana">
+                            Pampeana
+                          </label>
+                        </div>
+                        <div class="form-check form-switch form-check-inline">
+                          <input type="checkbox" class="form-check-input" id="borigen_nea" name="nea" value="1" js-input="nea">
+                          <label class="form-check-label" for="borigen_nea">
+                            NEA
+                          </label>
+                        </div>
+                        <div class="form-check form-switch form-check-inline">
+                          <input type="checkbox" class="form-check-input" id="borigen_noa" name="noa" value="1" js-input="noa">
+                          <label class="form-check-label" for="borigen_noa">
+                            NOA
+                          </label>
+                        </div>
+                        <div class="form-check form-switch form-check-inline">
+                          <input type="checkbox" class="form-check-input" id="borigen_cuyana" name="cuyana" value="1" js-input="cuyana">
+                          <label class="form-check-label" for="borigen_cuyana">
+                            Cuyana
+                          </label>
+                        </div>
+                        <div class="form-check form-switch form-check-inline">
+                          <input type="checkbox" class="form-check-input" id="borigen_patagonica" name="patagonica" value="1" js-input="patagonica">
+                          <label class="form-check-label" for="borigen_patagonica">
+                            Patagónica
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block mt-4 w-100 text-white" js-search-btn>
+                  Buscar
+                </button>
+              </form>
+            </arbolado-form>
+      
+            <arbolado-google-ads class="mt-4 d-block"></arbolado-google-ads>
+      
+            <div class="row text-center mt-4" id="colaboran">
+              <p class="col-12 text-muted">
+                Este mapa cuenta con<br>
+                la valiosa colaboración de:
+              </p>
+              <a class="col-6 p-4" href="https://www.instagram.com/laciudadnosregalasabores/" target="_blank">
+                <img class="img-fluid" src="/imgs/colaborador-lcnrs.png" alt="La ciudad nos regala sabores">
+              </a>
+              <a class="col-6 p-4" href="https://www.instagram.com/elrenacerdelalaguna/" target="_blank">
+                <img class="img-fluid" src="/imgs/colaborador-laguna-fvet.png" alt="El Renacer de la Laguna - FVET - UBA">
+              </a>
+            </div>
+          </div>
+        </aside>
 
       </div>
     </div>
@@ -588,6 +594,32 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">
               Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Instructions Modal -->
+    <div class="modal" tabindex="-1" aria-hidden="true" aria-labelledby="instructions-title" role="dialog" js-instructions-modal>
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 id="instructions-title">
+              Instrucciones
+            </h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
+            </button>
+           </div>
+          <div class="modal-body">
+            Para empezar hacé click en el mapa para colocar una marca y buscar por zona o en el botón de filtros para seleccionar una especie.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">
+              Cerrar
+            </button>
+            <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" js-instructions-close-hard>
+              No volver a mostrar
             </button>
           </div>
         </div>

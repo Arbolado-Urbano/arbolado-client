@@ -28,7 +28,7 @@ customElements.define('arbolado-tree-drawer', TreeDrawer)
 customElements.define('arbolado-address-lookup', AddresLookup)
 customElements.define('arbolado-google-ads', GoogleAds)
 
-window.Arbolado.ready(() => {
+window.Arbolado.ready(async () => {
   const searchForm = document.querySelector('[js-arbolado-form]') as SearchForm
   const mapElement = document.querySelector('[js-arbolado-map]') as MapElement
   const treeDrawer = document.querySelector('[js-tree-drawer]') as TreeDrawer
@@ -46,5 +46,12 @@ window.Arbolado.ready(() => {
   document.querySelectorAll('[data-bs-toggle="popover"]').forEach(element => new bootstrap.Popover(element))
 
   // Check to see if a source is selected on the URL
-  window.Arbolado.loadSourceFromURL()
+  if (!await window.Arbolado.loadSourceFromURL()) {
+    // Display instructions modal
+    const InstructionsModalHardCloseBtn = document.querySelector('[js-instructions-close-hard]') as HTMLButtonElement
+    InstructionsModalHardCloseBtn.addEventListener('click', () => localStorage.setItem('hide-instructions', 'true'))
+    if (localStorage.getItem('hide-instructions') !== 'true') {
+      (new bootstrap.Modal(document.querySelector('[js-instructions-modal]') as HTMLElement)).show()
+    }
+  }
 })
