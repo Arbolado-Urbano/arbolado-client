@@ -3,10 +3,11 @@ import 'leaflet.markercluster'
 
 import Tree from '../types/Tree'
 
+const { VITE_MAPBOX_TOKEN: accessToken } = import.meta.env
+
 const environment = {
   highlightColor: '#5cba9d',
   mapDisableClusteringAt: 21,
-  mapboxToken: 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw',
   searchRadius: 1000,
 }
 
@@ -19,7 +20,7 @@ export default class MapElement extends HTMLElement {
       L.tileLayer(
         'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
         {
-          accessToken: environment.mapboxToken,
+          accessToken,
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
           subdomains: 'abcd',
           maxZoom: 21

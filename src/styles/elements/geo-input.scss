@@ -1,0 +1,30 @@
+.geo-input {
+  display: block;
+  height: 500px;
+  margin-top: .5rem;
+  position: relative;
+}
+
+.geo-input .btn {
+  bottom: 2rem;
+  position: absolute;
+  right: 1rem;
+  z-index: 999;
+}
+
+.geo-input .loader {
+  align-items: center;
+  background-color: rgba(0, 0, 0, .5);
+  justify-content: center;
+  position: absolute;
+  inset: 0;
+  z-index: 99999;
+}
+
+.geo-input.loading .loader {
+  display: flex;
+}
+
+.geo-input__map {
+  height: 100%;
+}
