@@ -526,211 +526,247 @@
     <div id="add-tree-modal" class="modal fade" tabindex="-1" aria-hidden="true" aria-labelledby="add-tree-title" role="dialog" js-modal="tree">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <form novalidate js-tree-form>
-            <div class="modal-header">
-              <h4 id="add-tree-title">
-                Agregar árbol
-              </h4>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
-              </button>
-            </div>
-            <div class="modal-body">
-              <div class="mb-3">
-                <label for="form-email" class="form-label">Email</label>
-                <input name="email" type="text" class="form-control" id="form-email" required>
+          <arbolado-add-tree-form>
+            <form novalidate js-tree-form>
+              <div class="modal-header border-0">
+                <h4 id="add-tree-title">
+                  Agregar árbol
+                </h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
+                </button>
               </div>
-              <div class="mb-3">
-                <label for="form-name" class="form-label">Nombre o alias</label>
-                <input name="name" type="email" class="form-control" id="form-name" aria-describedby="form-name-help" required>
-                <div id="form-name-help" class="form-text">
-                  Nos interesa que tu ayuda sea visible, es por eso que te pedimos tu nombre (o podés ingresar un pseudónimo).
-                  El mismo figurará en la descripción del árbol ingresado.
-                </div>
-              </div>
-              <div class="mb-3">
-                <label for="form-website" class="form-label">Sitio web</label>
-                <input name="website" type="url" class="form-control" id="form-website" aria-describedby="form-website-help">
-                <div id="form-website-help" class="form-text">
-                  Opcional. Si tenés un sitio personal o de algún emprendimiento que quieras dar a conocer, podés publicarlo aquí y se publicará junto a tu nombre o alias.
-                  Podés usar tu perfil de instagram, facebook o twitter.
-                </div>
-              </div>
-              <div class="mb-3">
-                <label for="form-coordinates" class="form-label">Coordenadas</label>
-                <arbolado-geo-input id="form-coordinates" name="coordinates" class="geo-input" js-geo-input required aria-describedby="form-coordinates-help">
-                  <div id="geo-input-map" class="geo-input__map"></div>
-                  <button type="button" class="btn btn-primary" js-geo-btn>
-                    <i class="fa-solid fa-location-crosshairs"></i>
-                    Localizar
-                  </button>
-                  <div class="loader">
-                    <div class="spinner-grow absolute" style="width: 3rem; height: 3rem;" role="status">
-                      <span class="visually-hidden">Loading...</span>
+              <div class="progress" role="progressbar" aria-label="Progreso del formulario" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="height: 2px" js-progress>
+                <div class="progress-bar" js-progress-bar style="width: 0;"></div>
+              </div>                
+              <div class="modal-body">
+                <!-- Paso 1: Datos personales -->
+                <div js-step>
+                  <h5>Datos personales (1/4)</h5>
+                  <div class="mb-3">
+                    <label for="form-email" class="form-label">Email</label>
+                    <input name="email" type="text" class="form-control" id="form-email" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="form-name" class="form-label">Nombre o alias</label>
+                    <input name="name" type="email" class="form-control" id="form-name" aria-describedby="form-name-help" required>
+                    <div id="form-name-help" class="form-text">
+                      Nos interesa que tu ayuda sea visible, es por eso que te pedimos tu nombre (o podés ingresar un pseudónimo).
+                      El mismo figurará en la descripción del árbol ingresado.
                     </div>
                   </div>
-                </arbolado-geo-input>
-                <div id="form-coordinates-help" class="form-text">
-                  Tocá un punto en el mapa o usá el botón "Localizar" para usar tu ubicación actual.
-                </div>
-              </div>
-              <!-- Espacio verde checkbox -->
-              <div class="mb-3">
-                <label for="form-species" class="form-label">Nombre científico</label>
-                <arbolado-species-select id="form-species" name="species" js-input="species" aria-describedby="form-species-help">
-                  <div class="btn-group dropdown w-100">
-                    <button type="button" class="form-select text-start species-select__btn" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="species-dropdown" js-species-select-btn>
-                      Todas
-                    </button>
-                    <div id="species-dropdown" class="dropdown-menu w-100 px-2 pb-0 mt-2" role="menu" js-species-dropdown>
-                      <input class="form-control w-100" type="text" placeholder="Buscar" js-species-select-input autocomplete="off">
-                      <ul class="species-select__list mt-2 mb-0 p-0" js-species-select-list>
-                        <div class="text-center my-5">
-                          <div class="spinner-border spinner-border-lg text-primary" role="status">
-                            <span class="visually-hidden">Cargando...</span>
-                          </div>
-                        </div>
-                      </ul>
+                  <div class="mb-3">
+                    <label for="form-website" class="form-label">Sitio web</label>
+                    <input name="website" type="url" class="form-control" id="form-website" aria-describedby="form-website-help">
+                    <div id="form-website-help" class="form-text">
+                      Opcional. Si tenés un sitio personal o de algún emprendimiento que quieras dar a conocer, podés publicarlo aquí y se publicará junto a tu nombre o alias.
+                      Podés usar tu perfil de instagram, facebook o twitter.
                     </div>
                   </div>
-                  <template js-template="species-select-item">
-                    <li class="dropdown-item px-2" js-species-select-item>
-                      <button type="button" class="species-select__item__btn" js-species-select-item-btn>
-                        <span js-scientific-name></span>
-                        <small class="muted-text" js-common-name></small>
+                </div>
+                <!-- Paso 2: Ubicación -->
+                <div class="d-none" js-step>
+                  <h5>Ubicación (2/4)</h5>
+                  <div class="mb-3">
+                    <label for="form-coordinates" class="form-label">Coordenadas</label>
+                    <arbolado-geo-input id="form-coordinates" name="coordinates" class="geo-input" js-geo-input required aria-describedby="form-coordinates-help">
+                      <div id="geo-input-map" class="geo-input__map"></div>
+                      <button type="button" class="btn btn-primary" js-geo-btn>
+                        <i class="fa-solid fa-location-crosshairs"></i>
+                        Localizar
                       </button>
-                    </li>
-                  </template>
-                </arbolado-species-select>
-                <div id="form-species-help" class="form-text">
-                  Género y especie. Si la especie no está en la lista o no sabés cuál es, completá el nombre en el siguiente campo.
+                      <div class="loader">
+                        <div class="spinner-grow absolute" style="width: 3rem; height: 3rem;" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                      </div>
+                    </arbolado-geo-input>
+                    <div id="form-coordinates-help" class="form-text">
+                      Tocá un punto en el mapa o usá el botón "Localizar" para usar tu ubicación actual.
+                    </div>
+                  </div>
+                  <!-- Espacio verde checkbox -->
+                </div>
+                <!-- Paso 3: Identificación de especie -->
+                <div class="d-none" js-step>
+                  <h5>Identificación de especie (3/4)</h5>
+                  <div class="mb-3">
+                    <label for="form-images" class="form-label">Fotos</label>
+                    <input class="form-control" type="file" id="form-images" name="images[]" accept="image/*" multiple aria-describedby="form-images-help">
+                    <div id="form-images-help" class="form-text">
+                      Opcional. Las fotos serán usadas para intentar detectar automáticamente la especie del árbol.
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="form-species" class="form-label">Nombre científico</label>
+                    <arbolado-species-select id="form-species" name="species" js-input="species" aria-describedby="form-species-help">
+                      <div class="btn-group dropdown w-100">
+                        <button type="button" class="form-select text-start species-select__btn" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="species-dropdown" js-species-select-btn>
+                          Todas
+                        </button>
+                        <div id="species-dropdown" class="dropdown-menu w-100 px-2 pb-0 mt-2" role="menu" js-species-dropdown>
+                          <input class="form-control w-100" type="text" placeholder="Buscar" js-species-select-input autocomplete="off">
+                          <ul class="species-select__list mt-2 mb-0 p-0" js-species-select-list>
+                            <div class="text-center my-5">
+                              <div class="spinner-border spinner-border-lg text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                              </div>
+                            </div>
+                          </ul>
+                        </div>
+                      </div>
+                      <template js-template="species-select-item">
+                        <li class="dropdown-item px-2" js-species-select-item>
+                          <button type="button" class="species-select__item__btn" js-species-select-item-btn>
+                            <span js-scientific-name></span>
+                            <small class="muted-text" js-common-name></small>
+                          </button>
+                        </li>
+                      </template>
+                    </arbolado-species-select>
+                    <div id="form-species-help" class="form-text">
+                      Género y especie. Si la especie no está en la lista o no sabés cuál es, completá el nombre en el siguiente campo.
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="form-common-name" class="form-label">Nombre común</label>
+                    <input name="common-name" type="text" class="form-control" id="form-common-name" aria-describedby="form-common-name-help">
+                    <div id="form-common-name-help" class="form-text">
+                      Nombre por el cual se identifica a la especie de forma popular.
+                    </div>
+                  </div>
+                </div>
+                <!-- Paso 4: Datos del árbol -->
+                <div class="d-none" js-step>
+                  <h5>Datos del árbol (4/4)</h5>
+                  <div class="mb-3">
+                    <label for="form-height" class="form-label">Altura total (m)</label>
+                    <input name="height" type="number" class="form-control" id="form-height" aria-describedby="form-height-help">
+                    <div id="form-height-help" class="form-text">
+                      Ingresar el valor en metros.
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <span class="form-label">Inclinación</span>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="inclination" id="inclination-1" aria-describedby="form-inclination-help" value="normal">
+                      <label class="form-check-label" for="inclination-1">
+                        Tronco normal
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="inclination" id="inclination-2" aria-describedby="form-inclination-help" value="slight">
+                      <label class="form-check-label" for="inclination-2">
+                        Levemente inclinado (5º a 20º)
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="inclination" id="inclination-3" aria-describedby="form-inclination-help" value="very">
+                      <label class="form-check-label" for="inclination-3">
+                        Muy inclinado (> a 20º)
+                      </label>
+                    </div>
+                    <div id="form-inclination-help" class="form-text">
+                      Ingresá el valor en grados con respecto a la vertical.
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="form-diameter-trunk" class="form-label">Diámetro de tronco (cm)</label>
+                    <input name="diameter-trunk" type="number" class="form-control" id="form-diameter-trunk" aria-describedby="form-diameter-trunk-help">
+                    <div id="form-diameter-trunk-help" class="form-text">
+                      Tomar el diámetro a la altura del pecho. Por favor, ingresá el valor en centímetros.
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="form-diameter-canopy" class="form-label">Diámetro de copa (m)</label>
+                    <input name="diameter-canopy" type="number" class="form-control" id="form-diameter-canopy" aria-describedby="form-diameter-canopy-help">
+                    <div id="form-diameter-canopy-help" class="form-text">
+                      Tomar el diámetro aproximado de la copa. Por favor, ingresá el valor en metros.
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <span class="form-label">Etapa de desarrollo</span>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="development" id="development-1" aria-describedby="form-development-help" value="young">
+                      <label class="form-check-label" for="development-1">
+                        Joven
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="development" id="development-2" aria-describedby="form-development-help" value="adult">
+                      <label class="form-check-label" for="development-2">
+                        Adulto
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="development" id="development-3" aria-describedby="form-development-help" value="senescent">
+                      <label class="form-check-label" for="development-3">
+                        Senescente
+                      </label>
+                    </div>
+                    <div id="form-development-help" class="form-text">
+                      Cada especie tiene su evolución, es por eso que no lo podemos medir en años.
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <span class="form-label">Estado fitosanitario del árbol </span>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="health" id="health-1" aria-describedby="form-health-help" value="healthy">
+                      <label class="form-check-label" for="health-1">
+                        Se lo ve sano
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="health" id="health-2" aria-describedby="form-health-help" value="fungi">
+                      <label class="form-check-label" for="health-2">
+                        Hojas con hongos
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="health" id="health-3" aria-describedby="form-health-help" value="hollow">
+                      <label class="form-check-label" for="health-3">
+                        Tronco ahuecado
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="health" id="health-3" aria-describedby="form-health-help" value="pests">
+                      <label class="form-check-label" for="health-3">
+                        Está plagado de insectos
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="health" id="health-3" aria-describedby="form-health-help" value="sick">
+                      <label class="form-check-label" for="health-3">
+                        Se lo ve enfermo pero no sé bien de qué se trata
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-none" js-step>
+                  Gracias!
                 </div>
               </div>
-              <div class="mb-3">
-                <label for="form-common-name" class="form-label">Nombre común</label>
-                <input name="common-name" type="text" class="form-control" id="form-common-name" aria-describedby="form-common-name-help">
-                <div id="form-common-name-help" class="form-text">
-                  Nombre por el cual se identifica a la especie de forma popular.
-                </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-dark me-auto" data-bs-dismiss="modal" js-cancel-btn>
+                  Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" js-prev-btn disabled>
+                  Anterior
+                </button>
+                <button type="button" class="btn btn-primary" js-next-btn>
+                  Siguiente
+                </button>
+                <button type="submit" class="btn btn-primary d-none" js-submit-btn>
+                  Enviar
+                </button>
+                <button type="button" class="btn btn-outline-dark ms-auto d-none" data-bs-dismiss="modal" js-close-btn>
+                  Cerrar
+                </button>
+                <button type="button" class="btn btn-primary d-none" js-reset-btn>
+                  Agregar otro árbol
+                </button>
               </div>
-              <div class="mb-3">
-                <label for="form-height" class="form-label">Altura total (m)</label>
-                <input name="height" type="number" class="form-control" id="form-height" aria-describedby="form-height-help">
-                <div id="form-height-help" class="form-text">
-                  Ingresar el valor en metros.
-                </div>
-              </div>
-              <div class="mb-3">
-                <span class="form-label">Inclinación</span>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="inclination" id="inclination-1" aria-describedby="form-inclination-help" value="normal">
-                  <label class="form-check-label" for="inclination-1">
-                    Tronco normal
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="inclination" id="inclination-2" aria-describedby="form-inclination-help" value="slight">
-                  <label class="form-check-label" for="inclination-2">
-                    Levemente inclinado (5º a 20º)
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="inclination" id="inclination-3" aria-describedby="form-inclination-help" value="very">
-                  <label class="form-check-label" for="inclination-3">
-                    Muy inclinado (> a 20º)
-                  </label>
-                </div>
-                <div id="form-inclination-help" class="form-text">
-                  Ingresá el valor en grados con respecto a la vertical.
-                </div>
-              </div>
-              <div class="mb-3">
-                <label for="form-diameter-trunk" class="form-label">Diámetro de tronco (cm)</label>
-                <input name="diameter-trunk" type="number" class="form-control" id="form-diameter-trunk" aria-describedby="form-diameter-trunk-help">
-                <div id="form-diameter-trunk-help" class="form-text">
-                  Tomar el diámetro a la altura del pecho. Por favor, ingresá el valor en centímetros.
-                </div>
-              </div>
-              <div class="mb-3">
-                <label for="form-diameter-canopy" class="form-label">Diámetro de copa (m)</label>
-                <input name="diameter-canopy" type="number" class="form-control" id="form-diameter-canopy" aria-describedby="form-diameter-canopy-help">
-                <div id="form-diameter-canopy-help" class="form-text">
-                  Tomar el diámetro aproximado de la copa. Por favor, ingresá el valor en metros.
-                </div>
-              </div>
-              <div class="mb-3">
-                <span class="form-label">Etapa de desarrollo</span>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="development" id="development-1" aria-describedby="form-development-help" value="young">
-                  <label class="form-check-label" for="development-1">
-                    Joven
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="development" id="development-2" aria-describedby="form-development-help" value="adult">
-                  <label class="form-check-label" for="development-2">
-                    Adulto
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="development" id="development-3" aria-describedby="form-development-help" value="senescent">
-                  <label class="form-check-label" for="development-3">
-                    Senescente
-                  </label>
-                </div>
-                <div id="form-development-help" class="form-text">
-                  Cada especie tiene su evolución, es por eso que no lo podemos medir en años.
-                </div>
-              </div>
-              <div class="mb-3">
-                <span class="form-label">Estado fitosanitario del árbol </span>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="health" id="health-1" aria-describedby="form-health-help" value="healthy">
-                  <label class="form-check-label" for="health-1">
-                    Se lo ve sano
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="health" id="health-2" aria-describedby="form-health-help" value="fungi">
-                  <label class="form-check-label" for="health-2">
-                    Hojas con hongos
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="health" id="health-3" aria-describedby="form-health-help" value="hollow">
-                  <label class="form-check-label" for="health-3">
-                    Tronco ahuecado
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="health" id="health-3" aria-describedby="form-health-help" value="pests">
-                  <label class="form-check-label" for="health-3">
-                    Está plagado de insectos
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="health" id="health-3" aria-describedby="form-health-help" value="sick">
-                  <label class="form-check-label" for="health-3">
-                    Se lo ve enfermo pero no sé bien de qué se trata
-                  </label>
-                </div>
-              </div>
-              <div class="mb-3">
-                <label for="form-images" class="form-label">Fotos</label>
-                <input class="form-control" type="file" id="form-images" name="images[]" accept="image/*" multiple aria-describedby="form-images-help">
-                <div id="form-images-help" class="form-text">
-                  Opcional. Las fotos serán usadas para intentar detectar automáticamente la especie del árbol.
-                </div>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">
-                Cancelar
-              </button>
-              <button type="submit" class="btn btn-primary">
-                Enviar
-              </button>
-            </div>
-          </form>
+            </form>
+          </arbolado-add-tree-form>
         </div>
       </div>
     </div>
