@@ -166,7 +166,7 @@ export default class MapElement extends HTMLElement {
    */
   private latlngUpdated(map: L.Map, latLng: L.LatLng): void {
     // Emit the new marker coordinates
-    window.Arbolado.emitEvent(this, 'arbolado/maker:set', { latLng })
+    window.Arbolado.emitEvent(this, 'arbolado:maker/set', { latLng })
     // Re-center the map around the marker
     map.panTo(latLng)
   }
@@ -176,12 +176,12 @@ export default class MapElement extends HTMLElement {
     markerPopupContent.querySelector('[js-marker-popup-search]')?.addEventListener('click', () => {
       this.marker?.closePopup()
       // Emit an event when the user clicks the search button from marker so the search form can be notified and perform the search
-      window.Arbolado.emitEvent(this, 'arbolado/marker:search')
+      window.Arbolado.emitEvent(this, 'arbolado:marker/search')
     })
     markerPopupContent.querySelector('[js-marker-popup-clear]')?.addEventListener('click', () => {
       this.removeMarker()
       // Emit an event when the user clears the map marker so the search form can be notified and update its UI
-      window.Arbolado.emitEvent(this, 'arbolado/marker:removed')
+      window.Arbolado.emitEvent(this, 'arbolado:marker/removed')
     })
     return markerPopupContent
   }
@@ -247,6 +247,6 @@ export default class MapElement extends HTMLElement {
    */
   public selectTree(id: number): void {
     // Emit the selected tree's ID
-    window.Arbolado.emitEvent(this, 'arbolado/tree:selected', { id })
+    window.Arbolado.emitEvent(this, 'arbolado:tree/selected', { id })
   }
 }

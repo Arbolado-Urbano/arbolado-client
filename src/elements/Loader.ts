@@ -1,7 +1,7 @@
 export default class Loader extends HTMLElement {
   constructor() {
     super()
-    document.addEventListener('arbolado/loading', (event) => {
+    document.addEventListener('arbolado:loading', (event) => {
       if ((event as CustomEvent).detail.loading) this.show()
       else this.hide()
     })

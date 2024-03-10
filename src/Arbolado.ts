@@ -13,9 +13,9 @@ export default class Arbolado {
     document.addEventListener('keydown', this.handleEsc.bind(this))
     window.addEventListener('popstate', () => {
       this.queryParams = new URLSearchParams(window.location.search)
-      this.emitEvent(document, 'arbolado/queryParams:update')
+      this.emitEvent(document, 'arbolado:queryParams/update')
     })
-    this.overlay.addEventListener('click', () => this.emitEvent(document, 'arbolado/overlay:click'))
+    this.overlay.addEventListener('click', () => this.emitEvent(document, 'arbolado:overlay/click'))
   }
 
   ready(fn: () => any) {
@@ -27,7 +27,7 @@ export default class Arbolado {
   }
 
   setLoading(loading: boolean) {
-    this.emitEvent(document, 'arbolado/loading', { loading })
+    this.emitEvent(document, 'arbolado:loading', { loading })
   }
 
   pushURL(path: string) {
@@ -116,7 +116,7 @@ export default class Arbolado {
     if (!fuenteUrl) return
     const trees = await window.Arbolado.fetchJson(`${import.meta.env.VITE_API_URL}/fuentes/${fuenteUrl}`, 'GET')
     if (!trees?.length) return
-    window.Arbolado.emitEvent(document, 'arbolado/results:updated', { trees })
+    window.Arbolado.emitEvent(document, 'arbolado:results/updated', { trees })
     window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
     return true
   }

@@ -71,7 +71,7 @@ export default class TreeModal extends HTMLElement {
     window.addEventListener('popstate', () => this.loadTreeFromURL())
     this.addEventListener('focusout', this.handleFocusOut)
     this.addEventListener('keydown', this.handleKeyDown)
-    document.addEventListener('arbolado/overlay:click', () => this.close())
+    document.addEventListener('arbolado:overlay/click', () => this.close())
   }
 
   private setTreeValue(name: treeDataKey, value?: string, attribute?: string) {
@@ -196,7 +196,7 @@ export default class TreeModal extends HTMLElement {
       history.pushState(null, '', url)
     }
 
-    window.Arbolado.emitEvent(this, 'arbolado/tree:displayed', { tree })
+    window.Arbolado.emitEvent(this, 'arbolado:tree/displayed', { tree })
   }
 
   private hasFocus(within: boolean = false) {

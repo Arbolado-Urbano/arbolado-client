@@ -36,13 +36,13 @@ window.Arbolado.ready(async () => {
   const searchForm = document.querySelector('[js-arbolado-form]') as SearchForm
   const mapElement = document.querySelector('[js-arbolado-map]') as MapElement
   const treeDrawer = document.querySelector('[js-tree-drawer]') as TreeDrawer
-  document.addEventListener('arbolado/results:updated', (event) => mapElement.displayTrees((event as CustomEvent).detail.trees))
-  searchForm.addEventListener('arbolado/marker:remove', () => mapElement.removeMarker())
-  mapElement.addEventListener('arbolado/maker:set', (event) => searchForm.setMarker((event as CustomEvent).detail.latLng))
-  mapElement.addEventListener('arbolado/tree:selected', (event) => treeDrawer.displayTree((event as CustomEvent).detail.id))
-  mapElement.addEventListener('arbolado/marker:removed', () => searchForm.removeMarker())
-  mapElement.addEventListener('arbolado/marker:search', () => searchForm.search())
-  treeDrawer.addEventListener('arbolado/tree:displayed', (event) => mapElement.displayTree((event as CustomEvent).detail.tree))
+  document.addEventListener('arbolado:results/updated', (event) => mapElement.displayTrees((event as CustomEvent).detail.trees))
+  searchForm.addEventListener('arbolado:marker/remove', () => mapElement.removeMarker())
+  mapElement.addEventListener('arbolado:maker/set', (event) => searchForm.setMarker((event as CustomEvent).detail.latLng))
+  mapElement.addEventListener('arbolado:tree/selected', (event) => treeDrawer.displayTree((event as CustomEvent).detail.id))
+  mapElement.addEventListener('arbolado:marker/removed', () => searchForm.removeMarker())
+  mapElement.addEventListener('arbolado:marker/search', () => searchForm.search())
+  treeDrawer.addEventListener('arbolado:tree/displayed', (event) => mapElement.displayTree((event as CustomEvent).detail.tree))
 
   // Init Bootstrap's tooltips
   document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((element) => new bootstrap.Tooltip(element))
