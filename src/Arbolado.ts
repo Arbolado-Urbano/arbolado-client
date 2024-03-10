@@ -1,5 +1,6 @@
 import { LatLng, LatLngBounds } from 'leaflet'
 import NominatimResponse from './types/NominatimResponse'
+import Alert, { AlertType } from './elements/Alert'
 
 export default class Arbolado {
   overlay: HTMLElement 
@@ -64,6 +65,13 @@ export default class Arbolado {
     } catch (error) {
       console.error(error)
     }
+  }
+
+  alert(type: AlertType, content: string, timeout?: number) {
+    const alert = new Alert(type, content)
+    alert.addEventListener('arbolado:alert/closed', () => alert.remove())
+    document.body.append(alert)
+    alert.show(timeout)
   }
 
   validateForm(form: HTMLFormElement): boolean {

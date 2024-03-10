@@ -11,11 +11,14 @@ import AddresLookup from './elements/AddressLookup'
 import GoogleAds from './elements/GoogleAds'
 import GeoInput from './elements/GeoInput'
 import AddTreeForm from './elements/AddTreeForm'
+import Captcha from './elements/Captcha'
+import Alert from './elements/Alert'
 
 declare global {
   interface Window {
     Arbolado: Arbolado,
     adsbygoogle: any,
+    grecaptcha: ReCaptchaV2.ReCaptcha,
   }
 }
 
@@ -31,6 +34,8 @@ customElements.define('arbolado-address-lookup', AddresLookup)
 customElements.define('arbolado-google-ads', GoogleAds)
 customElements.define('arbolado-geo-input', GeoInput)
 customElements.define('arbolado-add-tree-form', AddTreeForm)
+customElements.define('arbolado-captcha', Captcha)
+customElements.define('arbolado-alert', Alert)
 
 window.Arbolado.ready(async () => {
   const searchForm = document.querySelector('[js-arbolado-form]') as SearchForm
@@ -48,17 +53,6 @@ window.Arbolado.ready(async () => {
   document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((element) => new bootstrap.Tooltip(element))
   // Init Bootstrap's popovers
   document.querySelectorAll('[data-bs-toggle="popover"]').forEach(element => new bootstrap.Popover(element))
-
-  const geoInput = document.querySelector('[js-geo-input]') as GeoInput | null
-  document.querySelector('[js-modal="tree"]')?.addEventListener('shown.bs.modal', () => geoInput?.resetHeight())
-
-  const treeForm = document.querySelector('[js-tree-form]') as HTMLFormElement | null
-  treeForm?.addEventListener('submit', async (event) => {
-    event.preventDefault()
-    const data = new FormData(treeForm)
-    const response = await window.Arbolado.fetchJson(`${import.meta.env.VITE_API_URL}/identificar`, 'POST', data)
-    console.log(response)
-  })
 
   // Check to see if a source is selected on the URL
   await window.Arbolado.loadSourceFromURL()

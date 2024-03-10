@@ -16,6 +16,14 @@
       'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
       })(window,document,'script','dataLayer','GTM-T34XKKQ8');
     </script>
+    <!-- Google reCaptcha -->
+    <script>
+      function catpchaOnLoadCallBack() {
+        document.addEventListener('DOMContentLoaded', () => window.Arbolado.emitEvent(document, 'arbolado:captcha/loaded'))
+      }
+    </script>
+    <script src="https://www.google.com/recaptcha/api.js?onload=catpchaOnLoadCallBack&render=explicit&hl=es" async defer></script>
+    <!-- Site scripts -->
     <script type="module" src="/src/main.ts"></script>
   </head>
   <body class="d-flex flex-column">
@@ -523,10 +531,10 @@
     </div>
 
     <!-- Add tree Modal -->
-    <div id="add-tree-modal" class="modal fade" tabindex="-1" aria-hidden="true" aria-labelledby="add-tree-title" role="dialog" js-modal="tree">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <arbolado-add-tree-form>
+    <arbolado-add-tree-form>
+      <div id="add-tree-modal" class="modal fade" tabindex="-1" aria-hidden="true" aria-labelledby="add-tree-title" role="dialog" js-modal="tree">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
             <form novalidate js-tree-form>
               <div class="modal-header border-0">
                 <h4 id="add-tree-title">
@@ -755,7 +763,7 @@
                 <button type="button" class="btn btn-primary" js-next-btn>
                   Siguiente
                 </button>
-                <button type="submit" class="btn btn-primary d-none" js-submit-btn>
+                <button class="btn btn-primary d-none" type="submit" js-submit-btn>
                   Enviar
                 </button>
                 <button type="button" class="btn btn-outline-dark ms-auto d-none" data-bs-dismiss="modal" js-close-btn>
@@ -766,10 +774,10 @@
                 </button>
               </div>
             </form>
-          </arbolado-add-tree-form>
+          </div>
         </div>
       </div>
-    </div>
+    </arbolado-add-tree-form>
 
     <!-- Follow us Modal -->
     <div id="follow-modal" class="modal fade" tabindex="-1" aria-hidden="true" aria-labelledby="follow-title" role="dialog">
@@ -858,5 +866,14 @@
       </div>
     </div>
 
+    <!-- Alert template -->
+    <template js-template="alert">
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar" js-alert-close></button>
+      <div js-alert-content>
+      </div>
+    </template>
+
+    <!-- reCaptcha widget -->
+    <arbolado-captcha data-sitekey="6Lcg0ZMpAAAAAJJpYl-IZ12gGSBR48KwN5gBWigh" js-captcha-widget></arbolado-captcha>
   </body>
 </html>
