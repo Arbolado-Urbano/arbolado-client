@@ -609,8 +609,35 @@
                     <div class="border border-top-0 p-3">
                       <div js-tab="auto" class="d-flex flex-column">
                         <div class="mb-3">
-                          <label for="form-images" class="form-label">Fotos</label>
-                          <input class="form-control" type="file" id="form-images" name="images[]" accept="image/*" multiple aria-describedby="form-images-help" required>
+                          <span class="form-label">Fotos</span>
+                          <ul class="list-unstyled row" js-species-images>
+                          </ul>
+                          <template js-template="species-image">
+                            <li class="col-12 col-lg-6 mt-2 mb-lg-0">
+                              <div class="btn-group w-100" role="group" aria-label="Basic radio toggle button group">
+                                <input type="radio" class="btn-check" name="image-type" id="image-type-leaf" value="leaf" autocomplete="off">
+                                <label class="btn btn-outline-primary" style="border-bottom-left-radius: 0;" for="image-type-leaf">Hojas</label>
+                                <input type="radio" class="btn-check" name="image-type" id="image-type-flower" value="flower" autocomplete="off">
+                                <label class="btn btn-outline-primary" for="image-type-flower">Flores</label>
+                                <input type="radio" class="btn-check" name="image-type" id="image-type-fruit" value="fruit" autocomplete="off">
+                                <label class="btn btn-outline-primary" for="image-type-fruit">Frutos</label>
+                                <input type="radio" class="btn-check" name="image-type" id="image-type-bark" value="bark" autocomplete="off">
+                                <label class="btn btn-outline-primary" for="image-type-bark">Tronco</label>
+                                <input type="radio" class="btn-check" name="image-type" id="image-type-auto" value="auto" checked autocomplete="off">
+                                <label class="btn btn-outline-primary" style="border-bottom-right-radius: 0;" for="image-type-auto">Otros</label>
+                              </div>
+                              <div class="position-relative">
+                                <button type="button" js-remove class="btn btn-danger btn-lg position-absolute top-0 end-0 mt-2 me-2 z-1" title="Descartar foto">
+                                  <i class="fas fa-trash fa-fw"></i>
+                                </button>
+                                <div class="img-crop rounded-bottom">
+                                  <img class="img-crop__img" js-species-image src="" alt="">
+                                </div>
+                              </div>
+                            </li>
+                          </template>
+                          <label for="form-images" class="btn btn-primary">Agregar fotos</label>
+                          <input class="d-none" type="file" id="form-images" name="images[]" accept="image/*" multiple aria-describedby="form-images-help" autocomplete="off" required>
                           <div class="invalid-feedback">
                             Por favor seleccione alguna foto o determine manualmente la especie seleccionando la opción "Manual"
                           </div>

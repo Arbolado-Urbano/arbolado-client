@@ -1,0 +1,19 @@
+.img-crop {
+  overflow: hidden;
+  position: relative;
+}
+
+.img-crop::after {
+  content: '';
+  display: block;
+  padding-bottom: 100%;
+}
+
+.img-crop__img {
+  height: 100%;
+  left: 0;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}

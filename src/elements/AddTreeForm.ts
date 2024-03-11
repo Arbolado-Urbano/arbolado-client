@@ -20,12 +20,16 @@ export default class AddTreeForm extends HTMLElement {
   private geoInput: GeoInput
   private captchaWidget: Captcha
   private imagesInput: HTMLInputElement
+  private speciesImages: HTMLUListElement
+  private speciesImageTemplate: HTMLTemplateElement
+  private selectedImages: File[] = []
 
   constructor() {
     super()
     this.reset = this.reset.bind(this)
     this.submit = this.submit.bind(this)
     this.identifySpecies = this.identifySpecies.bind(this)
+    this.processSpeciesImages = this.processSpeciesImages.bind(this)
     
     this.captchaWidget = document.querySelector('[js-captcha-widget]') as Captcha
     this.form = this.querySelector('[js-tree-form]') as HTMLFormElement
@@ -40,6 +44,8 @@ export default class AddTreeForm extends HTMLElement {
     this.speciesSelect = this.querySelector('[js-input="species"]') as SpeciesSelect
     this.speciesManualWrapper = this.querySelector('[js-species-manual]') as HTMLElement
     this.speciesManualInput = this.querySelector('[name="species-manual"]') as HTMLInputElement
+    this.speciesImages = this.querySelector('[js-species-images]') as HTMLUListElement
+    this.speciesImageTemplate = this.querySelector('[js-template="species-image"]') as HTMLTemplateElement
     this.imagesInput = this.querySelector('[name="images[]"]') as HTMLInputElement
     this.steps = this.querySelectorAll('[js-step]')
     this.progress = { wrapper: this.querySelector('[js-progress]') as HTMLElement, bar: this.querySelector('[js-progress-bar]') as HTMLElement}
@@ -63,6 +69,8 @@ export default class AddTreeForm extends HTMLElement {
     // Alternate between automatic and manual speceies selection inputs
     this.querySelector('[js-tab="auto"]')?.addEventListener('arbolado:tab/open', () => this.imagesInput.setAttribute('required', 'true'))
     this.querySelector('[js-tab="auto"]')?.addEventListener('arbolado:tab/close', () => this.imagesInput.removeAttribute('required'))
+
+    this.imagesInput.addEventListener('change', this.processSpeciesImages)
 
     // Submit handler
     this.form.addEventListener('submit', this.submit)
@@ -117,9 +125,46 @@ export default class AddTreeForm extends HTMLElement {
     this.goStep(0)
   }
 
+  private processSpeciesImages() {
+    // Remove the is-invalid class for the image input when an image is selected in case it's there
+    if (this.imagesInput.value) this.imagesInput.classList.remove('is-invalid')
+    const imageFiles = this.imagesInput.files
+    if (!imageFiles) return
+    for (let index = 0; index < imageFiles.length; index++) {
+      const imageFile = imageFiles[index]
+      this.selectedImages.push(imageFile)
+    }
+    this.imagesInput.value = ''
+    this.renderSpeciesImages()
+  }
+
+  private renderSpeciesImages() {
+    this.speciesImages.innerHTML = ''
+    for (let index = 0; index < this.selectedImages.length; index++) {
+      const imageFile = this.selectedImages[index]
+      const speciesImageWrapper = this.speciesImageTemplate.content.cloneNode(true) as HTMLLIElement
+      const speciesImage = speciesImageWrapper.querySelector('[js-species-image]') as HTMLImageElement
+      speciesImage.src = URL.createObjectURL(imageFile)
+      for (const type of ['leaf', 'flower', 'fruit', 'bark', 'auto']) {
+        const imageTypeInput = speciesImageWrapper.querySelector(`[id="image-type-${type}"]`)
+        imageTypeInput?.setAttribute('name', `image-type-${index}`)
+        imageTypeInput?.setAttribute('id', `image-type-${type}-${index}`)
+        speciesImageWrapper.querySelector(`[for="image-type-${type}"]`)?.setAttribute('for', `image-type-${type}-${index}`)
+      }
+      speciesImageWrapper.querySelector('[js-remove]')?.addEventListener('click', () => {
+        this.selectedImages.splice(index, 1)
+        this.renderSpeciesImages()
+      })
+      this.speciesImages.append(speciesImageWrapper)
+    }
+  }
+
   private async identifySpecies() {
     // TODO: Check to see if there are selected images
-    if (!this.imagesInput.value) this.imagesInput.classList.add()
+    if (!this.imagesInput.value) {
+      this.imagesInput.classList.add('is-invalid')
+      return
+    }
     let token
     try {
       token = await this.captchaWidget.execute()
