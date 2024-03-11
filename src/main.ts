@@ -13,6 +13,7 @@ import GeoInput from './elements/GeoInput'
 import AddTreeForm from './elements/AddTreeForm'
 import Captcha from './elements/Captcha'
 import Alert from './elements/Alert'
+import TabGroup from './elements/TabGroup'
 
 declare global {
   interface Window {
@@ -36,6 +37,7 @@ customElements.define('arbolado-geo-input', GeoInput)
 customElements.define('arbolado-add-tree-form', AddTreeForm)
 customElements.define('arbolado-captcha', Captcha)
 customElements.define('arbolado-alert', Alert)
+customElements.define('arbolado-tab-group', TabGroup)
 
 window.Arbolado.ready(async () => {
   const searchForm = document.querySelector('[js-arbolado-form]') as SearchForm

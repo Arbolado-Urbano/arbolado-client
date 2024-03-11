@@ -597,51 +597,73 @@
                 <!-- Paso 3: Identificación de especie -->
                 <div class="d-none" js-step>
                   <h5>Identificación de especie (3/4)</h5>
-                  <div class="mb-3">
-                    <label for="form-images" class="form-label">Fotos</label>
-                    <input class="form-control" type="file" id="form-images" name="images[]" accept="image/*" multiple aria-describedby="form-images-help">
-                    <div id="form-images-help" class="form-text">
-                      Opcional. Las fotos serán usadas para intentar detectar automáticamente la especie del árbol.
-                    </div>
-                  </div>
-                  <div class="mb-3">
-                    <label for="form-species" class="form-label">Nombre científico</label>
-                    <arbolado-species-select id="form-species" name="species" js-input="species" aria-describedby="form-species-help">
-                      <div class="btn-group dropdown w-100">
-                        <button type="button" class="form-select text-start species-select__btn" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="species-dropdown" js-species-select-btn>
-                          Todas
+                  <arbolado-tab-group>
+                    <ul class="nav nav-tabs">
+                      <li class="nav-item">
+                        <button type="button" class="nav-link active" aria-current="page" js-tab-btn="auto">Automática</button>
+                      </li>
+                      <li class="nav-item">
+                        <button type="button" class="nav-link" js-tab-btn="manual">Manual</button>
+                      </li>
+                    </ul>
+                    <div class="border border-top-0 p-3">
+                      <div js-tab="auto" class="d-flex flex-column">
+                        <div class="mb-3">
+                          <label for="form-images" class="form-label">Fotos</label>
+                          <input class="form-control" type="file" id="form-images" name="images[]" accept="image/*" multiple aria-describedby="form-images-help" required>
+                          <div class="invalid-feedback">
+                            Por favor seleccione alguna foto o determine manualmente la especie seleccionando la opción "Manual"
+                          </div>
+                          <div id="form-images-help" class="form-text">
+                            Opcional. Las fotos serán usadas para intentar detectar automáticamente la especie del árbol.
+                          </div>
+                        </div>
+                        <button type="button" js-identify-btn class="btn btn-primary ms-auto">
+                          Identificar
                         </button>
-                        <div id="species-dropdown" class="dropdown-menu w-100 px-2 pb-0 mt-2" role="menu" js-species-dropdown>
-                          <input class="form-control w-100" type="text" placeholder="Buscar" js-species-select-input autocomplete="off">
-                          <ul class="species-select__list mt-2 mb-0 p-0" js-species-select-list>
-                            <div class="text-center my-5">
-                              <div class="spinner-border spinner-border-lg text-primary" role="status">
-                                <span class="visually-hidden">Cargando...</span>
+                      </div>
+                      <div js-tab="manual" class="d-none">
+                        <div class="mb-3">
+                          <label for="form-species" class="form-label">Nombre científico/común</label>
+                          <arbolado-species-select id="form-species" name="species" js-input="species" aria-describedby="form-species-help" data-no-selection-label="Otro (especificar)">
+                            <div class="btn-group dropdown w-100">
+                              <button type="button" class="form-select text-start species-select__btn" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="species-dropdown" js-species-select-btn>
+                                Seleccionar
+                              </button>
+                              <div id="species-dropdown" class="dropdown-menu w-100 px-2 pb-0 mt-2" role="menu" js-species-dropdown>
+                                <input class="form-control w-100" type="text" placeholder="Buscar" js-species-select-input autocomplete="off">
+                                <ul class="species-select__list mt-2 mb-0 p-0" js-species-select-list>
+                                  <div class="text-center my-5">
+                                    <div class="spinner-border spinner-border-lg text-primary" role="status">
+                                      <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                  </div>
+                                </ul>
                               </div>
                             </div>
-                          </ul>
+                            <template js-template="species-select-item">
+                              <li class="dropdown-item px-2" js-species-select-item>
+                                <button type="button" class="species-select__item__btn" js-species-select-item-btn>
+                                  <span js-scientific-name></span>
+                                  <small class="muted-text" js-common-name></small>
+                                </button>
+                              </li>
+                            </template>
+                          </arbolado-species-select>
+                          <div id="form-species-help" class="form-text">
+                            Género y especie. Si la especie no está en la lista o no sabés cuál es, seleccioná "Otro" y completá el nombre en el siguiente campo.
+                          </div>
+                        </div>
+                        <div js-species-manual class="d-none">
+                          <label for="form-species-manual" class="form-label">Nombre de la especie</label>
+                          <input name="species-manual" type="text" class="form-control" id="form-species-manual" aria-describedby="form-species-manual-help">
+                          <div id="form-species-manual-help" class="form-text">
+                            Especifique el nombre de la especie de forma manual.
+                          </div>
                         </div>
                       </div>
-                      <template js-template="species-select-item">
-                        <li class="dropdown-item px-2" js-species-select-item>
-                          <button type="button" class="species-select__item__btn" js-species-select-item-btn>
-                            <span js-scientific-name></span>
-                            <small class="muted-text" js-common-name></small>
-                          </button>
-                        </li>
-                      </template>
-                    </arbolado-species-select>
-                    <div id="form-species-help" class="form-text">
-                      Género y especie. Si la especie no está en la lista o no sabés cuál es, completá el nombre en el siguiente campo.
                     </div>
-                  </div>
-                  <div class="mb-3">
-                    <label for="form-common-name" class="form-label">Nombre común</label>
-                    <input name="common-name" type="text" class="form-control" id="form-common-name" aria-describedby="form-common-name-help">
-                    <div id="form-common-name-help" class="form-text">
-                      Nombre por el cual se identifica a la especie de forma popular.
-                    </div>
-                  </div>
+                  </arbolado-tab-group>
                 </div>
                 <!-- Paso 4: Datos del árbol -->
                 <div class="d-none" js-step>
@@ -757,10 +779,10 @@
                 <button type="button" class="btn btn-outline-dark me-auto" data-bs-dismiss="modal" js-cancel-btn>
                   Cancelar
                 </button>
-                <button type="button" class="btn btn-primary" js-prev-btn disabled>
+                <button type="button" class="btn btn-outline-primary d-none" js-prev-btn>
                   Anterior
                 </button>
-                <button type="button" class="btn btn-primary" js-next-btn>
+                <button type="button" class="btn btn-outline-primary" js-next-btn>
                   Siguiente
                 </button>
                 <button class="btn btn-primary d-none" type="submit" js-submit-btn>
