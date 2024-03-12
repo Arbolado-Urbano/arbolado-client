@@ -2,6 +2,8 @@ import SpeciesSelect from './SpeciesSelect'
 import Captcha from './Captcha'
 import GeoInput from './GeoInput'
 
+declare type ImageType = 'leaf' | 'flower' | 'fruit' | 'bark' | 'auto'
+
 export default class AddTreeForm extends HTMLElement {
   private step: number = 0
   private steps: NodeListOf<Element>
@@ -22,7 +24,7 @@ export default class AddTreeForm extends HTMLElement {
   private imagesInput: HTMLInputElement
   private speciesImages: HTMLUListElement
   private speciesImageTemplate: HTMLTemplateElement
-  private selectedImages: File[] = []
+  private selectedImages: { image: File, type: ImageType }[] = []
 
   constructor() {
     super()
@@ -131,28 +133,43 @@ export default class AddTreeForm extends HTMLElement {
     const imageFiles = this.imagesInput.files
     if (!imageFiles) return
     for (let index = 0; index < imageFiles.length; index++) {
+      if (this.selectedImages.length >= 5) break
       const imageFile = imageFiles[index]
-      this.selectedImages.push(imageFile)
+      this.selectedImages.push({ image: imageFile, type: 'auto' })
     }
     this.imagesInput.value = ''
+    if (this.selectedImages.length >= 5) {
+      this.querySelector('[js-species-image-btn]')?.setAttribute('disabled', 'disabled')
+      this.querySelector('[js-species-image-btn]')?.classList.add('disabled')
+      this.imagesInput.setAttribute('disabled', 'disabled')
+    }
     this.renderSpeciesImages()
   }
 
   private renderSpeciesImages() {
     this.speciesImages.innerHTML = ''
     for (let index = 0; index < this.selectedImages.length; index++) {
-      const imageFile = this.selectedImages[index]
+      const selectedImage = this.selectedImages[index]
+      const imageFile = selectedImage.image
       const speciesImageWrapper = this.speciesImageTemplate.content.cloneNode(true) as HTMLLIElement
       const speciesImage = speciesImageWrapper.querySelector('[js-species-image]') as HTMLImageElement
       speciesImage.src = URL.createObjectURL(imageFile)
+      speciesImageWrapper.querySelector(`[id="image-type-${selectedImage.type}"]`)?.setAttribute('checked', 'checked')
       for (const type of ['leaf', 'flower', 'fruit', 'bark', 'auto']) {
         const imageTypeInput = speciesImageWrapper.querySelector(`[id="image-type-${type}"]`)
         imageTypeInput?.setAttribute('name', `image-type-${index}`)
         imageTypeInput?.setAttribute('id', `image-type-${type}-${index}`)
         speciesImageWrapper.querySelector(`[for="image-type-${type}"]`)?.setAttribute('for', `image-type-${type}-${index}`)
+        speciesImageWrapper.querySelectorAll('input').forEach((typeInput) => typeInput.addEventListener('change', () => {
+          const selectedType = document.querySelector(`[name="image-type-${index}"]:checked`) as HTMLInputElement
+          selectedImage.type = selectedType.value as ImageType
+        }))
       }
       speciesImageWrapper.querySelector('[js-remove]')?.addEventListener('click', () => {
         this.selectedImages.splice(index, 1)
+        this.querySelector('[js-species-image-btn]')?.removeAttribute('disabled')
+        this.querySelector('[js-species-image-btn]')?.classList.remove('disabled')
+        this.imagesInput.removeAttribute('disabled')
         this.renderSpeciesImages()
       })
       this.speciesImages.append(speciesImageWrapper)
@@ -160,8 +177,7 @@ export default class AddTreeForm extends HTMLElement {
   }
 
   private async identifySpecies() {
-    // TODO: Check to see if there are selected images
-    if (!this.imagesInput.value) {
+    if (!this.selectedImages.length) {
       this.imagesInput.classList.add('is-invalid')
       return
     }
@@ -174,7 +190,10 @@ export default class AddTreeForm extends HTMLElement {
     }
     if (!token) return
     const data = new FormData()
-    data.set('images[]', this.imagesInput.value)
+    for (const selectedImage of this.selectedImages) {
+      data.append('images[]', selectedImage.image)
+      data.append('types[]', selectedImage.type)
+    }
     // Add captcha token to data
     data.set('captcha', token)
     const response = await window.Arbolado.fetchJson(`${import.meta.env.VITE_API_URL}/identificar`, 'POST', data)

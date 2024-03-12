@@ -610,6 +610,9 @@
                       <div js-tab="auto" class="d-flex flex-column">
                         <div class="mb-3">
                           <span class="form-label">Fotos</span>
+                          <div id="form-images-help" class="form-text">
+                            Las fotos serán usadas para intentar detectar automáticamente la especie del árbol.
+                          </div>
                           <ul class="list-unstyled row" js-species-images>
                           </ul>
                           <template js-template="species-image">
@@ -623,7 +626,7 @@
                                 <label class="btn btn-outline-primary" for="image-type-fruit">Frutos</label>
                                 <input type="radio" class="btn-check" name="image-type" id="image-type-bark" value="bark" autocomplete="off">
                                 <label class="btn btn-outline-primary" for="image-type-bark">Tronco</label>
-                                <input type="radio" class="btn-check" name="image-type" id="image-type-auto" value="auto" checked autocomplete="off">
+                                <input type="radio" class="btn-check" name="image-type" id="image-type-auto" value="auto" autocomplete="off">
                                 <label class="btn btn-outline-primary" style="border-bottom-right-radius: 0;" for="image-type-auto">Otros</label>
                               </div>
                               <div class="position-relative">
@@ -636,13 +639,10 @@
                               </div>
                             </li>
                           </template>
-                          <label for="form-images" class="btn btn-primary">Agregar fotos</label>
-                          <input class="d-none" type="file" id="form-images" name="images[]" accept="image/*" multiple aria-describedby="form-images-help" autocomplete="off" required>
+                          <label for="form-images" class="btn btn-primary" aria-describedby="form-images-help" js-species-image-btn>Agregar fotos</label>
+                          <input class="d-none" type="file" id="form-images" name="images[]" accept="image/*" multiple autocomplete="off" required>
                           <div class="invalid-feedback">
                             Por favor seleccione alguna foto o determine manualmente la especie seleccionando la opción "Manual"
-                          </div>
-                          <div id="form-images-help" class="form-text">
-                            Opcional. Las fotos serán usadas para intentar detectar automáticamente la especie del árbol.
                           </div>
                         </div>
                         <button type="button" js-identify-btn class="btn btn-primary ms-auto">
