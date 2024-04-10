@@ -1,7 +1,9 @@
 import * as L from 'leaflet'
 import 'leaflet.markercluster'
 
-import Tree from '../types/Tree'
+import MarkerPopupTemplate from './MarkerPopup.html?raw'
+
+import Tree from '../../types/Tree'
 
 const { VITE_MAPBOX_TOKEN: accessToken } = import.meta.env
 
@@ -45,7 +47,6 @@ export default class MapElement extends HTMLElement {
     spiderfyDistanceMultiplier: 2,
     zoomToBoundsOnClick: true,
   }
-  private markerPopupTemplate!: HTMLTemplateElement
   private marker?: L.Marker // Marker
   private circle?: L.Circle // Circle around marker indicating search radius
   private treeMarkers!: L.MarkerClusterGroup // Trees from search result
@@ -72,9 +73,6 @@ export default class MapElement extends HTMLElement {
     this.map.on('click', (event: any) => {
       this.setMarker(event.latlng)
     })
-
-    // Init the "search" popup for the map marker
-    this.markerPopupTemplate = this.querySelector('[js-template="marker-popup"]') as HTMLTemplateElement
 
     // Look for a marker on the query params. If there's one set it.
     const marker = window.Arbolado.queryParams.get('user_latlng')
@@ -172,7 +170,7 @@ export default class MapElement extends HTMLElement {
   }
 
   private createMarkerPopup() {
-    const markerPopupContent = this.markerPopupTemplate.content.cloneNode(true) as HTMLElement
+    const markerPopupContent = window.Arbolado.loadTemplate(MarkerPopupTemplate) as HTMLElement
     markerPopupContent.querySelector('[js-marker-popup-search]')?.addEventListener('click', () => {
       this.marker?.closePopup()
       // Emit an event when the user clicks the search button from marker so the search form can be notified and perform the search

@@ -12,6 +12,7 @@ export default class Captcha extends HTMLElement {
   }
 
   execute(): Promise<string> {
+    if (!this.rendered) this.render()
     return new Promise((resolve, reject) => {
       document.addEventListener('arbolado:captcha/callback', (event) => {
         const { token } = (event as CustomEvent).detail

@@ -1,16 +1,18 @@
+import AlertTemplate from './Alert.html?raw'
+
 export default class Alert extends HTMLElement {
   contentElement: HTMLElement
   
   constructor(type: AlertType, content: string = '') {
     super()
+    this.innerHTML = AlertTemplate
     this.show = this.show.bind(this)
     this.hide = this.hide.bind(this)
     this.setType = this.setType.bind(this)
     this.setContent = this.setContent.bind(this)
 
-    const template = document.querySelector('[js-template="alert"]') as HTMLTemplateElement
-    const templateClone = template.content.cloneNode(true)
-    this.append(templateClone)
+    const template = window.Arbolado.loadTemplate(AlertTemplate) as HTMLTemplateElement
+    this.append(template)
     this.classList.add('alert')
     this.classList.add('alert-dismissible')
     this.classList.add('fade')

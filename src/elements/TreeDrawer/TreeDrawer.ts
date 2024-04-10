@@ -1,4 +1,8 @@
-import Tree from '../types/Tree'
+import TreeDrawerTemplate from './TreeDrawer.html?raw'
+import SourceAccordionTemplate from './SourceAccordion.html?raw'
+
+import Tree from '../../types/Tree'
+
 type TreeData = {
   id: { element: HTMLElement, label?: string },
   nombre_cientifico: { element: HTMLElement, label?: string },
@@ -29,16 +33,14 @@ export default class TreeModal extends HTMLElement {
   private closeBtn: HTMLButtonElement
   private treeData: TreeData
   private previousUrl?: string
-  private sourceAccordionTemplate: HTMLTemplateElement
   
   constructor() {
     super()
+    this.innerHTML = TreeDrawerTemplate
     this.close = this.close.bind(this)
     this.handleFocusOut = this.handleFocusOut.bind(this)
     this.handleKeyDown = this.handleKeyDown.bind(this)
 
-    this.sourceAccordionTemplate = this.querySelector('[js-template="source-accordion"]') as HTMLTemplateElement
-    
     const { VITE_GOOGLE_MAPS_STREET_VIEW_URL, VITE_GOOGLE_MAPS_API_KEY } = import.meta.env
     this.streetViewUrl = `${VITE_GOOGLE_MAPS_STREET_VIEW_URL}&key=${VITE_GOOGLE_MAPS_API_KEY}`
 
@@ -115,7 +117,7 @@ export default class TreeModal extends HTMLElement {
     for (const record of tree.records) {
       const { fecha_creacion } = record
       const { id, descripcion, nombre, facebook, instagram, twitter, url } = record.source
-      const sourceElement = this.sourceAccordionTemplate.content.cloneNode(true) as HTMLElement
+      const sourceElement = window.Arbolado.loadTemplate(SourceAccordionTemplate) as HTMLElement
       const accordionBtn = sourceElement.querySelector('[js-accordion-btn]') as HTMLButtonElement
       const accordion = sourceElement.querySelector('[js-accordion]') as HTMLDivElement
       const accordionBody = sourceElement.querySelector('[js-accordion-body]') as HTMLDivElement

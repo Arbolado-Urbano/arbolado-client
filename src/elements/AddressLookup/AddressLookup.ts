@@ -1,7 +1,9 @@
-import NominatimResponse from '../types/NominatimResponse'
-import MapElement from './MapElement'
+import AddressLookupTemplate from './AddressLookup.html?raw'
 
-export default class AddresLookup extends HTMLElement {
+import NominatimResponse from '../../types/NominatimResponse'
+import MapElement from '../MapElement/MapElement'
+
+export default class AddressLookup extends HTMLElement {
   private loadingElement: HTMLElement
   private searchBtn: HTMLButtonElement
   private inputElement: HTMLInputElement
@@ -12,6 +14,7 @@ export default class AddresLookup extends HTMLElement {
   constructor() {
     super()
 
+    this.innerHTML = AddressLookupTemplate
     this.loadingElement = this.querySelector('[js-address-lookup-loading]') as HTMLElement
     this.searchBtn = this.querySelector('[js-address-lookup-btn]') as HTMLButtonElement
     this.inputElement = this.querySelector('[js-address-lookup-input]') as HTMLInputElement

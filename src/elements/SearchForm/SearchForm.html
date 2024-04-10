@@ -1,0 +1,91 @@
+<form js-form novalidate>
+  <input type="hidden" name="radio" value="1000" js-input="radio">
+  <div class="row">
+    <div class="col-12">
+      <div class="mb-3">
+        <h2>
+          ¿Dónde?
+        </h2>
+        <div class="form-check form-check-inline">
+          <input type="radio" id="marker-all" name="marker" class="form-check-input" value="" js-input="marker-all">
+          <label class="form-check-label" for="marker-all">
+            En todo el mapa
+          </label>
+        </div>
+        <div class="custom-control custom-radio form-check-inline" data-bs-toggle="tooltip" data-bs-title="Hacé click en el mapa para colocar una marca.">
+          <input type="radio" id="marker-point" name="marker" class="form-check-input" value="1" disabled js-input="marker-point">
+          <label class="form-check-label" for="marker-point">
+            Marcar en el mapa
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="mb-3">
+        <h2>
+          ¿Qué especie?
+        </h2>
+        <arbolado-species-select name="species" js-input="species"></arbolado-species-select>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="mb-3">
+        <h2>
+          Sabores
+        </h2>
+        <div class="form-check form-switch">
+          <input type="checkbox" class="form-check-input" id="input-flavors" name="flavors" js-input="flavors">
+          <label class="form-check-label" for="input-flavors">
+            Frutales y medicinales
+          </label>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="regiones">
+          <h2>
+            Región de origen
+            <a href="#" id="origen" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Por el momento el mapa permite filtrar especies para las distintas regiones de origen sólo dentro de Argentina, ¡esperamos ampliar esta sección pronto!">
+              <i class="fas fa-question-circle"></i>
+            </a>
+          </h2>
+          <div class="form-check form-switch form-check-inline">
+            <input type="checkbox" class="form-check-input" id="borigen_pampeana" name="pampeana" value="1" js-input="pampeana">
+            <label class="form-check-label" for="borigen_pampeana">
+              Pampeana
+            </label>
+          </div>
+          <div class="form-check form-switch form-check-inline">
+            <input type="checkbox" class="form-check-input" id="borigen_nea" name="nea" value="1" js-input="nea">
+            <label class="form-check-label" for="borigen_nea">
+              NEA
+            </label>
+          </div>
+          <div class="form-check form-switch form-check-inline">
+            <input type="checkbox" class="form-check-input" id="borigen_noa" name="noa" value="1" js-input="noa">
+            <label class="form-check-label" for="borigen_noa">
+              NOA
+            </label>
+          </div>
+          <div class="form-check form-switch form-check-inline">
+            <input type="checkbox" class="form-check-input" id="borigen_cuyana" name="cuyana" value="1" js-input="cuyana">
+            <label class="form-check-label" for="borigen_cuyana">
+              Cuyana
+            </label>
+          </div>
+          <div class="form-check form-switch form-check-inline">
+            <input type="checkbox" class="form-check-input" id="borigen_patagonica" name="patagonica" value="1" js-input="patagonica">
+            <label class="form-check-label" for="borigen_patagonica">
+              Patagónica
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary btn-block mt-4 w-100 text-white" js-search-btn>
+    Buscar
+  </button>
+</form>

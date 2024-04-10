@@ -1,3 +1,5 @@
+import GeoInputTemplate from './GeoInput.html?raw'
+
 import * as L from 'leaflet'
 
 const { VITE_MAPBOX_TOKEN: accessToken } = import.meta.env
@@ -10,6 +12,7 @@ export default class GeoInput extends HTMLElement {
   private map?: L.Map // Map reference
   private marker?: L.Marker // Marker
   private mapOptions: L.MapOptions = { // Map options
+    dragging: !L.Browser.mobile, // Disable one finger dragging on mobile devices
     center: L.latLng(-34.4720387,-58.5388896), // San Isidro
     layers: [
       L.tileLayer(
@@ -29,6 +32,7 @@ export default class GeoInput extends HTMLElement {
 
   constructor() {
     super()
+    this.innerHTML = GeoInputTemplate
     this.handleClick = this.handleClick.bind(this)
     this.handleSuccess = this.handleSuccess.bind(this)
     this.handleError = this.handleError.bind(this)
@@ -40,7 +44,7 @@ export default class GeoInput extends HTMLElement {
 
     this.map = L.map('geo-input-map', this.mapOptions)
     this.map.on('click', (event: any) => {
-      this.setMarker(event.latlng)
+      this.setValue(event.latlng)
     })
   }
 
@@ -56,6 +60,7 @@ export default class GeoInput extends HTMLElement {
     this._value = value
     this._internals.setFormValue(this._value)
     this.checkValidity()
+    window.Arbolado.emitEvent(this, 'change')
   }
   checkValidity() { return this._internals.checkValidity() }
   reportValidity() { return this._internals.reportValidity() }
@@ -75,12 +80,11 @@ export default class GeoInput extends HTMLElement {
     console.warn(`ERROR(${err.code}): ${err.message}`)
     alert('No es posible determinar su ubicación. Por favor ingrese manualmente')
   }
+
   handleSuccess: PositionCallback = (pos) => {
     const { coords } = pos
-    console.log(`More or less ${coords.accuracy} meters.`)
-    this.value = `${coords.latitude},${coords.longitude}`
     const latLng = new L.LatLng(coords.latitude, coords.longitude)
-    this.setMarker(latLng)
+    this.setValue(latLng)
   }
 
   handleClick() {
@@ -104,31 +108,31 @@ export default class GeoInput extends HTMLElement {
   }
   
   /**
-  * Sets a marker on the map based on coordinates
+  * Sets the given latLng as the current value and sets a marker on the map for those coordinates
   * @param latLng - Latitude and longitude coordinates
   */
- public setMarker(latLng: L.LatLng): void {
-   // Get the map object
-   if (!this.map) return
-  // If there's no marker on the map...
-  if (!this.marker) {
-    L.Icon.Default.imagePath = '/imgs/markers/'
-    // Create a new marker
-    this.marker = new L.Marker([latLng.lat, latLng.lng], {
-      draggable: true,
-      riseOnHover: true,
-    })
-    this.map.addLayer(this.marker)
-  } else {
-    // If a marker already exists, move it
-    this.marker.setLatLng([latLng.lat, latLng.lng])
+  public setValue(latLng: L.LatLng): void {
+    // Get the map object
+    if (!this.map) return
+    // If there's no marker on the map...
+    if (!this.marker) {
+      L.Icon.Default.imagePath = '/imgs/markers/'
+      // Create a new marker
+      this.marker = new L.Marker([latLng.lat, latLng.lng], {
+        draggable: true,
+        riseOnHover: true,
+      })
+      this.map.addLayer(this.marker)
+    } else {
+      // If a marker already exists, move it
+      this.marker.setLatLng([latLng.lat, latLng.lng])
+    }
+    if (!this.map.hasLayer(this.marker)) {
+      this.map.addLayer(this.marker)
+    }
+    // Update the selected coordinates
+    this.latlngUpdated(latLng)
+    // Set the value for the selected coordinates
+    this.value = `${latLng.lat},${latLng.lng}`
   }
-
-  if (!this.map.hasLayer(this.marker)) {
-    this.map.addLayer(this.marker)
-  }
-
-  // Update the selected coordinates
-  this.latlngUpdated(latLng)
- }
 }

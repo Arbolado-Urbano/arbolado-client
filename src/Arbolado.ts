@@ -1,6 +1,6 @@
 import { LatLng, LatLngBounds } from 'leaflet'
 import NominatimResponse from './types/NominatimResponse'
-import Alert, { AlertType } from './elements/Alert'
+import Alert, { AlertType } from './elements/Alert/Alert'
 
 export default class Arbolado {
   overlay: HTMLElement 
@@ -21,6 +21,12 @@ export default class Arbolado {
 
   ready(fn: () => any) {
     document.addEventListener('DOMContentLoaded', fn)
+  }
+
+  loadTemplate(HTMLContent: string): Node {
+    const template = document.createElement('template')
+    template.innerHTML = HTMLContent
+    return template.content.cloneNode(true)
   }
 
   emitEvent(element: Node, name: string, data?: any) {

@@ -2,17 +2,17 @@ import * as bootstrap from 'bootstrap'
 
 import Arbolado from './Arbolado'
 
-import Loader from './elements/Loader'
-import MapElement from './elements/MapElement'
-import SearchForm from './elements/SearchForm'
-import TreeDrawer from './elements/TreeDrawer'
-import SpeciesSelect from './elements/SpeciesSelect'
-import AddresLookup from './elements/AddressLookup'
+import Loader from './elements/Loader/Loader'
+import MapElement from './elements/MapElement/MapElement'
+import SearchForm from './elements/SearchForm/SearchForm'
+import TreeDrawer from './elements/TreeDrawer/TreeDrawer'
+import SpeciesSelect from './elements/SpeciesSelect/SpeciesSelect'
+import AddressLookup from './elements/AddressLookup/AddressLookup'
 import GoogleAds from './elements/GoogleAds'
-import GeoInput from './elements/GeoInput'
-import AddTreeForm from './elements/AddTreeForm'
+import GeoInput from './elements/GeoInput/GeoInput'
+import AddTreeForm from './elements/AddTreeForm/AddTreeForm'
 import Captcha from './elements/Captcha'
-import Alert from './elements/Alert'
+import Alert from './elements/Alert/Alert'
 import TabGroup from './elements/TabGroup'
 
 declare global {
@@ -31,7 +31,7 @@ customElements.define('arbolado-map', MapElement)
 customElements.define('arbolado-species-select', SpeciesSelect)
 customElements.define('arbolado-form', SearchForm)
 customElements.define('arbolado-tree-drawer', TreeDrawer)
-customElements.define('arbolado-address-lookup', AddresLookup)
+customElements.define('arbolado-address-lookup', AddressLookup)
 customElements.define('arbolado-google-ads', GoogleAds)
 customElements.define('arbolado-geo-input', GeoInput)
 customElements.define('arbolado-add-tree-form', AddTreeForm)

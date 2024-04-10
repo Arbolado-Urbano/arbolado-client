@@ -1,4 +1,7 @@
-import Species from '../types/Species'
+import SpeciesSelectTemplate from './SpeciesSelect.html?raw'
+import SpeciesSelectItemTemplate from './SpeciesSelectItem.html?raw'
+
+import Species from '../../types/Species'
 
 export default class SpeciesSelect extends HTMLElement {
   private species: Species[] = []
@@ -12,6 +15,7 @@ export default class SpeciesSelect extends HTMLElement {
 
   constructor() {
     super()
+    this.innerHTML = SpeciesSelectTemplate
     this.handleKeyDown = this.handleKeyDown.bind(this)
     this.renderSpecies = this.renderSpecies.bind(this)
     this.addSpeciesOption = this.addSpeciesOption.bind(this)
@@ -161,8 +165,7 @@ export default class SpeciesSelect extends HTMLElement {
   }
 
   private addSpeciesOption(species: Species, index: number) {
-    const template = this.querySelector('[js-template="species-select-item"]') as HTMLTemplateElement
-    const templateClone = template.content.cloneNode(true) as HTMLElement
+    const templateClone = window.Arbolado.loadTemplate(SpeciesSelectItemTemplate) as HTMLElement
     const item = templateClone.querySelector('[js-species-select-item]') as HTMLElement
     const btn = templateClone.querySelector('[js-species-select-item-btn]') as HTMLButtonElement
     const scientificName = btn.querySelector('[js-scientific-name]') as HTMLElement

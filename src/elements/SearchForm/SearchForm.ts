@@ -1,7 +1,9 @@
 import * as bootstrap from 'bootstrap'
 import { LatLng } from 'leaflet'
 
-import SpeciesSelect from './SpeciesSelect'
+import SearchFormTemplate from './SearchForm.html?raw'
+
+import SpeciesSelect from '../SpeciesSelect/SpeciesSelect'
 
 export default class SearchForm extends HTMLElement {
   private latLng?: LatLng
@@ -23,6 +25,7 @@ export default class SearchForm extends HTMLElement {
   
   constructor() {
     super()
+    this.innerHTML = SearchFormTemplate
     this.noResultsModal = new bootstrap.Modal(document.querySelector('[js-no-results-modal]') as HTMLElement)
     // Init form fields
     this.form = this.querySelector('[js-form]') as HTMLFormElement

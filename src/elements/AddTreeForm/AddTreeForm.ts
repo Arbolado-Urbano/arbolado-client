@@ -1,12 +1,16 @@
-import SpeciesSelect from './SpeciesSelect'
-import Captcha from './Captcha'
-import GeoInput from './GeoInput'
+import AddTreeFormTemplate from './AddTreeForm.html?raw'
+import SpeciesImageTemplate from './SpeciesImage.html?raw'
+
+import SpeciesSelect from '../SpeciesSelect/SpeciesSelect'
+import Captcha from '../Captcha'
+import GeoInput from '../GeoInput/GeoInput'
+import PlantNetResponse from '../../types/PlantNetResponse'
 
 declare type ImageType = 'leaf' | 'flower' | 'fruit' | 'bark' | 'auto'
 
 export default class AddTreeForm extends HTMLElement {
   private step: number = 0
-  private steps: NodeListOf<Element>
+  private steps: NodeListOf<HTMLFormElement>
   private nextBtn: HTMLButtonElement
   private prevBtn: HTMLButtonElement
   private submitBtn: HTMLButtonElement
@@ -14,7 +18,6 @@ export default class AddTreeForm extends HTMLElement {
   private cancelBtn: HTMLButtonElement
   private resetBtn: HTMLButtonElement
   private progress: { wrapper: HTMLElement, bar: HTMLElement }
-  private form: HTMLFormElement
   private identifyBtn: HTMLButtonElement
   private speciesSelect: SpeciesSelect
   private speciesManualWrapper: HTMLElement
@@ -23,18 +26,21 @@ export default class AddTreeForm extends HTMLElement {
   private captchaWidget: Captcha
   private imagesInput: HTMLInputElement
   private speciesImages: HTMLUListElement
-  private speciesImageTemplate: HTMLTemplateElement
   private selectedImages: { image: File, type: ImageType }[] = []
+  private selectedSpecies?: string
+  private autoSpecies: boolean = true
+  private speciesAutoInput: HTMLInputElement
+  private speciesAutoError: HTMLDivElement
 
   constructor() {
     super()
+    this.innerHTML = AddTreeFormTemplate
     this.reset = this.reset.bind(this)
     this.submit = this.submit.bind(this)
     this.identifySpecies = this.identifySpecies.bind(this)
     this.processSpeciesImages = this.processSpeciesImages.bind(this)
     
     this.captchaWidget = document.querySelector('[js-captcha-widget]') as Captcha
-    this.form = this.querySelector('[js-tree-form]') as HTMLFormElement
     this.submitBtn = this.querySelector('[js-submit-btn]') as HTMLButtonElement
     this.nextBtn = this.querySelector('[js-next-btn]') as HTMLButtonElement
     this.prevBtn = this.querySelector('[js-prev-btn]') as HTMLButtonElement
@@ -47,8 +53,9 @@ export default class AddTreeForm extends HTMLElement {
     this.speciesManualWrapper = this.querySelector('[js-species-manual]') as HTMLElement
     this.speciesManualInput = this.querySelector('[name="species-manual"]') as HTMLInputElement
     this.speciesImages = this.querySelector('[js-species-images]') as HTMLUListElement
-    this.speciesImageTemplate = this.querySelector('[js-template="species-image"]') as HTMLTemplateElement
     this.imagesInput = this.querySelector('[name="images[]"]') as HTMLInputElement
+    this.speciesAutoInput = this.querySelector('[js-auto-species-input]') as HTMLInputElement
+    this.speciesAutoError = this.querySelector('[js-auto-species-error]') as HTMLDivElement
     this.steps = this.querySelectorAll('[js-step]')
     this.progress = { wrapper: this.querySelector('[js-progress]') as HTMLElement, bar: this.querySelector('[js-progress-bar]') as HTMLElement}
 
@@ -69,17 +76,25 @@ export default class AddTreeForm extends HTMLElement {
     }) 
     
     // Alternate between automatic and manual speceies selection inputs
-    this.querySelector('[js-tab="auto"]')?.addEventListener('arbolado:tab/open', () => this.imagesInput.setAttribute('required', 'true'))
-    this.querySelector('[js-tab="auto"]')?.addEventListener('arbolado:tab/close', () => this.imagesInput.removeAttribute('required'))
+    this.querySelector('[js-tab="auto"]')?.addEventListener('arbolado:tab/open', () => {
+      this.imagesInput.setAttribute('required', 'true')
+      this.speciesSelect.removeAttribute('required')
+      this.autoSpecies = true
+    })
+    this.querySelector('[js-tab="auto"]')?.addEventListener('arbolado:tab/close', () => {
+      this.imagesInput.removeAttribute('required')
+      this.speciesSelect.setAttribute('required', 'true')
+      this.autoSpecies = false
+    })
 
     this.imagesInput.addEventListener('change', this.processSpeciesImages)
 
-    // Submit handler
-    this.form.addEventListener('submit', this.submit)
+    this.submitBtn.addEventListener('click', () => this.submit())
   }
 
   private goStep(index: number) {
-    if ((index >= this.steps.length) || (index < 0) || (!this.isValidCurrentStep())) return
+    if ((index >= this.steps.length) || (index < 0)) return
+    if ((index > this.step) && (!this.isValidCurrentStep())) return
     this.step = index
     this.steps.forEach((step) => step.classList.add('d-none'))
     this.steps[this.step]?.classList.remove('d-none')
@@ -115,7 +130,33 @@ export default class AddTreeForm extends HTMLElement {
   }
 
   private isValidCurrentStep() {
-    return true
+    const stepForm = this.steps[this.step]
+    stepForm.classList.add('was-validated')
+    if (this.step === 1) {
+      if (this.geoInput.value !== null) {
+        this.geoInput.classList.remove('is-invalid')
+        return true
+      } else {
+        this.geoInput.classList.add('is-invalid')
+        this.geoInput.addEventListener('change', () => this.geoInput.classList.remove('is-invalid'), { once: true })
+        return false
+      }
+    } else if (this.step === 2) {
+      if (!this.autoSpecies) {
+        if (!this.speciesSelect.value) {
+          this.speciesSelect.classList.add('is-invalid')
+          this.speciesSelect.addEventListener('change', () => this.speciesSelect.classList.remove('is-invalid'), { once: true })
+          return false
+        } else {
+          this.speciesSelect.classList.remove('is-invalid')
+          if (this.speciesSelect.value.id === -1) {
+            return !!this.speciesManualInput.value
+          }
+          return true
+        }
+      }
+    }
+    return stepForm.checkValidity()
   }
 
   private reset() {
@@ -151,7 +192,7 @@ export default class AddTreeForm extends HTMLElement {
     for (let index = 0; index < this.selectedImages.length; index++) {
       const selectedImage = this.selectedImages[index]
       const imageFile = selectedImage.image
-      const speciesImageWrapper = this.speciesImageTemplate.content.cloneNode(true) as HTMLLIElement
+      const speciesImageWrapper = window.Arbolado.loadTemplate(SpeciesImageTemplate) as HTMLLIElement
       const speciesImage = speciesImageWrapper.querySelector('[js-species-image]') as HTMLImageElement
       speciesImage.src = URL.createObjectURL(imageFile)
       speciesImageWrapper.querySelector(`[id="image-type-${selectedImage.type}"]`)?.setAttribute('checked', 'checked')
@@ -177,6 +218,7 @@ export default class AddTreeForm extends HTMLElement {
   }
 
   private async identifySpecies() {
+    this.speciesAutoError.classList.remove('d-block')
     if (!this.selectedImages.length) {
       this.imagesInput.classList.add('is-invalid')
       return
@@ -196,12 +238,17 @@ export default class AddTreeForm extends HTMLElement {
     }
     // Add captcha token to data
     data.set('captcha', token)
-    const response = await window.Arbolado.fetchJson(`${import.meta.env.VITE_API_URL}/identificar`, 'POST', data)
-    console.log(response)
+    const response = await window.Arbolado.fetchJson(`${import.meta.env.VITE_API_URL}/identificar`, 'POST', data) as PlantNetResponse
+    if (response) {
+      const bestMatchSpecies = response.results[0]?.species
+      this.selectedSpecies = bestMatchSpecies.scientificNameWithoutAuthor
+      this.speciesAutoInput.value = `${bestMatchSpecies?.scientificName} (${bestMatchSpecies?.commonNames.join(', ')})`
+    } else {
+      this.speciesAutoError.classList.add('d-block')
+    }
   }
 
-  private async submit(event: SubmitEvent) {
-    event.preventDefault()
+  private async submit() {
     // Validate the form
     // if (!window.Arbolado.validateForm(this.form)) return
     let token
@@ -213,14 +260,41 @@ export default class AddTreeForm extends HTMLElement {
     }
     if (!token) return
 
-    // Get the form's data
-    const data = new FormData(this.form)
-    // Add captcha token to data
-    data.set('captcha', token)
+    // Species is used in case of automatic or manual input
+    let species: string | undefined = undefined
+    // SpeciesId is used in case of a selection from the species dropdown
+    let speciesId: number | undefined = undefined
+    if (this.autoSpecies) {
+      species = this.selectedSpecies || ""
+    } else if (this.speciesSelect.value?.id === -1) {
+      species = this.speciesManualInput.value
+    } else {
+      speciesId = this.speciesSelect.value?.id
+    }
 
-    // // Make the search
-    // let requestUrl = `${import.meta.env.VITE_API_URL}/arboles`
-    // const response = await window.Arbolado.fetchJson(requestUrl)
+    const step0FormData = new FormData(this.steps[0])
+    const step3FormData = new FormData(this.steps[3])
+
+    const data = JSON.stringify({
+      email: step0FormData.get("email"),
+      name: step0FormData.get("name"),
+      website: step0FormData.get("website"),
+      coordinates: this.geoInput.value,
+      species,
+      speciesId,
+      height: step3FormData.get("height"),
+      inclination: step3FormData.get("inclination"),
+      diameterTrunk: step3FormData.get("diameter-trunk"),
+      diameterCanopy: step3FormData.get("diameter-canopy"),
+      development: step3FormData.get("development"),
+      health: step3FormData.get("health"),
+      captcha: token,
+    })
+
+    // Make the search
+    let requestUrl = `${import.meta.env.VITE_API_URL}/arboles`
+    const response = await window.Arbolado.fetchJson(requestUrl, "POST", data)
+    console.log(response)
     // TODO: Response handling
   }
 }
