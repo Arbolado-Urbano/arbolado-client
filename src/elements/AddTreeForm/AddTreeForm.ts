@@ -165,6 +165,11 @@ export default class AddTreeForm extends HTMLElement {
     this.cancelBtn.classList.remove('d-none')
     this.closeBtn.classList.add('d-none')
     this.resetBtn.classList.add('d-none')
+    this.steps.forEach((step, index) => {
+      step.classList.remove('was-validated')
+      if (index === 0) { return }
+      step.reset()
+    })
     this.goStep(0)
   }
 
@@ -293,8 +298,11 @@ export default class AddTreeForm extends HTMLElement {
 
     // Make the search
     let requestUrl = `${import.meta.env.VITE_API_URL}/arboles`
-    const response = await window.Arbolado.fetchJson(requestUrl, "POST", data)
-    console.log(response)
-    // TODO: Response handling
+    const response = await window.Arbolado.fetch(requestUrl, "POST", data)
+    if (response?.status == 200) {
+      this.goStep(this.step + 1)
+    } else {
+      alert('Ocurrió un error, intentá de nuevo más tarde')
+    }
   }
 }
