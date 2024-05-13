@@ -39,7 +39,8 @@ export default class AddTreeForm extends HTMLElement {
     this.submit = this.submit.bind(this)
     this.identifySpecies = this.identifySpecies.bind(this)
     this.processSpeciesImages = this.processSpeciesImages.bind(this)
-    
+    this.fileToBase64 = this.fileToBase64.bind(this)
+
     this.captchaWidget = document.querySelector('[js-captcha-widget]') as Captcha
     this.submitBtn = this.querySelector('[js-submit-btn]') as HTMLButtonElement
     this.nextBtn = this.querySelector('[js-next-btn]') as HTMLButtonElement
@@ -57,7 +58,7 @@ export default class AddTreeForm extends HTMLElement {
     this.speciesAutoInput = this.querySelector('[js-auto-species-input]') as HTMLInputElement
     this.speciesAutoError = this.querySelector('[js-auto-species-error]') as HTMLDivElement
     this.steps = this.querySelectorAll('[js-step]')
-    this.progress = { wrapper: this.querySelector('[js-progress]') as HTMLElement, bar: this.querySelector('[js-progress-bar]') as HTMLElement}
+    this.progress = { wrapper: this.querySelector('[js-progress]') as HTMLElement, bar: this.querySelector('[js-progress-bar]') as HTMLElement }
 
     this.nextBtn.addEventListener('click', () => this.goStep(this.step + 1))
     this.prevBtn.addEventListener('click', () => this.goStep(this.step - 1))
@@ -73,8 +74,8 @@ export default class AddTreeForm extends HTMLElement {
         this.speciesManualInput.removeAttribute('required')
         this.speciesManualWrapper.classList.add('d-none')
       }
-    }) 
-    
+    })
+
     // Alternate between automatic and manual speceies selection inputs
     this.querySelector('[js-tab="auto"]')?.addEventListener('arbolado:tab/open', () => {
       this.imagesInput.setAttribute('required', 'true')
@@ -98,7 +99,7 @@ export default class AddTreeForm extends HTMLElement {
     this.step = index
     this.steps.forEach((step) => step.classList.add('d-none'))
     this.steps[this.step]?.classList.remove('d-none')
-    if (index > 0)  {
+    if (index > 0) {
       this.prevBtn.classList.remove('d-none')
     } else {
       this.prevBtn.classList.add('d-none')
@@ -142,6 +143,7 @@ export default class AddTreeForm extends HTMLElement {
         return false
       }
     } else if (this.step === 2) {
+      debugger
       if (!this.autoSpecies) {
         if (!this.speciesSelect.value) {
           this.speciesSelect.classList.add('is-invalid')
@@ -152,6 +154,14 @@ export default class AddTreeForm extends HTMLElement {
           if (this.speciesSelect.value.id === -1) {
             return !!this.speciesManualInput.value
           }
+          return true
+        }
+      } else {
+        if (this.speciesAutoInput.value === '') {
+          this.speciesAutoInput.classList.add('is-invalid')
+          return false
+        } else {
+          this.speciesAutoInput.classList.remove('is-invalid')
           return true
         }
       }
@@ -248,9 +258,21 @@ export default class AddTreeForm extends HTMLElement {
       const bestMatchSpecies = response.results[0]?.species
       this.selectedSpecies = bestMatchSpecies.scientificNameWithoutAuthor
       this.speciesAutoInput.value = `${bestMatchSpecies?.scientificName} (${bestMatchSpecies?.commonNames.join(', ')})`
+      this.speciesAutoInput.classList.remove('is-invalid')
     } else {
       this.speciesAutoError.classList.add('d-block')
     }
+  }
+
+  private async fileToBase64(file: File) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = function () {
+        resolve(reader.result)
+      }
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
   }
 
   private async submit() {
@@ -270,7 +292,7 @@ export default class AddTreeForm extends HTMLElement {
     // SpeciesId is used in case of a selection from the species dropdown
     let speciesId: number | undefined = undefined
     if (this.autoSpecies) {
-      species = this.selectedSpecies || ""
+      species = this.selectedSpecies || ''
     } else if (this.speciesSelect.value?.id === -1) {
       species = this.speciesManualInput.value
     } else {
@@ -281,24 +303,25 @@ export default class AddTreeForm extends HTMLElement {
     const step3FormData = new FormData(this.steps[3])
 
     const data = JSON.stringify({
-      email: step0FormData.get("email"),
-      name: step0FormData.get("name"),
-      website: step0FormData.get("website"),
+      email: step0FormData.get('email'),
+      name: step0FormData.get('name'),
+      website: step0FormData.get('website'),
       coordinates: this.geoInput.value,
       species,
       speciesId,
-      height: step3FormData.get("height"),
-      inclination: step3FormData.get("inclination"),
-      diameterTrunk: step3FormData.get("diameter-trunk"),
-      diameterCanopy: step3FormData.get("diameter-canopy"),
-      development: step3FormData.get("development"),
-      health: step3FormData.get("health"),
+      height: step3FormData.get('height'),
+      inclination: step3FormData.get('inclination'),
+      diameterTrunk: step3FormData.get('diameter-trunk'),
+      diameterCanopy: step3FormData.get('diameter-canopy'),
+      development: step3FormData.get('development'),
+      health: step3FormData.get('health'),
+      images: await Promise.all(this.selectedImages.map(async (value) => await this.fileToBase64(value.image))),
       captcha: token,
     })
 
-    // Make the search
+    // Submit
     let requestUrl = `${import.meta.env.VITE_API_URL}/arboles`
-    const response = await window.Arbolado.fetch(requestUrl, "POST", data)
+    const response = await window.Arbolado.fetch(requestUrl, 'POST', data)
     if (response?.status == 200) {
       this.goStep(this.step + 1)
     } else {

@@ -79,10 +79,7 @@
                   <ul class="list-unstyled row" js-species-images>
                   </ul>
                   <label for="form-images" class="btn btn-primary" aria-describedby="form-images-help" js-species-image-btn>Agregar fotos</label>
-                  <input class="d-none" type="file" id="form-images" name="images[]" accept="image/*" multiple autocomplete="off" required>
-                  <div class="invalid-feedback">
-                    Por favor seleccioná alguna foto o determiná manualmente la especie seleccionando la opción "Manual"
-                  </div>
+                  <input class="d-none" type="file" id="form-images" name="images[]" accept="image/*" multiple autocomplete="off">
                 </div>
                 <div class="container">
                   <div class="row gap-3">
@@ -91,6 +88,9 @@
                     <button type="button" js-identify-btn class="btn btn-primary col flex-grow-0">
                       Identificar
                     </button>
+                    <div class="invalid-feedback">
+                      Por favor seleccioná alguna foto y presioná el botón "Identificar" o determiná manualmente la especie seleccionando la opción "Manual"
+                    </div>
                   </div>
                 </div>
                 <div js-auto-species-error class="invalid-feedback">
@@ -133,23 +133,35 @@
             </div>
           </div>
           <div class="mb-3">
-            <span class="form-label">Inclinación</span>
+            <span class="form-label">Inclinación estimada del tronco</span>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="inclination" id="inclination-1" aria-describedby="form-inclination-help" value="normal">
+              <input class="form-check-input" type="radio" name="inclination" id="inclination-1" aria-describedby="form-inclination-help" value="0">
               <label class="form-check-label" for="inclination-1">
-                Tronco normal
+                Tronco normal (0º a 5º)
               </label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="inclination" id="inclination-2" aria-describedby="form-inclination-help" value="slight">
+              <input class="form-check-input" type="radio" name="inclination" id="inclination-2" aria-describedby="form-inclination-help" value="10">
               <label class="form-check-label" for="inclination-2">
-                Levemente inclinado (5º a 20º)
+                Levemente inclinado (5º a 15º)
               </label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="inclination" id="inclination-3" aria-describedby="form-inclination-help" value="very">
+              <input class="form-check-input" type="radio" name="inclination" id="inclination-3" aria-describedby="form-inclination-help" value="20">
               <label class="form-check-label" for="inclination-3">
-                Muy inclinado (> a 20º)
+                Moderadamente inclinado (15º a 25º)
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="inclination" id="inclination-4" aria-describedby="form-inclination-help" value="30">
+              <label class="form-check-label" for="inclination-4">
+                Riesgo de caída (25º a 35º)
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="inclination" id="inclination-5" aria-describedby="form-inclination-help" value="90">
+              <label class="form-check-label" for="inclination-5">
+                Muy riesgoso (> a 35º)
               </label>
             </div>
             <div id="form-inclination-help" class="form-text">
