@@ -1,7 +1,8 @@
+import { LatLngBounds } from 'leaflet'
+
 import AddressLookupTemplate from './AddressLookup.html?raw'
 
 import NominatimResponse from '../../types/NominatimResponse'
-import MapElement from '../MapElement/MapElement'
 
 export default class AddressLookup extends HTMLElement {
   private loadingElement: HTMLElement
@@ -9,7 +10,7 @@ export default class AddressLookup extends HTMLElement {
   private inputElement: HTMLInputElement
   private resultsElement: HTMLElement
   private itemTemplate: HTMLTemplateElement
-  private mapElement: MapElement
+  private bounds?: LatLngBounds
   
   constructor() {
     super()
@@ -20,10 +21,13 @@ export default class AddressLookup extends HTMLElement {
     this.inputElement = this.querySelector('[js-address-lookup-input]') as HTMLInputElement
     this.resultsElement = this.querySelector('[js-address-lookup-results]') as HTMLElement
     this.itemTemplate = this.querySelector('[js-template="address-lookup-item"]') as HTMLTemplateElement
-    this.mapElement = document.querySelector('[js-arbolado-map]') as MapElement
 
     this.inputElement.addEventListener('keydown', (event: KeyboardEvent) => this.handleKeydown(event))
     this.searchBtn.addEventListener('click', () => this.handleSearch())
+  }
+
+  public setBounds(bounds: LatLngBounds) {
+    this.bounds = bounds
   }
 
   private toggleLoading(loading: boolean) {
@@ -37,14 +41,16 @@ export default class AddressLookup extends HTMLElement {
   }
 
   private handleKeydown(event: KeyboardEvent) {
-    if ((event.key === 'Enter') || (event.key === 'NumpadEnter')) this.handleSearch()
+    if ((event.key === 'Enter') || (event.key === 'NumpadEnter')) {
+      event.preventDefault()
+      this.handleSearch()
+    }
   }
 
   private async handleSearch() {
     this.toggleLoading(true)
-    const bounds = this.mapElement.getMapBounds(); // Get the current map bounds
     // Search withing the map bounds
-    const results = await window.Arbolado.addressLookup(this.inputElement.value, bounds)
+    const results = await window.Arbolado.addressLookup(this.inputElement.value, this.bounds)
     // Load the search results
     if (results.length) {
       this.resultsElement.classList.remove('d-none')
@@ -67,7 +73,8 @@ export default class AddressLookup extends HTMLElement {
   }
 
   private selectAddress(address: NominatimResponse) {
-    this.mapElement.setMarker(address.latlng)
+    window.Arbolado.emitEvent(this, 'arbolado:address/selected', { latLng: address.latlng })
+    // this.mapElement.setMarker(address.latlng)
     this.inputElement.value = address.displayName
     this.resultsElement.classList.add('d-none')
   }

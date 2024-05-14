@@ -5,6 +5,19 @@
   z-index: 1;
 }
 
+.map-container + .loader {
+  align-items: center;
+  background-color: rgba(0, 0, 0, .5);
+  justify-content: center;
+  position: absolute;
+  inset: 0;
+  z-index: 99999;
+}
+
+.map-container.loading + .loader {
+  display: flex;
+}
+
 @include media-breakpoint-down(lg) {
   .map-container {
     height: 600px;

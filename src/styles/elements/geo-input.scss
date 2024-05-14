@@ -5,10 +5,17 @@
   position: relative;
 }
 
-.geo-input .btn {
-  bottom: 2rem;
+.geo-input arbolado-geo-btn {
+  bottom: 1.5rem;
   position: absolute;
-  right: 1rem;
+  right: .5rem;
+  z-index: 999;
+}
+
+.geo-input .address-search {
+  top: .5rem;
+  position: absolute;
+  right: .5rem;
   z-index: 999;
 }
 

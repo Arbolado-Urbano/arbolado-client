@@ -14,6 +14,7 @@ import AddTreeForm from './elements/AddTreeForm/AddTreeForm'
 import Captcha from './elements/Captcha'
 import Alert from './elements/Alert/Alert'
 import TabGroup from './elements/TabGroup'
+import GeoBtn from './elements/GeoBtn/GeoBtn'
 
 declare global {
   interface Window {
@@ -34,6 +35,7 @@ customElements.define('arbolado-tree-drawer', TreeDrawer)
 customElements.define('arbolado-address-lookup', AddressLookup)
 customElements.define('arbolado-google-ads', GoogleAds)
 customElements.define('arbolado-geo-input', GeoInput)
+customElements.define('arbolado-geo-btn', GeoBtn)
 customElements.define('arbolado-add-tree-form', AddTreeForm)
 customElements.define('arbolado-captcha', Captcha)
 customElements.define('arbolado-alert', Alert)
@@ -43,13 +45,16 @@ window.Arbolado.ready(async () => {
   const searchForm = document.querySelector('[js-arbolado-form]') as SearchForm
   const mapElement = document.querySelector('[js-arbolado-map]') as MapElement
   const treeDrawer = document.querySelector('[js-tree-drawer]') as TreeDrawer
+  const addressLookup = document.querySelector('[js-address-lookup]')  as AddressLookup
   document.addEventListener('arbolado:results/updated', (event) => mapElement.displayTrees((event as CustomEvent).detail.trees))
   searchForm.addEventListener('arbolado:marker/remove', () => mapElement.removeMarker())
   mapElement.addEventListener('arbolado:maker/set', (event) => searchForm.setMarker((event as CustomEvent).detail.latLng))
   mapElement.addEventListener('arbolado:tree/selected', (event) => treeDrawer.displayTree((event as CustomEvent).detail.id))
   mapElement.addEventListener('arbolado:marker/removed', () => searchForm.removeMarker())
   mapElement.addEventListener('arbolado:marker/search', () => searchForm.search())
+  mapElement.addEventListener('arbolado:map/move', (event) => addressLookup.setBounds((event as CustomEvent).detail.bounds))
   treeDrawer.addEventListener('arbolado:tree/displayed', (event) => mapElement.displayTree((event as CustomEvent).detail.tree))
+  addressLookup.addEventListener('arbolado:address/selected', (event) => mapElement.setMarker((event as CustomEvent).detail.latLng))
 
   // Init Bootstrap's tooltips
   document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((element) => new bootstrap.Tooltip(element))

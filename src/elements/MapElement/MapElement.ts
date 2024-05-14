@@ -4,6 +4,7 @@ import 'leaflet.markercluster'
 import MarkerPopupTemplate from './MarkerPopup.html?raw'
 
 import Tree from '../../types/Tree'
+import GeoBtn from '../GeoBtn/GeoBtn'
 
 const { VITE_MAPBOX_TOKEN: accessToken } = import.meta.env
 
@@ -14,6 +15,7 @@ const environment = {
 }
 
 export default class MapElement extends HTMLElement {
+  private geoBtn: GeoBtn
   private map!: L.Map // Map reference
   private mapFitToBoundsOptions: L.FitBoundsOptions = { maxZoom: 15, padding: [15, 15] } // To zoom into search results
   private options: L.MapOptions = { // Map options
@@ -60,6 +62,15 @@ export default class MapElement extends HTMLElement {
 
   constructor() {
     super()
+    this.geoBtn = document.querySelector('[js-map-geo-btn]') as GeoBtn
+    this.geoBtn.addEventListener('arbolado:geo/searching', () => this.setLoading(true))
+    this.geoBtn.addEventListener('arbolado:geo/error', () => this.setLoading(false))
+    this.geoBtn.addEventListener('arbolado:geo/success', (event) => {
+      this.setLoading(false)
+      const data = (event as CustomEvent).detail
+      const latLng = new L.LatLng(data.lat, data.lng)
+      this.setMarker(latLng)
+    })
     this.initMap()
   }
 
@@ -73,6 +84,7 @@ export default class MapElement extends HTMLElement {
     this.map.on('click', (event: any) => {
       this.setMarker(event.latlng)
     })
+    this.map.on('move', () => window.Arbolado.emitEvent(this, 'arbolado:map/move', { bounds: this.getMapBounds() }))
 
     // Look for a marker on the query params. If there's one set it.
     const marker = window.Arbolado.queryParams.get('user_latlng')
@@ -87,6 +99,11 @@ export default class MapElement extends HTMLElement {
         window.Arbolado.pushQueryParams()
       }
     }
+  }
+
+  private setLoading(loading: boolean) {
+    if (loading) this.classList.add('loading')
+    else this.classList.remove('loading')
   }
   
   private async getLocationFromURL(): Promise<L.LatLng | undefined> {

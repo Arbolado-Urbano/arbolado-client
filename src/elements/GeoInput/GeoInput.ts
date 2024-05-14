@@ -1,14 +1,16 @@
 import GeoInputTemplate from './GeoInput.html?raw'
+import GeoBtn from '../GeoBtn/GeoBtn'
 
 import * as L from 'leaflet'
+import AddressLookup from '../AddressLookup/AddressLookup'
 
 const { VITE_MAPBOX_TOKEN: accessToken } = import.meta.env
 
 export default class GeoInput extends HTMLElement {
   _internals: ElementInternals
   _value: string | null = null
-  private options: PositionOptions = { enableHighAccuracy: true }
-  private btn: HTMLButtonElement
+  private addressLookup: AddressLookup
+  private geoBtn: GeoBtn
   private map?: L.Map // Map reference
   private marker?: L.Marker // Marker
   private mapOptions: L.MapOptions = { // Map options
@@ -33,19 +35,26 @@ export default class GeoInput extends HTMLElement {
   constructor() {
     super()
     this.innerHTML = GeoInputTemplate
-    this.handleClick = this.handleClick.bind(this)
-    this.handleSuccess = this.handleSuccess.bind(this)
-    this.handleError = this.handleError.bind(this)
 
     this._internals = this.attachInternals()
-    this.btn = this.querySelector('[js-geo-btn]') as HTMLButtonElement
+    this.geoBtn = this.querySelector('[js-geo-btn]') as GeoBtn
+    this.addressLookup = this.querySelector('[js-address-lookup]') as AddressLookup
 
-    this.btn.addEventListener('click', this.handleClick)
+    this.geoBtn.addEventListener('arbolado:geo/searching', () => this.setLoading(true))
+    this.geoBtn.addEventListener('arbolado:geo/error', () => this.setLoading(false))
+    this.geoBtn.addEventListener('arbolado:geo/success', (event) => {
+      this.setLoading(false)
+      const data = (event as CustomEvent).detail
+      const latLng = new L.LatLng(data.lat, data.lng)
+      this.setValue(latLng)
+    })
 
     this.map = L.map('geo-input-map', this.mapOptions)
     this.map.on('click', (event: any) => {
       this.setValue(event.latlng)
     })
+    this.map.on('move', () => this.map && this.addressLookup.setBounds(this.map.getBounds()))
+    this.addressLookup.addEventListener('arbolado:address/selected', (event) => this.setValue((event as CustomEvent).detail.latLng))
   }
 
   static get formAssociated() { return true }
@@ -68,28 +77,6 @@ export default class GeoInput extends HTMLElement {
   setLoading(loading: boolean) {
     if (loading) this.classList.add('loading')
     else this.classList.remove('loading')
-  }
-
-  getPosition() {
-    return new Promise((resolve: PositionCallback, reject: PositionErrorCallback) => {
-      navigator.geolocation.getCurrentPosition(resolve, reject, this.options)
-    })
-  }
-
-  handleError: PositionErrorCallback = (err) => {
-    console.warn(`ERROR(${err.code}): ${err.message}`)
-    alert('No es posible determinar su ubicación. Por favor ingrese manualmente')
-  }
-
-  handleSuccess: PositionCallback = (pos) => {
-    const { coords } = pos
-    const latLng = new L.LatLng(coords.latitude, coords.longitude)
-    this.setValue(latLng)
-  }
-
-  handleClick() {
-    this.setLoading(true)
-    this.getPosition().then(this.handleSuccess).catch(this.handleError).finally(() => this.setLoading(false))
   }
 
   resetHeight(): void {

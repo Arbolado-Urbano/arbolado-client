@@ -86,6 +86,12 @@
         <main class="p-0 position-relative">
           
           <arbolado-map id="map" js-arbolado-map class="map-container"></arbolado-map>
+          
+          <div class="loader">
+            <div class="spinner-grow absolute" style="width: 3rem; height: 3rem;" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
     
           <div class="floating-content">
             <div class="d-flex gap-1 mb-2">
@@ -99,7 +105,8 @@
               </button>
             </div>
 
-            <arbolado-address-lookup class="address-search"></arbolado-address-lookup>
+            <arbolado-address-lookup class="address-search" js-address-lookup></arbolado-address-lookup>
+            <arbolado-geo-btn class="mt-2 d-block" js-map-geo-btn></arbolado-geo-btn>
           </div>
         </main>
 
