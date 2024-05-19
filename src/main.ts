@@ -8,7 +8,6 @@ import SearchForm from './elements/SearchForm/SearchForm'
 import TreeDrawer from './elements/TreeDrawer/TreeDrawer'
 import SpeciesSelect from './elements/SpeciesSelect/SpeciesSelect'
 import AddressLookup from './elements/AddressLookup/AddressLookup'
-import GoogleAds from './elements/GoogleAds'
 import GeoInput from './elements/GeoInput/GeoInput'
 import AddTreeForm from './elements/AddTreeForm/AddTreeForm'
 import Captcha from './elements/Captcha'
@@ -19,7 +18,6 @@ import GeoBtn from './elements/GeoBtn/GeoBtn'
 declare global {
   interface Window {
     Arbolado: Arbolado,
-    adsbygoogle: any,
     grecaptcha: ReCaptchaV2.ReCaptcha,
   }
 }
@@ -33,7 +31,6 @@ customElements.define('arbolado-species-select', SpeciesSelect)
 customElements.define('arbolado-form', SearchForm)
 customElements.define('arbolado-tree-drawer', TreeDrawer)
 customElements.define('arbolado-address-lookup', AddressLookup)
-customElements.define('arbolado-google-ads', GoogleAds)
 customElements.define('arbolado-geo-input', GeoInput)
 customElements.define('arbolado-geo-btn', GeoBtn)
 customElements.define('arbolado-add-tree-form', AddTreeForm)
