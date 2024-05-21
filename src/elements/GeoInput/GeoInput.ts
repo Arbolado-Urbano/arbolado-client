@@ -7,7 +7,6 @@ import AddressLookup from '../AddressLookup/AddressLookup'
 const { VITE_MAPBOX_TOKEN: accessToken } = import.meta.env
 
 export default class GeoInput extends HTMLElement {
-  _internals: ElementInternals
   _value: string | null = null
   private addressLookup: AddressLookup
   private geoBtn: GeoBtn
@@ -36,7 +35,6 @@ export default class GeoInput extends HTMLElement {
     super()
     this.innerHTML = GeoInputTemplate
 
-    this._internals = this.attachInternals()
     this.geoBtn = this.querySelector('[js-geo-btn]') as GeoBtn
     this.addressLookup = this.querySelector('[js-address-lookup]') as AddressLookup
 
@@ -58,21 +56,11 @@ export default class GeoInput extends HTMLElement {
   }
 
   static get formAssociated() { return true }
-  get form() { return this._internals.form }
-  get name() { return this.getAttribute('name') }
-  get type() { return this.localName }
-  get validity() { return this._internals.validity }
-  get validationMessage() { return this._internals.validationMessage }
-  get willValidate() { return this._internals.willValidate }
   get value() { return this._value }
   set value(value) {
     this._value = value
-    this._internals.setFormValue(this._value)
-    this.checkValidity()
     window.Arbolado.emitEvent(this, 'change')
   }
-  checkValidity() { return this._internals.checkValidity() }
-  reportValidity() { return this._internals.reportValidity() }
 
   setLoading(loading: boolean) {
     if (loading) this.classList.add('loading')

@@ -18,9 +18,3 @@
   display: flex;
 }
 
-@include media-breakpoint-down(lg) {
-  .map-container {
-    height: 600px;
-  }
-}
-

@@ -1,22 +1,32 @@
 <li class="col-12 col-lg-6 mt-2 mb-lg-0">
-  <div class="btn-group w-100" role="group" aria-label="Basic radio toggle button group">
-    <input type="radio" class="btn-check" name="image-type" id="image-type-leaf" value="leaf" autocomplete="off">
-    <label class="btn btn-outline-primary" style="border-bottom-left-radius: 0;" for="image-type-leaf">Hojas</label>
-    <input type="radio" class="btn-check" name="image-type" id="image-type-flower" value="flower" autocomplete="off">
-    <label class="btn btn-outline-primary" for="image-type-flower">Flores</label>
-    <input type="radio" class="btn-check" name="image-type" id="image-type-fruit" value="fruit" autocomplete="off">
-    <label class="btn btn-outline-primary" for="image-type-fruit">Frutos</label>
-    <input type="radio" class="btn-check" name="image-type" id="image-type-bark" value="bark" autocomplete="off">
-    <label class="btn btn-outline-primary" for="image-type-bark">Tronco</label>
-    <input type="radio" class="btn-check" name="image-type" id="image-type-auto" value="auto" autocomplete="off">
-    <label class="btn btn-outline-primary" style="border-bottom-right-radius: 0;" for="image-type-auto">Otros</label>
-  </div>
-  <div class="position-relative">
-    <button type="button" js-remove class="btn btn-danger btn-lg position-absolute top-0 end-0 mt-2 me-2 z-1" title="Descartar foto">
-      <i class="fas fa-trash fa-fw"></i>
-    </button>
-    <div class="img-crop rounded-bottom">
-      <img class="img-crop__img" js-species-image src="" alt="">
+  <div class="card">
+    <div class="position-relative">
+      <button type="button" js-remove class="btn btn-danger btn-lg position-absolute top-0 end-0 mt-2 me-2 z-1" title="Descartar foto">
+        <i class="fas fa-trash fa-fw"></i>
+      </button>
+      <img class="card-img-top" js-species-image src="" alt="">
+    </div>
+    <div class="card-body">
+      <div class="form-check form-check-inline">
+        <input type="radio" class="form-check-input" name="image-type" id="image-type-leaf" value="leaf" autocomplete="off">
+        <label class="form-check-label" style="border-bottom-left-radius: 0;" for="image-type-leaf">Hojas</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input type="radio" class="form-check-input" name="image-type" id="image-type-flower" value="flower" autocomplete="off">
+        <label class="form-check-label" style="border-bottom-left-radius: 0;" for="image-type-flower">Flores</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input type="radio" class="form-check-input" name="image-type" id="image-type-fruit" value="fruit" autocomplete="off">
+        <label class="form-check-label" style="border-bottom-left-radius: 0;" for="image-type-fruit">Frutos</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input type="radio" class="form-check-input" name="image-type" id="image-type-bark" value="bark" autocomplete="off">
+        <label class="form-check-label" style="border-bottom-left-radius: 0;" for="image-type-bark">Tronco</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input type="radio" class="form-check-input" name="image-type" id="image-type-auto" value="auto" autocomplete="off">
+        <label class="form-check-label" style="border-bottom-left-radius: 0;" for="image-type-auto">Otros</label>
+      </div>
     </div>
   </div>
 </li>
