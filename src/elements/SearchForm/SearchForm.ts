@@ -98,7 +98,7 @@ export default class SearchForm extends HTMLElement {
   }
 
   // If checked => the query param "name" will be set with the value "value", otherwise the param will be deleted
-  private setQueryParam(name: string, checked: boolean, value: string = '') {
+  private setQueryParam(name: string, checked: boolean, value: string = '1') {
     if (checked) {
       window.Arbolado.queryParams.set(name, value)
     } else {

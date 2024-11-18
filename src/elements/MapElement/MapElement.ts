@@ -135,7 +135,7 @@ export default class MapElement extends HTMLElement {
    * @param trees - Array with the trees to display
    */
   public displayTrees(trees?: Tree[]): void {
-    if (!trees) return
+    if ((!trees) || (typeof trees[Symbol.iterator] !== 'function')) return
     window.Arbolado.setLoading(true)
     this.marker?.closePopup() // Close the marker popup just in case it was open
     this.treeMarkers.clearLayers() // Remove all previous trees
