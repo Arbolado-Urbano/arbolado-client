@@ -142,7 +142,7 @@ export default class SpeciesSelect extends HTMLElement {
     const searchTerm = this.inputElement.value.toLowerCase()
     this.filtered = this.species.filter((species) => {
       return (
-        species.nombre_comun.toLowerCase().includes(searchTerm) ||
+        species.nombre_comun?.toLowerCase().includes(searchTerm) ||
         species.nombre_cientifico.toLowerCase().includes(searchTerm)
       )
     })
@@ -157,7 +157,7 @@ export default class SpeciesSelect extends HTMLElement {
       const commonName = document.createElement('small')
       commonName.classList.add('muted-text')
       commonName.classList.add('ms-1')
-      commonName.innerText = this.value.nombre_comun
+      commonName.innerText = this.value.nombre_comun || this.value.nombre_cientifico
       this.btnElement.appendChild(commonName)
     } else {
       this.btnElement.innerText = this.noSelectionElement.nombre_cientifico
