@@ -59,7 +59,7 @@ export default class TreeModal extends HTMLElement {
       altura: { element: this.querySelector('[js-tree-data="altura"]') as HTMLElement, label: 'Altura:' },
       espacio_verde: { element: this.querySelector('[js-tree-data="espacio_verde"]') as HTMLElement },
       calle: { element: this.querySelector('[js-tree-data="calle"]') as HTMLElement },
-      nombre: { element: this.querySelector('[js-tree-data="nombre"]') as HTMLElement, label: 'Datos aprotados por' },
+      nombre: { element: this.querySelector('[js-tree-data="nombre"]') as HTMLElement, label: 'Datos aportados por' },
       fecha_creacion: { element: this.querySelector('[js-tree-data="fecha_creacion"]') as HTMLElement },
       descripcion: { element: this.querySelector('[js-tree-data="descripcion"]') as HTMLElement },
       url: { element: this.querySelector('[js-tree-data="url"]') as HTMLAnchorElement },
