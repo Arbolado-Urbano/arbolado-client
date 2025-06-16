@@ -1,0 +1,199 @@
+{
+  "id": "arbolado-urbano",
+  "name": "Arbolado Urbano",
+  "short_name": "Arbolado Urbano",
+  "theme_color": "#5cba9d",
+  "background_color": "#f8f9fa",
+  "display": "standalone",
+  "display_override": [],
+  "scope": "/",
+  "start_url": "/",
+  "orientation": "portrait",
+  "description": "Mapa colaborativo del arbolado en espacios públicos.",
+  "dir": "ltr",
+  "lang": "es",
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "categories": [
+    "education",
+    "utilities"
+  ],
+  "iarc_rating_id": "",
+  "shortcuts": [],
+  "icons": [
+    {
+      "src": "icons/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-mask-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-mask-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-mask-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-mask-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-mask-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-mask-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-mask-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-mask-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-monochrome-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "monochrome"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/narrow/1.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Vista incial"
+    },
+    {
+      "src": "screenshots/narrow/2.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Panel de filtros"
+    },
+    {
+      "src": "screenshots/narrow/3.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Búsqueda por zona"
+    },
+    {
+      "src": "screenshots/narrow/4.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Resultados de búsqueda"
+    },
+    {
+      "src": "screenshots/narrow/5.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Ficha de un árbol"
+    },
+    {
+      "src": "screenshots/wide/1.png",
+      "sizes": "2880x1800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Vista incial"
+    },
+    {
+      "src": "screenshots/wide/2.png",
+      "sizes": "2880x1800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Panel de filtros"
+    },
+    {
+      "src": "screenshots/wide/3.png",
+      "sizes": "2880x1800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Búsqueda por zona"
+    },
+    {
+      "src": "screenshots/wide/4.png",
+      "sizes": "2880x1800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Resultados de búsqueda"
+    },
+    {
+      "src": "screenshots/wide/5.png",
+      "sizes": "2880x1800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Ficha de un árbol"
+    }
+  ]
+}
