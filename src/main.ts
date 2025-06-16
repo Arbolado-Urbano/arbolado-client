@@ -42,7 +42,7 @@ window.Arbolado.ready(async () => {
   const searchForm = document.querySelector('[js-arbolado-form]') as SearchForm
   const mapElement = document.querySelector('[js-arbolado-map]') as MapElement
   const treeDrawer = document.querySelector('[js-tree-drawer]') as TreeDrawer
-  const addressLookup = document.querySelector('[js-address-lookup]')  as AddressLookup
+  const addressLookup = document.querySelector('[js-address-lookup]') as AddressLookup
   document.addEventListener('arbolado:results/updated', (event) => mapElement.displayTrees((event as CustomEvent).detail.trees))
   searchForm.addEventListener('arbolado:marker/remove', () => mapElement.removeMarker())
   mapElement.addEventListener('arbolado:maker/set', (event) => searchForm.setMarker((event as CustomEvent).detail.latLng))
@@ -60,4 +60,12 @@ window.Arbolado.ready(async () => {
 
   // Check to see if a source is selected on the URL
   await window.Arbolado.loadSourceFromURL()
+
+  // Check if the privacy policy modal should be displayed
+  if ((new URLSearchParams(window.location.search)).has("privacidad")) {
+    const privacyModalElement = document.querySelector("#privacy-modal")
+    if (privacyModalElement) {
+      new bootstrap.Modal(privacyModalElement).show()
+    }
+  }
 })
