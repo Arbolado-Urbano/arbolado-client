@@ -1,0 +1,28 @@
+services:
+  db:
+    image: mysql:9
+    ports:
+      - 3306:3306
+    expose:
+      - '3306'
+    environment:
+      MYSQL_DATABASE: arbolado
+      MYSQL_PASSWORD: 6EENjywaR7zQhB
+      MYSQL_USER: arbolado_user
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
+    volumes:
+      - mysql_volume:/var/lib/mysql
+  api:
+    image: ghcr.io/arbolado-urbano/arbolado-api:latest
+    ports:
+      - '8080:8000'
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: arbolado
+      DB_PASSWORD: 6EENjywaR7zQhB
+      DB_USERNAME: arbolado_user
+    depends_on:
+      - db
+volumes:
+  mysql_volume:
