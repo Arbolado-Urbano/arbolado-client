@@ -1,0 +1,16 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.arboladourbano.twa",
+      "sha256_cert_fingerprints": [
+        "48:4B:4E:8A:25:25:7C:2C:00:A0:35:96:12:86:37:88:68:40:E4:7D:71:14:5D:B0:77:9E:DC:DA:BC:21:3C:D1",
+        "29:EB:5B:D1:E9:16:55:7E:9F:F0:92:E2:BE:D0:D4:25:D4:5C:30:20:C0:06:F9:86:C8:AE:7B:CA:F8:15:BE:07",
+        "E8:BE:9C:53:5A:AF:B9:3C:EB:9F:34:CE:90:17:86:61:E9:06:42:63:C2:7C:9A:D0:11:E7:A5:13:BE:E8:31:66"
+      ]
+    }
+  }
+]
