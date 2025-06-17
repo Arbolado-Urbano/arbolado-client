@@ -68,4 +68,12 @@ window.Arbolado.ready(async () => {
       new bootstrap.Modal(privacyModalElement).show()
     }
   }
+
+  // Check if the instructions modal should be displayed
+  if ((new URLSearchParams(window.location.search)).has("ayuda")) {
+    const instructionsModalElement = document.querySelector("#instructions-modal")
+    if (instructionsModalElement) {
+      new bootstrap.Modal(instructionsModalElement).show()
+    }
+  }
 })
