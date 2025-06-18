@@ -13,12 +13,18 @@
   "dir": "ltr",
   "lang": "es",
   "prefer_related_applications": false,
-  "related_applications": [],
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.arboladourbano.twa",
+      "id": "com.arboladourbano.twa"
+    }
+  ],
   "categories": [
     "education",
     "utilities"
   ],
-  "iarc_rating_id": "",
+  "iarc_rating_id": "8a315954-5ceb-4c87-86ab-9c86f8a57490",
   "shortcuts": [],
   "icons": [
     {
