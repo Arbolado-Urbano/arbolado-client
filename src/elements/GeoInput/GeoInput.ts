@@ -4,8 +4,6 @@ import GeoBtn from '../GeoBtn/GeoBtn'
 import * as L from 'leaflet'
 import AddressLookup from '../AddressLookup/AddressLookup'
 
-const { VITE_MAPBOX_TOKEN: accessToken } = import.meta.env
-
 export default class GeoInput extends HTMLElement {
   _value: string | null = null
   private addressLookup: AddressLookup
@@ -19,7 +17,6 @@ export default class GeoInput extends HTMLElement {
       L.tileLayer(
         'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
         {
-          accessToken,
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
           subdomains: 'abcd',
           maxZoom: 21

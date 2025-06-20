@@ -6,8 +6,6 @@ import MarkerPopupTemplate from './MarkerPopup.html?raw'
 import Tree from '../../types/Tree'
 import GeoBtn from '../GeoBtn/GeoBtn'
 
-const { VITE_MAPBOX_TOKEN: accessToken } = import.meta.env
-
 const environment = {
   highlightColor: '#5cba9d',
   mapDisableClusteringAt: 21,
@@ -24,7 +22,6 @@ export default class MapElement extends HTMLElement {
       L.tileLayer(
         'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
         {
-          accessToken,
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
           subdomains: 'abcd',
           maxZoom: 21
@@ -99,6 +96,7 @@ export default class MapElement extends HTMLElement {
         window.Arbolado.pushQueryParams()
       }
     }
+    console.log(this.map.getBounds())
   }
 
   private setLoading(loading: boolean) {
