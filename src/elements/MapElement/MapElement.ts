@@ -96,7 +96,6 @@ export default class MapElement extends HTMLElement {
         window.Arbolado.pushQueryParams()
       }
     }
-    console.log(this.map.getBounds())
   }
 
   private setLoading(loading: boolean) {
