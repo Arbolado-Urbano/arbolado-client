@@ -19,6 +19,7 @@ declare global {
   interface Window {
     Arbolado: Arbolado,
     grecaptcha: ReCaptchaV2.ReCaptcha,
+    ios?: { getCurrentPosition: () => void }
   }
 }
 
