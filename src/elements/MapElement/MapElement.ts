@@ -14,7 +14,7 @@ const environment = {
 
 export default class MapElement extends HTMLElement {
   private geoBtn: GeoBtn
-  private map!: L.Map // Map reference
+  private map: L.Map // Map reference
   private mapFitToBoundsOptions: L.FitBoundsOptions = { maxZoom: 15, padding: [15, 15] } // To zoom into search results
   private options: L.MapOptions = { // Map options
     center: L.latLng(-34.618, -58.44), // BsAs
@@ -46,8 +46,8 @@ export default class MapElement extends HTMLElement {
     spiderfyDistanceMultiplier: 2,
     zoomToBoundsOnClick: true,
   }
-  private marker?: L.Marker // Marker
-  private circle?: L.Circle // Circle around marker indicating search radius
+  private marker: L.Marker // Marker
+  private circle: L.Circle // Circle around marker indicating search radius
   private treeMarkers!: L.MarkerClusterGroup // Trees from search result
   private icons: { [key: string]: L.Icon } = {
     default: new L.Icon({
@@ -59,6 +59,9 @@ export default class MapElement extends HTMLElement {
 
   constructor() {
     super()
+    const { marker, circle } = this.createMarker()
+    this.marker = marker
+    this.circle = circle
     this.geoBtn = document.querySelector('[js-map-geo-btn]') as GeoBtn
     this.geoBtn.addEventListener('arbolado:geo/searching', () => this.setLoading(true))
     this.geoBtn.addEventListener('arbolado:geo/error', () => this.setLoading(false))
@@ -68,21 +71,38 @@ export default class MapElement extends HTMLElement {
       const latLng = new L.LatLng(data.lat, data.lng)
       this.setMarker(latLng)
     })
-    this.initMap()
+    this.treeMarkers = L.markerClusterGroup(this.clusterOptions)
+    this.map = this.initMap()
+    this.processURL()
   }
 
-  private async initMap() {
-    this.treeMarkers = L.markerClusterGroup(this.clusterOptions)
+  private initMap() {
     const options = { ...this.options }
-    const center = await this.getLocationFromURL()
-    if (center) options.center = center
-    this.map = L.map('map', options)
-    this.map.addLayer(this.treeMarkers)
-    this.map.on('click', (event: any) => {
+    const map = L.map('map', options)
+    map.addLayer(this.treeMarkers)
+    map.on('click', (event: any) => {
       this.setMarker(event.latlng)
     })
-    this.map.on('move', () => window.Arbolado.emitEvent(this, 'arbolado:map/move', { bounds: this.getMapBounds() }))
+    map.on('move', () => window.Arbolado.emitEvent(this, 'arbolado:map/move', { bounds: map.getBounds() }))
+    return map
+  }
 
+  private setLoading(loading: boolean) {
+    if (loading) this.classList.add('loading')
+    else this.classList.remove('loading')
+  }
+  
+  private async processURL(): Promise<L.LatLng | undefined> {
+    // Look for a location on the path
+    const path = window.location.pathname.split('/')
+    if (path[1] !== 'ubicacion') return undefined
+    const ubicacion = path[2]
+    if (ubicacion) {
+      const results = await window.Arbolado.addressLookup(ubicacion)
+      if (results[0]) {
+        this.latlngUpdated(this.map, results[0].latlng)
+      }
+    }
     // Look for a marker on the query params. If there's one set it.
     const marker = window.Arbolado.queryParams.get('user_latlng')
     const radius = window.Arbolado.queryParams.get('radio')
@@ -96,27 +116,6 @@ export default class MapElement extends HTMLElement {
         window.Arbolado.pushQueryParams()
       }
     }
-  }
-
-  private setLoading(loading: boolean) {
-    if (loading) this.classList.add('loading')
-    else this.classList.remove('loading')
-  }
-  
-  private async getLocationFromURL(): Promise<L.LatLng | undefined> {
-    const path = window.location.pathname.split('/')
-    if (path[1] !== 'ubicacion') return undefined
-    const ubicacion = path[2]
-    if (!ubicacion) return undefined
-    const results = await window.Arbolado.addressLookup(ubicacion)
-    return results[0]?.latlng
-  }
-
-  /**
-   * Returns the current bounds of the map
-   */
-  public getMapBounds(): L.LatLngBounds {
-    return this.map.getBounds()
   }
   
   /**
@@ -168,8 +167,8 @@ export default class MapElement extends HTMLElement {
    * Removes the search marker and it's "search radius" circle from the map
    */
   public removeMarker(): void {
-    if (this.marker) this.map.removeLayer(this.marker)
-    if (this.circle) this.map.removeLayer(this.circle)
+    this.map.removeLayer(this.marker)
+    this.map.removeLayer(this.circle)
   }
 
   /**
@@ -187,7 +186,7 @@ export default class MapElement extends HTMLElement {
   private createMarkerPopup() {
     const markerPopupContent = window.Arbolado.loadTemplate(MarkerPopupTemplate) as HTMLElement
     markerPopupContent.querySelector('[js-marker-popup-search]')?.addEventListener('click', () => {
-      this.marker?.closePopup()
+      this.marker.closePopup()
       // Emit an event when the user clicks the search button from marker so the search form can be notified and perform the search
       window.Arbolado.emitEvent(this, 'arbolado:marker/search')
     })
@@ -199,59 +198,60 @@ export default class MapElement extends HTMLElement {
     return markerPopupContent
   }
 
+  private createMarker() {
+    L.Icon.Default.imagePath = '/imgs/markers/'
+    // Create a new marker
+    const marker = new L.Marker([0, 0], {
+      draggable: true,
+      riseOnHover: true,
+    })
+    // Create a circle around it to show the search radius
+    const circle = new L.Circle(
+      [0, 0],
+      {
+        radius: 0,
+        color: '#000',
+        fillColor: '#ddd',
+        fillOpacity: 0.3,
+      },
+    )
+    // When the marker is dragged move the circle to it
+    marker.on('dragend', (dragEvent) => {
+      const newLatlng = dragEvent.target.getLatLng()
+      circle.setLatLng(newLatlng)
+      // Update the selected coordinates
+      this.latlngUpdated(this.map, newLatlng)
+      this.marker.openPopup()
+    })
+    marker.bindPopup("")
+    // Create new popup content whenever it opens otherwise we get an empty popup.
+    // This is due to how we create the content using a template and cloning it.
+    // We need to do this to be able to set event listeners on the buttons inside of it.
+    marker.on("popupopen", () => marker.setPopupContent(this.createMarkerPopup()))
+    return { marker, circle }
+  }
+
   /**
    * Sets a marker on the map based on coordinates
    * @param latLng - Latitude and longitude coordinates
    */
   public setMarker(latLng: L.LatLng, radius: number = environment.searchRadius): void {
-    // Get the map object
-    if (this.map) {
-      // If there's no marker on the map...
-      if (!this.marker) {
-        L.Icon.Default.imagePath = '/imgs/markers/'
-        // Create a new marker
-        this.marker = new L.Marker([latLng.lat, latLng.lng], {
-          draggable: true,
-          riseOnHover: true,
-        })
-        this.map.addLayer(this.marker)
+    // Move the marker and its circle
+    this.marker.setLatLng([latLng.lat, latLng.lng])
+    this.circle.setRadius(radius)
+    this.circle.setLatLng([latLng.lat, latLng.lng])
 
-        // Create a circle around it to show the search radius
-        this.circle = new L.Circle(
-          [latLng.lat, latLng.lng],
-          {
-            radius,
-            color: '#000',
-            fillColor: '#ddd',
-            fillOpacity: 0.3,
-          },
-        )
-        this.map.addLayer(this.circle)
-
-        // When the marker is dragged move the circle to it
-        this.marker.on('dragend', (dragEvent) => {
-          const newLatlng = dragEvent.target.getLatLng()
-          this.circle?.setLatLng(newLatlng)
-          // Update the selected coordinates
-          this.latlngUpdated(this.map, newLatlng)
-        })
-        this.marker.on('click', () => this.marker?.bindPopup(this.createMarkerPopup()))
-      } else {
-        // If a marker already exists, move it and its circle
-        this.marker.setLatLng([latLng.lat, latLng.lng])
-        this.circle?.setLatLng([latLng.lat, latLng.lng])
-      }
-
-      if (!this.map.hasLayer(this.marker)) {
-        this.map.addLayer(this.marker)
-        if (this.circle) this.map.addLayer(this.circle)
-      }
-
-      // Update the selected coordinates
-      this.latlngUpdated(this.map, latLng)
-
-      this.marker.bindPopup(this.createMarkerPopup()).openPopup()
+    if (!this.map.hasLayer(this.marker)) {
+      this.map.addLayer(this.marker)
+      this.map.addLayer(this.circle)
     }
+
+    // Update the selected coordinates
+    this.latlngUpdated(this.map, latLng)
+
+    // Close and re-open the popup to force it to refresh its content just in case
+    this.marker.closePopup()
+    this.marker.openPopup()
   }
 
   /**
