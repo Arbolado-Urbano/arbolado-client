@@ -77,4 +77,9 @@ window.Arbolado.ready(async () => {
       new bootstrap.Modal(instructionsModalElement).show()
     }
   }
+
+  // Show donations button if we're not inside the iOS app
+  if (!window.ios) {
+    document.querySelector('[js-donaciones]')?.classList.remove('d-none')
+  }
 })
