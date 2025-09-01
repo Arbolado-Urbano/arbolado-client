@@ -9,14 +9,13 @@ import GeoBtn from '../GeoBtn/GeoBtn'
 const environment = {
   highlightColor: '#5cba9d',
   mapDisableClusteringAt: 21,
+  mapShowIconsAt: 18,
   searchRadius: 1000,
 }
 
 export default class MapElement extends HTMLElement {
   private geoBtn: GeoBtn
-  private map: L.Map // Map reference
-  private mapFitToBoundsOptions: L.FitBoundsOptions = { maxZoom: 15, padding: [15, 15] } // To zoom into search results
-  private options: L.MapOptions = { // Map options
+  private map: L.Map = L.map('map', { // Map options
     center: L.latLng(-34.618, -58.44), // BsAs
     layers: [
       L.tileLayer(
@@ -31,8 +30,11 @@ export default class MapElement extends HTMLElement {
     maxZoom: 21,
     minZoom: 5,
     zoom: 13,
-  }
-  private clusterOptions = {
+    preferCanvas: true,
+    renderer: L.canvas(),
+  }) // Map reference
+  private mapFitToBoundsOptions: L.FitBoundsOptions = { maxZoom: 15, padding: [15, 15] } // To zoom into search results
+  private clusterOptions: L.MarkerClusterGroupOptions = {
     disableClusteringAtZoom: environment.mapDisableClusteringAt,
     maxClusterRadius: 100, // px
     polygonOptions: {
@@ -48,7 +50,9 @@ export default class MapElement extends HTMLElement {
   }
   private marker: L.Marker // Marker
   private circle: L.Circle // Circle around marker indicating search radius
-  private treeMarkers!: L.MarkerClusterGroup // Trees from search result
+  private trees: Tree[] = []
+  private treeDots: L.FeatureGroup = L.featureGroup() // Trees from search result
+  private treeIcons!: L.MarkerClusterGroup // Trees from search result
   private icons: { [key: string]: L.Icon } = {
     default: new L.Icon({
       iconAnchor: [15, 31],
@@ -59,6 +63,7 @@ export default class MapElement extends HTMLElement {
 
   constructor() {
     super()
+    this.setMarker = this.setMarker.bind(this)
     const { marker, circle } = this.createMarker()
     this.marker = marker
     this.circle = circle
@@ -71,20 +76,30 @@ export default class MapElement extends HTMLElement {
       const latLng = new L.LatLng(data.lat, data.lng)
       this.setMarker(latLng)
     })
-    this.treeMarkers = L.markerClusterGroup(this.clusterOptions)
-    this.map = this.initMap()
+    this.treeIcons = L.markerClusterGroup(this.clusterOptions)
+    this.initMap()
     this.processURL()
   }
 
   private initMap() {
-    const options = { ...this.options }
-    const map = L.map('map', options)
-    map.addLayer(this.treeMarkers)
-    map.on('click', (event: any) => {
+    this.map.on('click', (event) => {
       this.setMarker(event.latlng)
     })
-    map.on('move', () => window.Arbolado.emitEvent(this, 'arbolado:map/move', { bounds: map.getBounds() }))
-    return map
+    this.map.on('moveend', () => {
+      window.Arbolado.emitEvent(this, 'arbolado:map/move', { bounds: this.map.getBounds() })
+      // Re-render the trees for the new map bounds
+      this.renderTrees(false)
+    })
+    this.map.on('zoomend', () => {
+      // Display either icons or dots depending on the zoom level
+      if (this.map.getZoom() >= environment.mapShowIconsAt) {
+        this.map.addLayer(this.treeIcons)
+        this.map.removeLayer(this.treeDots)
+      } else {
+        this.map.addLayer(this.treeDots)
+        this.map.removeLayer(this.treeIcons)
+      }
+    })
   }
 
   private setLoading(loading: boolean) {
@@ -123,19 +138,39 @@ export default class MapElement extends HTMLElement {
    * @param tree - the tree to display
    */
   public displayTree(tree: Tree) {
-    if (!this.treeMarkers.getLayers().length) this.displayTrees([tree])
+    if (!this.treeDots.getLayers().length) this.displayTrees([tree])
   }
 
   /**
-   * Displays the given trees on the map (discarding previous values)
+   * Sets & displays the given trees on the map (discarding previous values)
    * @param trees - Array with the trees to display
    */
   public displayTrees(trees?: Tree[]): void {
     if ((!trees) || (typeof trees[Symbol.iterator] !== 'function')) return
-    window.Arbolado.setLoading(true)
+    this.trees = trees
     this.marker?.closePopup() // Close the marker popup just in case it was open
-    this.treeMarkers.clearLayers() // Remove all previous trees
-    for (const tree of trees) {
+    this.renderTrees(true)
+  }
+
+  /**
+   * Renders the current trees on the map that are visible
+   * @param center - Indicates if the map should be centered around the trees
+   */
+  public renderTrees(center: boolean): void {
+    window.Arbolado.setLoading(true)
+    this.treeDots.clearLayers() // Remove all previous tree dots
+    this.treeIcons.clearLayers() // Remove all previous tree icons
+    // Filter the trees that are out of the map bounds
+    const mapBounds = this.map.getBounds()
+    const filteredTrees = this.trees.filter(tree => mapBounds.contains({ lat: tree.lat, lng: tree.lng }))
+    // Define the radius of the dots based on the current zoom level
+    const mapZoom = this.map.getZoom()
+    let radius = .1
+    if (mapZoom == environment.mapShowIconsAt - 3) radius = .5
+    else if (mapZoom === environment.mapShowIconsAt - 2) radius = 3
+    else if (mapZoom >= environment.mapShowIconsAt - 1) radius = 6
+    // Generate the dots and the icons for each visible tree
+    for (const tree of filteredTrees) {
       // Select the tree's icon or use the default if none
       let icon = this.icons.default
       if (tree.species.icono) {
@@ -148,17 +183,20 @@ export default class MapElement extends HTMLElement {
         }
         icon = this.icons[tree.species.icono]
       }
-      // Add a tree marker for the tree to the treeMarkers
-      this.treeMarkers.addLayer(
+      // Add a tree dot for the tree
+      this.treeDots.addLayer(
+        L.circleMarker(tree, { radius })
+      )
+      // Add a tree icon for the tree
+      this.treeIcons.addLayer(
         new L.Marker([tree.lat, tree.lng], { icon }).on('click', () => {
           this.selectTree(tree.id) // When the marker is clicked => select it
         })
       )
     }
-
     // Center the map on the results
-    if ((this.map) && (this.treeMarkers.getLayers().length)) {
-      this.map.fitBounds(this.treeMarkers.getBounds(), this.mapFitToBoundsOptions)
+    if ((center) && (this.treeDots.getLayers().length)) {
+      this.map.fitBounds(this.treeDots.getBounds(), this.mapFitToBoundsOptions)
     }
     window.Arbolado.setLoading(false)
   }
