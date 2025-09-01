@@ -3,11 +3,11 @@ import NominatimResponse from './types/NominatimResponse'
 import Alert, { AlertType } from './elements/Alert/Alert'
 
 export default class Arbolado {
-  overlay: HTMLElement 
+  overlay: HTMLElement
   queryParams: URLSearchParams
   callOnEsc: Function[] = []
   bodyScrollHide: number = 0
-  
+
   constructor() {
     this.overlay = document.querySelector('[js-overlay]') as HTMLElement
     this.queryParams = new URLSearchParams(window.location.search)

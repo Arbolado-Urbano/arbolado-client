@@ -1,7 +1,7 @@
 export default class TabGroup extends HTMLElement {
   private tabs: NodeListOf<Element>
   private tabBtns: NodeListOf<Element>
-  
+
   constructor() {
     super()
     this.tabs = this.querySelectorAll('[js-tab]')

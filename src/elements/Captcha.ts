@@ -1,7 +1,7 @@
 export default class Captcha extends HTMLElement {
   private sitekey: string
   public rendered: boolean = false
-  
+
   constructor() {
     super()
     this.render = this.render.bind(this)
