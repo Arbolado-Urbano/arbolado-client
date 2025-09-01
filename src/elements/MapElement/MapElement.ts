@@ -8,7 +8,7 @@ import GeoBtn from '../GeoBtn/GeoBtn'
 
 const environment = {
   highlightColor: '#5cba9d',
-  mapDisableClusteringAt: 21,
+  mapDisableClusteringAt: 20,
   searchRadius: 1000,
 }
 
