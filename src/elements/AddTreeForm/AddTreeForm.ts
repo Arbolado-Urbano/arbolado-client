@@ -143,7 +143,6 @@ export default class AddTreeForm extends HTMLElement {
         return false
       }
     } else if (this.step === 2) {
-      debugger
       if (!this.autoSpecies) {
         if (!this.speciesSelect.value) {
           this.speciesSelect.classList.add('is-invalid')
