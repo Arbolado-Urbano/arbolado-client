@@ -13,17 +13,17 @@ type TreeData = {
   procedencia_exotica: { element: HTMLElement, label?: string },
   regiones: { element: HTMLElement, label?: string },
   altura: { element: HTMLElement, label?: string },
-  espacio_verde: { element: HTMLElement, label?: string  },
-  calle: { element: HTMLElement, label?: string  },
+  espacio_verde: { element: HTMLElement, label?: string },
+  calle: { element: HTMLElement, label?: string },
   nombre: { element: HTMLElement, label?: string },
-  fecha_creacion: { element: HTMLElement, label?: string  },
-  descripcion: { element: HTMLElement, label?: string  },
-  url: { element: HTMLAnchorElement, label?: string  },
-  facebook: { element: HTMLAnchorElement, label?: string  },
-  instagram: { element: HTMLAnchorElement, label?: string  },
-  twitter: { element: HTMLAnchorElement, label?: string  },
-  streetview: { element: HTMLIFrameElement, label?: string  },
-  link: { element: HTMLAnchorElement, label?: string  },
+  fecha_creacion: { element: HTMLElement, label?: string },
+  descripcion: { element: HTMLElement, label?: string },
+  url: { element: HTMLAnchorElement, label?: string },
+  facebook: { element: HTMLAnchorElement, label?: string },
+  instagram: { element: HTMLAnchorElement, label?: string },
+  twitter: { element: HTMLAnchorElement, label?: string },
+  streetview: { element: HTMLIFrameElement, label?: string },
+  link: { element: HTMLAnchorElement, label?: string },
 }
 type treeDataKey = keyof TreeData
 
@@ -33,7 +33,7 @@ export default class TreeModal extends HTMLElement {
   private closeBtn: HTMLButtonElement
   private treeData: TreeData
   private previousUrl?: string
-  
+
   constructor() {
     super()
     this.innerHTML = TreeDrawerTemplate
@@ -110,7 +110,7 @@ export default class TreeModal extends HTMLElement {
       this.close(false)
     }
   }
-  
+
   private setTreeSources(tree: Tree) {
     const sourcesElement = this.querySelector('[js-sources]') as HTMLDivElement
     sourcesElement.innerHTML = ''
@@ -171,7 +171,7 @@ export default class TreeModal extends HTMLElement {
     if (tree.records[0].altura) tree.records[0].altura += ' m'
 
     const treeLink = `/arbol/${tree.id}`
-    
+
     this.setTreeValue('nombre_cientifico', tree.species.nombre_cientifico)
     this.setTreeValue('nombre_comun', tree.species.nombre_comun)
     this.setTreeValue('tipo', tree.species.type.tipo)

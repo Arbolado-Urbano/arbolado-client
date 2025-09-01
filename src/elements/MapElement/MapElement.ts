@@ -91,7 +91,7 @@ export default class MapElement extends HTMLElement {
     if (loading) this.classList.add('loading')
     else this.classList.remove('loading')
   }
-  
+
   private async processURL(): Promise<L.LatLng | undefined> {
     // Look for a location on the path
     const path = window.location.pathname.split('/')
@@ -117,7 +117,7 @@ export default class MapElement extends HTMLElement {
       }
     }
   }
-  
+
   /**
    * Displays the given tree on the map if there are no trees currently being displayed
    * @param tree - the tree to display
@@ -125,7 +125,7 @@ export default class MapElement extends HTMLElement {
   public displayTree(tree: Tree) {
     if (!this.treeMarkers.getLayers().length) this.displayTrees([tree])
   }
-  
+
   /**
    * Displays the given trees on the map (discarding previous values)
    * @param trees - Array with the trees to display

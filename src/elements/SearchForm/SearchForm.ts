@@ -22,7 +22,7 @@ export default class SearchForm extends HTMLElement {
   private species: SpeciesSelect
   private radio: HTMLInputElement
   private filtersSidebar: bootstrap.Offcanvas
-  
+
   constructor() {
     super()
     this.innerHTML = SearchFormTemplate
@@ -134,9 +134,9 @@ export default class SearchForm extends HTMLElement {
     this.setQueryParam('borigen_pampeana', this.pampeana.checked)
     this.setQueryParam('borigen_patagonica', this.patagonica.checked)
     if (this.markerPoint.checked) window.Arbolado.queryParams.set('radio', this.radio.value)
-    
+
     const searchQueryParams = new URLSearchParams(window.Arbolado.queryParams)
-    
+
     if (this.species.value?.url) {
       if (updateURL) window.Arbolado.pushURL(`/especie/${this.species.value.url}`)
       searchQueryParams.set('especie_id', this.species.value.id.toString())

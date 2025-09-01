@@ -11,7 +11,7 @@ export default class AddressLookup extends HTMLElement {
   private resultsElement: HTMLElement
   private itemTemplate: HTMLTemplateElement
   private bounds?: LatLngBounds
-  
+
   constructor() {
     super()
 

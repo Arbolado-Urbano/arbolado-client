@@ -12,7 +12,7 @@ export default class GeoInput extends HTMLElement {
   private marker?: L.Marker // Marker
   private mapOptions: L.MapOptions = { // Map options
     dragging: !L.Browser.mobile, // Disable one finger dragging on mobile devices
-    center: L.latLng(-34.4720387,-58.5388896), // San Isidro
+    center: L.latLng(-34.4720387, -58.5388896), // San Isidro
     layers: [
       L.tileLayer(
         'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
@@ -67,7 +67,7 @@ export default class GeoInput extends HTMLElement {
   resetHeight(): void {
     this.map?.invalidateSize()
   }
-  
+
   /**
    * Re-centers the map around the given coordinates
    * @param map - The map object
@@ -78,7 +78,7 @@ export default class GeoInput extends HTMLElement {
     this.map?.panTo(latLng)
     // Set the new coordinates
   }
-  
+
   /**
   * Sets the given latLng as the current value and sets a marker on the map for those coordinates
   * @param latLng - Latitude and longitude coordinates
