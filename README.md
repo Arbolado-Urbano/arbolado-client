@@ -22,7 +22,7 @@
 2. Levantar una instancia del proyecto "Arbolado API". Para esto hay 2 opciones:
     - Descargar e instalar el proyecto desde [Arbolado API](https://github.com/Arbolado-Urbano/arbolado-api).
     - Levantar una instancia de la imagen de Docker del proyecto siguiendo estos pasos:
-      1. En caso de no contar con uno, crear un [token classic en Github](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) con los permisos de read/writer packages, y ejecutar el siguiente comando: `"[token]" | docker login ghcr.io -u [user] --password-stdin`
+      1. En caso de no contar con uno, crear un [token classic en Github](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) con los permisos de read/writer packages, y ejecutar el siguiente comando: `echo "[token]" | docker login ghcr.io -u [user] --password-stdin`
       2. Ejecutar el comando `npm run docker:pull` para descargar las últimas versiones de las imágenes de Docker necesarias.
       3. Ejecutar el comando `npm run docker:up` para levantar una instancia de la API y de la base de datos con Docker.
       4. Ejecutar el comando `docker exec -i arbolado-client-api-1 php artisan migrate` para inicializar la base de datos.
