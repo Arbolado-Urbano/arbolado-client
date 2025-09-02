@@ -14,7 +14,7 @@
 
 ## Dependencias para desarrollo
 
-- [Docker](https://docs.docker.com/get-docker/) & [Docker Compose](https://docs.docker.com/compose/install/)
+- [Docker](https://docs.docker.com/get-docker/)
 
 ## Instalación para desarrollo
 
