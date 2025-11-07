@@ -12,31 +12,34 @@ export default class Captcha extends HTMLElement {
   }
 
   execute(): Promise<string> {
+    this.classList.add("show")
     if (!this.rendered) this.render()
     return new Promise((resolve, reject) => {
       document.addEventListener('arbolado:captcha/callback', (event) => {
         const { token } = (event as CustomEvent).detail
+        this.classList.remove("show")
         resolve(token)
       }, { once: true })
       try {
-        window.grecaptcha.execute()
+        window.turnstile.execute(this)
       } catch (error) {
+        this.classList.remove("show")
         reject(error)
       }
     })
   }
 
   render() {
-    window.grecaptcha.render(this, {
+    window.turnstile.render(this, {
       sitekey: this.sitekey,
       callback: this.callback,
-      size: 'invisible',
+      size: 'normal',
     })
     this.rendered = true
   }
 
   callback(token: string) {
     window.Arbolado.emitEvent(document, 'arbolado:captcha/callback', { token })
-    window.grecaptcha.reset()
+    window.turnstile.reset()
   }
 }
