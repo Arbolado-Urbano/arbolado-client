@@ -18,7 +18,7 @@ import GeoBtn from './elements/GeoBtn/GeoBtn'
 declare global {
   interface Window {
     Arbolado: Arbolado,
-    grecaptcha: ReCaptchaV2.ReCaptcha,
+    turnstile: Turnstile.Turnstile,
     ios?: { getCurrentPosition: () => void }
   }
 }
