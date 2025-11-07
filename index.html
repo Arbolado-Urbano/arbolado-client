@@ -15,13 +15,13 @@
       'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
       })(window,document,'script','dataLayer','GTM-T34XKKQ8');
     </script>
-    <!-- Google reCaptcha -->
+    <!-- Cloudflare Turnstile -->
     <script>
       function catpchaOnLoadCallBack() {
         document.addEventListener('DOMContentLoaded', () => window.Arbolado.emitEvent(document, 'arbolado:captcha/loaded'))
       }
     </script>
-    <script src="https://www.google.com/recaptcha/api.js?onload=catpchaOnLoadCallBack&render=explicit&hl=es" async defer></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=catpchaOnLoadCallBack&render=explicit" async defer></script>
     <!-- Site scripts -->
     <script type="module" src="/src/main.ts"></script>
   </head>
@@ -395,6 +395,6 @@
     </div>
 
     <!-- reCaptcha widget -->
-    <arbolado-captcha data-sitekey="6Lcg0ZMpAAAAAJJpYl-IZ12gGSBR48KwN5gBWigh" js-captcha-widget></arbolado-captcha>
+    <arbolado-captcha data-sitekey="%VITE_CAPTCHA_KEY%" js-captcha-widget></arbolado-captcha>
   </body>
 </html>
