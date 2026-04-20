@@ -1,16 +1,19 @@
 import * as L from 'leaflet'
-import 'leaflet.markercluster'
+
+import Supercluster from 'supercluster'
 
 import MarkerPopupTemplate from './MarkerPopup.html?raw'
 
+import { SEARCH_RADIUS } from '../../constants'
+
 import Tree from '../../types/Tree'
+
 import GeoBtn from '../GeoBtn/GeoBtn'
 
 const environment = {
   highlightColor: '#5cba9d',
-  mapDisableClusteringAt: 21,
-  mapShowIconsAt: 18,
-  searchRadius: 1000,
+  mapDisableClusteringAt: 18,
+  mapShowIconsAt: 17,
 }
 
 export default class MapElement extends HTMLElement {
@@ -23,37 +26,36 @@ export default class MapElement extends HTMLElement {
         {
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
           subdomains: 'abcd',
-          maxZoom: 21
+          maxZoom: 22
         },
       ),
     ],
-    maxZoom: 21,
+    maxZoom: 22,
     minZoom: 5,
     zoom: 13,
     preferCanvas: true,
     renderer: L.canvas(),
   }) // Map reference
-  private mapFitToBoundsOptions: L.FitBoundsOptions = { maxZoom: 15, padding: [15, 15] } // To zoom into search results
-  private clusterOptions: L.MarkerClusterGroupOptions = {
-    disableClusteringAtZoom: environment.mapDisableClusteringAt,
-    maxClusterRadius: 100, // px
-    polygonOptions: {
-      color: environment.highlightColor,
-      fillColor: environment.highlightColor,
-      fillOpacity: 0.1,
-      opacity: 1,
-      weight: 1,
-    },
-    showCoverageOnHover: true,
-    spiderfyDistanceMultiplier: 2,
-    zoomToBoundsOnClick: true,
-  }
+  private mapFitToBoundsOptions: L.FitBoundsOptions = { padding: [15, 15] } // To zoom into search results
+  // private clusterOptions: L.MarkerClusterGroupOptions = {
+  //   disableClusteringAtZoom: environment.mapDisableClusteringAt,
+  //   maxClusterRadius: 100, // px
+  //   polygonOptions: {
+  //     color: environment.highlightColor,
+  //     fillColor: environment.highlightColor,
+  //     fillOpacity: 0.1,
+  //     opacity: 1,
+  //     weight: 1,
+  //   },
+  //   showCoverageOnHover: true,
+  //   spiderfyDistanceMultiplier: 2,
+  //   zoomToBoundsOnClick: true,
+  // }
   private marker: L.Marker // Marker
   private circle: L.Circle // Circle around marker indicating search radius
-  private trees: Tree[] = []
-  private treeDots: L.FeatureGroup = L.featureGroup() // Trees from search result
-  private treeIcons!: L.MarkerClusterGroup // Trees from search result
-  private icons: { [key: string]: L.Icon } = {
+  private trees: Tree[] = [] // Trees from search result
+  private treesLayer: L.FeatureGroup = L.featureGroup() // Tree icons or dots layer
+  private icons: Record<string, L.Icon> = {
     default: new L.Icon({
       iconAnchor: [15, 31],
       iconSize: [30, 34],
@@ -76,12 +78,12 @@ export default class MapElement extends HTMLElement {
       const latLng = new L.LatLng(data.lat, data.lng)
       this.setMarker(latLng)
     })
-    this.treeIcons = L.markerClusterGroup(this.clusterOptions)
     this.initMap()
     this.processURL()
   }
 
   private initMap() {
+    this.map.addLayer(this.treesLayer)
     this.map.on('click', (event) => {
       this.setMarker(event.latlng)
     })
@@ -89,16 +91,6 @@ export default class MapElement extends HTMLElement {
       window.Arbolado.emitEvent(this, 'arbolado:map/move', { bounds: this.map.getBounds() })
       // Re-render the trees for the new map bounds
       this.renderTrees(false)
-    })
-    this.map.on('zoomend', () => {
-      // Display either icons or dots depending on the zoom level
-      if (this.map.getZoom() >= environment.mapShowIconsAt) {
-        this.map.addLayer(this.treeIcons)
-        this.map.removeLayer(this.treeDots)
-      } else {
-        this.map.addLayer(this.treeDots)
-        this.map.removeLayer(this.treeIcons)
-      }
     })
   }
 
@@ -138,7 +130,7 @@ export default class MapElement extends HTMLElement {
    * @param tree - the tree to display
    */
   public displayTree(tree: Tree) {
-    if (!this.treeDots.getLayers().length) this.displayTrees([tree])
+    if (!this.treesLayer.getLayers().length) this.displayTrees([tree])
   }
 
   /**
@@ -158,45 +150,75 @@ export default class MapElement extends HTMLElement {
    */
   public renderTrees(center: boolean): void {
     window.Arbolado.setLoading(true)
-    this.treeDots.clearLayers() // Remove all previous tree dots
-    this.treeIcons.clearLayers() // Remove all previous tree icons
-    // Filter the trees that are out of the map bounds
-    const mapBounds = this.map.getBounds()
-    const filteredTrees = this.trees.filter(tree => mapBounds.contains({ lat: tree.lat, lng: tree.lng }))
-    // Define the radius of the dots based on the current zoom level
+    // Remove all previous trees
+    this.treesLayer.clearLayers()
     const mapZoom = this.map.getZoom()
-    let radius = .1
-    if (mapZoom == environment.mapShowIconsAt - 3) radius = .5
-    else if (mapZoom === environment.mapShowIconsAt - 2) radius = 3
-    else if (mapZoom >= environment.mapShowIconsAt - 1) radius = 6
-    // Generate the dots and the icons for each visible tree
-    for (const tree of filteredTrees) {
-      // Select the tree's icon or use the default if none
-      let icon = this.icons.default
-      if (tree.species.icono) {
-        if (!this.icons[tree.species.icono]) {
-          this.icons[tree.species.icono] = new L.Icon({
-            iconAnchor: [15, 31],
-            iconSize: [30, 34],
-            iconUrl: `/imgs/markers/${tree.species.icono}`,
-          })
-        }
-        icon = this.icons[tree.species.icono]
+    const mapBounds = this.map.getBounds()
+    // Filter the trees that are out of the map bounds
+    const filteredTrees = this.trees.filter(tree => mapBounds.contains({ lat: tree.lat, lng: tree.lng }))
+    // Display dots while clustering is active
+    if (mapZoom <= environment.mapDisableClusteringAt) {
+      // Define the radius of the dots
+      const radius = mapZoom > 16 ? 5 : 1
+      // Generate the dots and the icons for each visible tree
+      for (const tree of filteredTrees) {
+        // Add a tree dot for the tree
+        this.treesLayer.addLayer(
+          L.circleMarker(tree, { radius, color: '#4f7663', fill: true, fillColor: '#4f7663', opacity: .5 })
+        )
       }
-      // Add a tree dot for the tree
-      this.treeDots.addLayer(
-        L.circleMarker(tree, { radius })
-      )
-      // Add a tree icon for the tree
-      this.treeIcons.addLayer(
-        new L.Marker([tree.lat, tree.lng], { icon }).on('click', () => {
-          this.selectTree(tree.id) // When the marker is clicked => select it
+    }
+    // Generate the clusters
+    let radius = 1500
+    if (mapZoom > 18) radius = 100
+    else if (mapZoom > 16) radius = 500
+    const points: Supercluster.PointFeature<{ tree: Tree }>[] = filteredTrees.map(tree => ({ type: 'Feature', properties: { tree }, geometry: { type: 'Point', coordinates: [tree.lng, tree.lat] } }))
+    const superCluster = new Supercluster<{ tree: Tree }>({ maxZoom: environment.mapDisableClusteringAt, radius })
+    superCluster.load(points)
+    const clusters = superCluster.getClusters([mapBounds.getWest(), mapBounds.getSouth(), mapBounds.getEast(), mapBounds.getNorth()], mapZoom)
+    // Add each cluster and icon to the trees layer
+    for (const cluster of clusters) {
+      const [lng, lat] = cluster.geometry.coordinates
+      if ('cluster' in cluster.properties) {
+        const { point_count: pointCount, cluster_id: clusterId } = cluster.properties
+        const size = pointCount < 10 ? 'small' : pointCount < 25 ? 'medium' : 'large'
+        const clusterIcon = L.divIcon({
+          html: `<div class="cluster-marker cluster-${size}">${pointCount}</div>`,
+          className: '',
+          iconSize: [30, 30],
+          iconAnchor: [15, 15]
         })
-      )
+        const marker = L.marker([lat, lng], { icon: clusterIcon }).on('click', () => {
+          // Zoom to cluster bounds on click
+          const expansionZoom = superCluster.getClusterExpansionZoom(clusterId)
+          this.map.setView([lat, lng], expansionZoom)
+        })
+        this.treesLayer.addLayer(marker)
+      } else {
+        const { tree } = cluster.properties
+        // Select the tree's icon or use the default if none
+        let icon = this.icons.default
+        if (tree.species.icono) {
+          if (!this.icons[tree.species.icono]) {
+            this.icons[tree.species.icono] = new L.Icon({
+              iconAnchor: [15, 31],
+              iconSize: [30, 34],
+              iconUrl: `/imgs/markers/${tree.species.icono}`,
+            })
+          }
+          icon = this.icons[tree.species.icono]
+        }
+        // Add a tree icon for the tree
+        this.treesLayer.addLayer(
+          new L.Marker([tree.lat, tree.lng], { icon }).on('click', () => {
+            this.selectTree(tree.id) // When the marker is clicked => select it
+          })
+        )
+      }
     }
     // Center the map on the results
-    if ((center) && (this.treeDots.getLayers().length)) {
-      this.map.fitBounds(this.treeDots.getBounds(), this.mapFitToBoundsOptions)
+    if ((center) && (this.treesLayer.getLayers().length)) {
+      this.map.fitBounds(this.treesLayer.getBounds(), this.mapFitToBoundsOptions)
     }
     window.Arbolado.setLoading(false)
   }
@@ -273,7 +295,7 @@ export default class MapElement extends HTMLElement {
    * Sets a marker on the map based on coordinates
    * @param latLng - Latitude and longitude coordinates
    */
-  public setMarker(latLng: L.LatLng, radius: number = environment.searchRadius): void {
+  public setMarker(latLng: L.LatLng, radius: number = SEARCH_RADIUS): void {
     // Move the marker and its circle
     this.marker.setLatLng([latLng.lat, latLng.lng])
     this.circle.setRadius(radius)

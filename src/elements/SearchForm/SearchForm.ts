@@ -1,7 +1,10 @@
 import * as bootstrap from 'bootstrap'
+
 import { LatLng } from 'leaflet'
 
 import SearchFormTemplate from './SearchForm.html?raw'
+
+import { SEARCH_RADIUS } from '../../constants'
 
 import SpeciesSelect from '../SpeciesSelect/SpeciesSelect'
 
@@ -72,6 +75,7 @@ export default class SearchForm extends HTMLElement {
     this.noa.checked = window.Arbolado.queryParams.get('borigen_noa') !== null
     this.pampeana.checked = window.Arbolado.queryParams.get('borigen_pampeana') !== null
     this.patagonica.checked = window.Arbolado.queryParams.get('borigen_patagonica') !== null
+    this.radio.value = window.Arbolado.queryParams.get('radio') ?? SEARCH_RADIUS.toString()
 
     const latLng = window.Arbolado.queryParams.get('user_latlng')
     if (latLng) {

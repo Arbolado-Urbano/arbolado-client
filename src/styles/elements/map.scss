@@ -18,3 +18,42 @@
   display: flex;
 }
 
+/* Clusters styles */
+.cluster-marker {
+  align-items: center;
+  border-width: 5px;
+  border-style: solid;
+  border-radius: 50%;
+  color: #000;
+  display: flex;
+  justify-content: center;
+  line-height: 1;
+  text-align: center;
+}
+
+.cluster-small {
+  background: #6ecc39;
+  border-color: #b5e28c99;
+  font-size: 12px;
+  height: 1.5rem;
+  line-height: 24px;
+  width: 1.5rem;
+}
+
+.cluster-medium {
+  background: #f0c20c;
+  border-color: #f1d35799;
+  font-size: 14px;
+  height: 2rem;
+  line-height: 34px;
+  width: 2rem;
+}
+
+.cluster-large {
+  background: #f18017;
+  border-color: #fd9c7399;
+  font-size: 16px;
+  height: 2.5rem;
+  line-height: 44px;
+  width: 2.5rem;
+}
