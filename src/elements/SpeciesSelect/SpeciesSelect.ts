@@ -12,6 +12,8 @@ export default class SpeciesSelect extends HTMLElement {
   private inputElement: HTMLInputElement
   private listElement: HTMLElement
   private noSelectionElement: Species
+  private emptyPlanterElement: HTMLInputElement
+  private emptyPlanter: Species | undefined
 
   constructor() {
     super()
@@ -22,13 +24,21 @@ export default class SpeciesSelect extends HTMLElement {
     this.handleInput = this.handleInput.bind(this)
     this.selectSpeciesFromURL = this.selectSpeciesFromURL.bind(this)
     this.loadSpecies = this.loadSpecies.bind(this)
+    this.handleEmptyPlanterToggle = this.handleEmptyPlanterToggle.bind(this)
 
     this.inputElement = this.querySelector('[js-species-select-input]') as HTMLInputElement
     this.listElement = this.querySelector('[js-species-select-list]') as HTMLElement
     this.btnElement = this.querySelector('[js-species-select-btn]') as HTMLButtonElement
+    this.emptyPlanterElement = this.querySelector('[js-input="empty-planter"]') as HTMLInputElement
+
+    // Set IDs
+    const emptyPlanterId = `${this.emptyPlanterElement.id}-${this.id}`
+    this.querySelector(`[for=${this.emptyPlanterElement.id}]`)?.setAttribute('for', emptyPlanterId)
+    this.emptyPlanterElement.id = emptyPlanterId
+    this.querySelector('[js-species-dropdown]')!.id += `-${this.id}`
 
     // Setup the "no species selected" option
-    const noSelectionLabel = this.getAttribute('data-no-selection-label') || 'Todas'
+    const noSelectionLabel = this.getAttribute('data-no-selection-label') ?? 'Todas'
     this.noSelectionElement = { nombre_cientifico: noSelectionLabel, nombre_comun: '', id: -1, url: '' }
 
     // Load the species list on first interaction
@@ -39,6 +49,8 @@ export default class SpeciesSelect extends HTMLElement {
     this.inputElement.addEventListener('input', this.handleInput)
     // Arrow key navigation & enter for selecting a species
     this.addEventListener('keydown', this.handleKeyDown, true)
+    // Empty planter selection toggle
+    this.emptyPlanterElement.addEventListener('click', this.handleEmptyPlanterToggle)
   }
 
   setValue(species: Species | null) {
@@ -48,12 +60,26 @@ export default class SpeciesSelect extends HTMLElement {
     this.resetFilter()
   }
 
+  private async handleEmptyPlanterToggle() {
+    if (this.emptyPlanterElement.checked) {
+      // Load species just in case to get the "empty planter" species ID
+      await this.loadSpecies()
+      this.btnElement.disabled = true
+      this.setValue(this.emptyPlanter ?? null)
+    } else {
+      this.btnElement.disabled = false
+      this.value = null
+      this.setValue(null)
+    }
+  }
+
   // Load the list of all species from the API
   private async loadSpecies() {
     if (this.status === 'loaded') return
     this.status = 'loading'
-    await window.Arbolado.fetchJson(`${import.meta.env.VITE_API_URL}/especies`, 'GET', undefined, undefined, false).then((species) => {
-      this.renderSpecies([this.noSelectionElement, ...species])
+    await window.Arbolado.fetchJson(`${import.meta.env.VITE_API_URL}/especies`, 'GET', undefined, undefined, false).then((species: Species[]) => {
+      this.emptyPlanter = species.find(item => item.url === 'plantera-vacia')
+      this.renderSpecies([this.noSelectionElement, ...species.filter(item => item.id !== this.emptyPlanter?.id)])
       this.status = 'loaded'
       window.Arbolado.emitEvent(this, 'arbolado:species/loaded')
     })
@@ -75,14 +101,14 @@ export default class SpeciesSelect extends HTMLElement {
   }
 
   private selectSpeciesFromURL(speciesURL: string) {
-    const species = this.species.find((species) => species.url === speciesURL) || null
+    const species = this.species.find((species) => species.url === speciesURL) ?? null
     this.selectSpecies(species?.id)
     return this.value
   }
 
   private selectSpecies(id?: number) {
     let species = null
-    if (id) species = this.species.find((species) => species.id === id) || null
+    if (id) species = this.species.find((species) => species.id === id) ?? null
     this.setValue(species)
   }
 
@@ -90,7 +116,7 @@ export default class SpeciesSelect extends HTMLElement {
     let index = this.getFocusedSpecies()
     const query = index !== false ? `[js-species-select-item-btn][data-index="${index}"]` : '[js-species-select-item-btn]'
     const speciesBtn: HTMLButtonElement | null = this.querySelector(query)
-    this.inputElement.setAttribute('aria-activeDescendant', speciesBtn?.id || '')
+    this.inputElement.setAttribute('aria-activeDescendant', speciesBtn?.id ?? '')
   }
 
   private getFocusedSpecies() {
@@ -157,7 +183,7 @@ export default class SpeciesSelect extends HTMLElement {
       const commonName = document.createElement('small')
       commonName.classList.add('muted-text')
       commonName.classList.add('ms-1')
-      commonName.innerText = this.value.nombre_comun || this.value.nombre_cientifico
+      commonName.innerText = this.value.nombre_comun ?? this.value.nombre_cientifico
       this.btnElement.appendChild(commonName)
     } else {
       this.btnElement.innerText = this.noSelectionElement.nombre_cientifico
@@ -173,8 +199,8 @@ export default class SpeciesSelect extends HTMLElement {
     item.dataset['index'] = index.toString()
     btn.dataset['index'] = index.toString()
     btn.id = `${this.btnElement.getAttribute('aria-controls')}-${index}`
-    scientificName.innerText = species?.nombre_cientifico || ''
-    commonName.innerText = species?.nombre_comun || ''
+    scientificName.innerText = species?.nombre_cientifico ?? ''
+    commonName.innerText = species?.nombre_comun ?? ''
     btn.addEventListener('click', () => this.selectSpecies(species?.id))
     this.listElement.append(templateClone)
   }

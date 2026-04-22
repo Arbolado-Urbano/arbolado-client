@@ -28,7 +28,7 @@ export default class AddTreeForm extends HTMLElement {
   private speciesImages: HTMLUListElement
   private selectedImages: { image: File, type: ImageType }[] = []
   private selectedSpecies?: string
-  private autoSpecies: boolean = true
+  private autoSpecies: boolean = false
   private speciesAutoInput: HTMLInputElement
   private speciesAutoError: HTMLDivElement
 
