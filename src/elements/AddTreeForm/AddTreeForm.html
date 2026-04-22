@@ -70,6 +70,28 @@
               </li>
             </ul>
             <div class="border border-top-0 p-3">
+              <div js-tab="manual" class="d-flex flex-column">
+                <div class="mb-3">
+                  <label for="form-species" class="form-label">Nombre científico/común</label>
+                  <arbolado-species-select id="form-species" name="species" js-input="species" aria-describedby="form-species-help" data-no-selection-label="Otro (especificar)"></arbolado-species-select>
+                  <div class="invalid-feedback">
+                    Por favor seleccioná alguna especie o seleciconá la opción "Automática" para identificarla automáticamente.
+                  </div>
+                  <div id="form-species-help" class="form-text">
+                    Género y especie. Si la especie no está en la lista o no sabés cuál es, seleccioná "Otro" y completá el nombre en el siguiente campo.
+                  </div>
+                </div>
+                <div js-species-manual class="d-none">
+                  <label for="form-species-manual" class="form-label">Nombre de la especie</label>
+                  <input name="species-manual" type="text" class="form-control" id="form-species-manual" aria-describedby="form-species-manual-help">
+                  <div class="invalid-feedback">
+                    Por favor ingresá el nombre de la especie.
+                  </div>
+                  <div id="form-species-manual-help" class="form-text">
+                    Especificá el nombre de la especie de forma manual.
+                  </div>
+                </div>
+              </div>
               <div js-tab="auto" class="d-none">
                 <div class="mb-3">
                   <span class="form-label">Fotos</span>
@@ -95,28 +117,6 @@
                 </div>
                 <div js-auto-species-error class="invalid-feedback">
                   No se pudo identificar la especie de forma automática. Intentá nuevamente con otras fotos o seleccioná la especie de forma manual.
-                </div>
-              </div>
-              <div js-tab="manual" class="d-flex flex-column">
-                <div class="mb-3">
-                  <label for="form-species" class="form-label">Nombre científico/común</label>
-                  <arbolado-species-select id="form-species" name="species" js-input="species" aria-describedby="form-species-help" data-no-selection-label="Otro (especificar)"></arbolado-species-select>
-                  <div class="invalid-feedback">
-                    Por favor seleccioná alguna especie o seleciconá la opción "Automática" para identificarla automáticamente.
-                  </div>
-                  <div id="form-species-help" class="form-text">
-                    Género y especie. Si la especie no está en la lista o no sabés cuál es, seleccioná "Otro" y completá el nombre en el siguiente campo.
-                  </div>
-                </div>
-                <div js-species-manual class="d-none">
-                  <label for="form-species-manual" class="form-label">Nombre de la especie</label>
-                  <input name="species-manual" type="text" class="form-control" id="form-species-manual" aria-describedby="form-species-manual-help">
-                  <div class="invalid-feedback">
-                    Por favor ingresá el nombre de la especie.
-                  </div>
-                  <div id="form-species-manual-help" class="form-text">
-                    Especificá el nombre de la especie de forma manual.
-                  </div>
                 </div>
               </div>
             </div>
