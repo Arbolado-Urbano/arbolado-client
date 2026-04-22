@@ -15,7 +15,7 @@ services:
   api:
     image: ghcr.io/arbolado-urbano/arbolado-api:latest
     ports:
-      - '8080:8000'
+      - '8000:8000'
     environment:
       DB_HOST: db
       DB_PORT: 3306
