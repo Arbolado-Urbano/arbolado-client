@@ -24,6 +24,8 @@ declare type Tree = {
     diametro_a_copa?: string
     inclinacion?: string
     fecha_creacion: string
+    estado_fitosanitario?: string
+    etapa_desarrollo?: string
     source: {
       id: number
       nombre: string
