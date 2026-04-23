@@ -21,7 +21,6 @@ declare type Tree = {
     id: number
     altura?: string
     diametro_a_p?: string
-    diametro_a_copa?: string
     inclinacion?: string
     fecha_creacion: string
     estado_fitosanitario?: string
