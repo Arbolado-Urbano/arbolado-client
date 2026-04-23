@@ -15,7 +15,6 @@ type TreeData = {
   altura: { element: HTMLElement, label?: string },
   inclinacion: { element: HTMLElement, label?: string },
   diametro_a_p: { element: HTMLElement, label?: string },
-  diametro_a_copa: { element: HTMLElement, label?: string },
   espacio_verde: { element: HTMLElement, label?: string },
   calle: { element: HTMLElement, label?: string },
   nombre: { element: HTMLElement, label?: string },
@@ -62,7 +61,6 @@ export default class TreeModal extends HTMLElement {
       altura: { element: this.querySelector('[js-tree-data="altura"]') as HTMLElement, label: 'Altura:' },
       inclinacion: { element: this.querySelector('[js-tree-data="inclinacion"]') as HTMLElement, label: 'Inclinación:' },
       diametro_a_p: { element: this.querySelector('[js-tree-data="diametro_a_p"]') as HTMLElement, label: 'Diámetro:' },
-      diametro_a_copa: { element: this.querySelector('[js-tree-data="diametro_a_copa"]') as HTMLElement, label: 'Diámetro copa:' },
       espacio_verde: { element: this.querySelector('[js-tree-data="espacio_verde"]') as HTMLElement },
       calle: { element: this.querySelector('[js-tree-data="calle"]') as HTMLElement },
       nombre: { element: this.querySelector('[js-tree-data="nombre"]') as HTMLElement, label: 'Datos aportados por' },
@@ -177,7 +175,6 @@ export default class TreeModal extends HTMLElement {
     if (tree.records[0].altura) tree.records[0].altura += ' m'
     if (tree.records[0].inclinacion) tree.records[0].inclinacion += 'º'
     if (tree.records[0].diametro_a_p) tree.records[0].diametro_a_p += ' m'
-    if (tree.records[0].diametro_a_copa) tree.records[0].diametro_a_copa += ' m'
 
     const treeLink = `/arbol/${tree.id}`
 
@@ -190,7 +187,6 @@ export default class TreeModal extends HTMLElement {
     this.setTreeValue('altura', tree.records[0].altura)
     this.setTreeValue('inclinacion', tree.records[0].inclinacion)
     this.setTreeValue('diametro_a_p', tree.records[0].diametro_a_p)
-    this.setTreeValue('diametro_a_copa', tree.records[0].diametro_a_copa)
     this.setTreeValue('espacio_verde', tree.espacio_verde ? `Espacio verde: ${tree.espacio_verde}` : undefined)
     this.setTreeValue('calle', `${tree.calle || ''} ${tree.calle_altura ? tree.calle_altura : 's/n'}`)
     this.setTreeValue('id', tree.id.toString())

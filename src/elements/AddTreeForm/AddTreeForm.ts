@@ -311,7 +311,6 @@ export default class AddTreeForm extends HTMLElement {
       height: step3FormData.get('height'),
       inclination: step3FormData.get('inclination'),
       diameterTrunk: step3FormData.get('diameter-trunk'),
-      diameterCanopy: step3FormData.get('diameter-canopy'),
       development: step3FormData.get('development'),
       health: step3FormData.get('health'),
       images: await Promise.all(this.selectedImages.map(async (value) => await this.fileToBase64(value.image))),
