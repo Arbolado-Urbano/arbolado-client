@@ -422,7 +422,7 @@ export default class AddTreeForm extends HTMLElement {
     })
 
     // Submit
-    const requestUrl = `${import.meta.env.VITE_API_URL}/${step0FormData.has('code') ? "arboles" : "aportes"}`
+    const requestUrl = `${import.meta.env.VITE_API_URL}/${this.personalDataTabGroup.currentTab() === 'code' ? 'arboles' : 'aportes'}`
     const response = await window.Arbolado.fetch(requestUrl, 'POST', data)
     if (response?.status == 200) {
       this.goStep(this.step + 1)
