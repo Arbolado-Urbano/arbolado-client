@@ -56,7 +56,7 @@ export default class SpeciesSelect extends HTMLElement {
   setValue(species: Species | null) {
     this.value = species
     this.updateBtnLabel()
-    window.Arbolado.emitEvent(this, 'change', { species: this.value })
+    window.Arbolado.emitEvent(this, 'arbolado:species/change', { species: this.value })
     this.resetFilter()
   }
 
@@ -70,6 +70,7 @@ export default class SpeciesSelect extends HTMLElement {
       this.btnElement.disabled = false
       this.value = null
       this.setValue(null)
+      this.btnElement.innerText = 'Seleccionar'
     }
   }
 

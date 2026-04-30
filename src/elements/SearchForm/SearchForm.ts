@@ -27,6 +27,7 @@ export default class SearchForm extends HTMLElement {
     super()
     this.innerHTML = SearchFormTemplate
     this.noResultsModal = new bootstrap.Modal(document.querySelector('[js-no-results-modal]') as HTMLElement)
+    this.handleSpeciesChange = this.handleSpeciesChange.bind(this)
     // Init form fields
     this.form = this.querySelector('[js-form]') as HTMLFormElement
     this.searchBtn = this.querySelector('[js-search-btn]') as HTMLButtonElement
@@ -60,6 +61,32 @@ export default class SearchForm extends HTMLElement {
       html: true,
     })
     this.searchBtnPopover.disable()
+    // Disable all filters if empty planter has been selected
+    this.species.addEventListener('arbolado:species/change', this.handleSpeciesChange)
+  }
+
+  private handleSpeciesChange(event: HTMLElementEventMap["arbolado:species/change"]) {
+    if (event.detail.species?.url === 'plantera-vacia') {
+      this.flavors.disabled = true
+      this.cuyana.disabled = true
+      this.nea.disabled = true
+      this.noa.disabled = true
+      this.pampeana.disabled = true
+      this.patagonica.disabled = true
+      this.flavors.checked = false
+      this.cuyana.checked = false
+      this.nea.checked = false
+      this.noa.checked = false
+      this.pampeana.checked = false
+      this.patagonica.checked = false
+    } else {
+      this.flavors.disabled = false
+      this.cuyana.disabled = false
+      this.nea.disabled = false
+      this.noa.disabled = false
+      this.pampeana.disabled = false
+      this.patagonica.disabled = false
+    }
   }
 
   private async updateFormValues() {
@@ -116,7 +143,7 @@ export default class SearchForm extends HTMLElement {
     // Check if a marker has been placed in the map
     if (this.markerPoint.checked) {
       data.set('marker', this.getLatLngString())
-    } else if (!this.species.value) {
+    } else if (!this.species.value || this.species.value.id === -1) {
       // If there's no marker and no species selected don't search
       // Show the popover for the search button that pops up when the search is too big
       this.searchBtnPopover.enable()
