@@ -10,41 +10,101 @@
       </div>
       <div class="progress" role="progressbar" aria-label="Progreso del formulario" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="height: 2px" js-progress>
         <div class="progress-bar" js-progress-bar style="width: 0;"></div>
-      </div>                
+      </div>
       <div class="modal-body">
         <!-- Paso 1: Datos personales -->
         <form novalidate js-step>
           <h5>Datos personales (1/4)</h5>
-          <div class="mb-3">
-            <label for="form-email" class="form-label">Email (requerido)</label>
-            <input name="email" type="text" class="form-control" id="form-email" required>
-            <div class="invalid-feedback">
-              Por favor ingresá tu email.
+          <arbolado-tab-group js-tabgroup="personal-data">
+            <ul class="nav nav-tabs">
+              <li class="nav-item">
+                <button type="button" class="nav-link active" aria-current="page" js-tab-btn="email">Email</button>
+              </li>
+              <li class="nav-item">
+                <button type="button" class="nav-link" js-tab-btn="code">Código</button>
+              </li>
+            </ul>
+            <div class="border border-top-0 p-3">
+              <div js-tab="email" class="d-flex flex-column">
+                <div class="mb-3">
+                  <label for="form-email" class="form-label">Email (requerido)</label>
+                  <input name="email" type="email" class="form-control" id="form-email" js-input="email" required>
+                  <div class="invalid-feedback">
+                    Por favor ingresá tu email.
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="form-name" class="form-label">Nombre o alias (requerido)</label>
+                  <input name="name" type="text" class="form-control" id="form-name" js-input="name" aria-describedby="form-name-help" required>
+                  <div class="invalid-feedback">
+                    Por favor ingresá tu nombre.
+                  </div>
+                  <div id="form-name-help" class="form-text">
+                    Nos interesa que tu ayuda sea visible, es por eso que te pedimos tu nombre (o podés ingresar un pseudónimo).
+                    El mismo figurará en la descripción del árbol ingresado.
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="form-website" class="form-label">Sitio web</label>
+                  <input name="website" type="url" class="form-control" id="form-website" aria-describedby="form-website-help" js-input="website">
+                  <div id="form-website-help" class="form-text">
+                    Opcional. Si tenés un sitio personal o de algún emprendimiento que quieras dar a conocer, podés publicarlo aquí y se publicará junto a tu nombre o alias.
+                    Podés usar tu perfil de instagram, facebook o twitter.
+                  </div>
+                </div>
+              </div>
+              <div js-tab="code" class="d-none flex-column">
+                <div class="mb-3">
+                  <label for="form-email" class="form-label">Código (requerido)</label>
+                  <input name="code" type="text" class="form-control" id="form-code" js-input="code" aria-describedby="form-code-help">
+                  <div class="invalid-feedback">
+                    Por favor ingresá tu código.
+                  </div>
+                  <div id="form-code-help" class="form-text">
+                    Si sos un censita y tenés un código ingresalo acá. Si no tenés un código, ingresá tus datos en la pestaña "Email".
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="mb-3">
-            <label for="form-name" class="form-label">Nombre o alias (requerido)</label>
-            <input name="name" type="text" class="form-control" id="form-name" aria-describedby="form-name-help" required>
-            <div class="invalid-feedback">
-              Por favor ingresá tu nombre.
-            </div>
-            <div id="form-name-help" class="form-text">
-              Nos interesa que tu ayuda sea visible, es por eso que te pedimos tu nombre (o podés ingresar un pseudónimo).
-              El mismo figurará en la descripción del árbol ingresado.
-            </div>
-          </div>
-          <div class="mb-3">
-            <label for="form-website" class="form-label">Sitio web</label>
-            <input name="website" type="url" class="form-control" id="form-website" aria-describedby="form-website-help">
-            <div id="form-website-help" class="form-text">
-              Opcional. Si tenés un sitio personal o de algún emprendimiento que quieras dar a conocer, podés publicarlo aquí y se publicará junto a tu nombre o alias.
-              Podés usar tu perfil de instagram, facebook o twitter.
+          </arbolado-tab-group>
+          <div class="d-flex justify-content-end">
+            <div class="form-check form-switch mt-3 mb-0 d-inline-block">
+              <input type="checkbox" class="form-check-input" id="input-remember" name="remember" js-input="remember">
+              <label class="form-check-label" for="input-remember">
+                Recordar datos
+              </label>
             </div>
           </div>
         </form>
         <!-- Paso 2: Ubicación -->
         <form novalidate class="d-none" js-step>
           <h5>Ubicación (2/4)</h5>
+          <div class="mb-3" js-input-wrapper="block">
+            <label for="form-block" class="form-label">Manzana (requerido)</label>
+            <input name="block" type="text" class="form-control" id="form-block" js-input="block" aria-describedby="form-block-help" required>
+            <div class="invalid-feedback">
+              Por favor ingresá la manzana.
+            </div>
+            <div id="form-block-help" class="form-text">
+              Ingresá el código de la manzana en la que está ubicado el árbol.
+            </div>
+          </div>
+          <div class="mb-3" js-input-wrapper="orientation">
+            <label for="form-orientation" class="form-label">Orientación (requerido)</label>
+            <select class="form-select" id="form-orientation" name="orientation" js-input="orientation" required>
+              <option selected hidden value="">Seleccione...</option>
+              <option value="N">Norte</option>
+              <option value="S">Sur</option>
+              <option value="E">Este</option>
+              <option value="O">Oeste</option>
+            </select>
+            <div class="invalid-feedback">
+              Por favor ingresá la orientación en la manzana del árbol.
+            </div>
+            <div id="form-orientation-help" class="form-text">
+              Ingresá la orientación del árbol dentro de la manzana en la que está ubicado.
+            </div>
+          </div>
           <div class="mb-3">
             <label for="form-coordinates" class="form-label">Ubicación del árbol (requerido)</label>
             <div id="form-coordinates-help" class="form-text">
@@ -83,7 +143,7 @@
                 </div>
                 <div js-species-manual class="d-none">
                   <label for="form-species-manual" class="form-label">Nombre de la especie</label>
-                  <input name="species-manual" type="text" class="form-control" id="form-species-manual" aria-describedby="form-species-manual-help">
+                  <input name="species-manual" type="text" class="form-control" js-input="species-manual" id="form-species-manual" aria-describedby="form-species-manual-help">
                   <div class="invalid-feedback">
                     Por favor ingresá el nombre de la especie.
                   </div>
@@ -101,7 +161,7 @@
                   <ul class="list-unstyled row" js-species-images>
                   </ul>
                   <label for="form-images" class="btn btn-primary" aria-describedby="form-images-help" js-species-image-btn>Agregar fotos</label>
-                  <input class="d-none" type="file" id="form-images" name="images[]" accept="image/*" multiple autocomplete="off" capture="environment">
+                  <input class="d-none" type="file" id="form-images" name="images[]" js-input="images[]" accept="image/*" multiple autocomplete="off" capture="environment">
                 </div>
                 <div class="container">
                   <div class="row gap-1 gap-lg-3">
@@ -125,14 +185,14 @@
         <!-- Paso 4: Datos del árbol -->
         <form novalidate class="d-none" js-step>
           <h5>Datos del árbol (opcionales) (4/4)</h5>
-          <div class="mb-3">
+          <div class="mb-3" js-input-wrapper="height">
             <label for="form-height" class="form-label">Altura total (m)</label>
-            <input name="height" type="number" class="form-control" id="form-height" aria-describedby="form-height-help">
+            <input name="height" type="number" class="form-control" id="form-height" aria-describedby="form-height-help" js-input="height">
             <div id="form-height-help" class="form-text">
               Ingresá el valor en metros.
             </div>
           </div>
-          <div class="mb-3">
+          <div class="mb-3" js-input-wrapper="inclination">
             <span class="form-label">Inclinación estimada del tronco</span>
             <div class="form-check">
               <input class="form-check-input" type="radio" name="inclination" id="inclination-1" aria-describedby="form-inclination-help" value="0">
@@ -168,14 +228,14 @@
               Ingresá el valor en grados con respecto a la vertical.
             </div>
           </div>
-          <div class="mb-3">
+          <div class="mb-3" js-input-wrapper="diameter">
             <label for="form-diameter-trunk" class="form-label">Diámetro de tronco (cm)</label>
-            <input name="diameter-trunk" type="number" class="form-control" id="form-diameter-trunk" aria-describedby="form-diameter-trunk-help">
+            <input name="diameter-trunk" type="number" class="form-control" id="form-diameter-trunk" aria-describedby="form-diameter-trunk-help" js-input="diameter">
             <div id="form-diameter-trunk-help" class="form-text">
               Tomá el diámetro a la altura del pecho. Por favor, ingresá el valor en centímetros.
             </div>
           </div>
-          <div class="mb-3">
+          <div class="mb-3" js-input-wrapper="development">
             <span class="form-label">Etapa de desarrollo</span>
             <div class="form-check">
               <input class="form-check-input" type="radio" name="development" id="development-1" aria-describedby="form-development-help" value="joven">
@@ -199,7 +259,7 @@
               Cada especie tiene su evolución, es por eso que no lo podemos medir en años.
             </div>
           </div>
-          <div class="mb-3">
+          <div class="mb-3" js-input-wrapper="health">
             <span class="form-label">Estado fitosanitario del árbol </span>
             <div class="form-check">
               <input class="form-check-input" type="radio" name="health" id="health-1" aria-describedby="form-health-help" value="sano">
@@ -242,7 +302,7 @@
         </form>
         <form novalidate class="d-none" js-step>
           Gracias!
-        </div>
+      </div>
       </form>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-dark me-auto" data-bs-dismiss="modal" js-cancel-btn>

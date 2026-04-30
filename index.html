@@ -17,11 +17,11 @@
     </script>
     <!-- Cloudflare Turnstile -->
     <script>
-      function catpchaOnLoadCallBack() {
+      function captchaOnLoadCallBack() {
         document.addEventListener('DOMContentLoaded', () => window.Arbolado.emitEvent(document, 'arbolado:captcha/loaded'))
       }
     </script>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=catpchaOnLoadCallBack&render=explicit" async defer></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=captchaOnLoadCallBack&render=explicit" async defer></script>
     <!-- Site scripts -->
     <script type="module" src="/src/main.ts"></script>
   </head>

@@ -1,5 +1,7 @@
 import * as bootstrap from 'bootstrap'
 
+import Species from './types/Species'
+
 import Arbolado from './Arbolado'
 
 import Loader from './elements/Loader/Loader'
@@ -20,6 +22,10 @@ declare global {
     Arbolado: Arbolado,
     turnstile: Turnstile.Turnstile,
     ios?: { getCurrentPosition: () => void }
+  }
+  interface HTMLElementEventMap {
+    'arbolado:form/step': CustomEvent<{ step: number }>
+    'arbolado:species/change': CustomEvent<{ species: Species | null }>
   }
 }
 
