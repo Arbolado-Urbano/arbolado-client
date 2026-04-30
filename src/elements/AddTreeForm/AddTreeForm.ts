@@ -365,8 +365,6 @@ export default class AddTreeForm extends HTMLElement {
   }
 
   private async submit() {
-    // Validate the form
-    // if (!window.Arbolado.validateForm(this.form)) return
     let token
     try {
       token = await this.captchaWidget.execute()
