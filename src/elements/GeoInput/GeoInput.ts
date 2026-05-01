@@ -12,7 +12,7 @@ export default class GeoInput extends HTMLElement {
   private marker?: L.Marker // Marker
   private mapOptions: L.MapOptions = { // Map options
     dragging: !L.Browser.mobile, // Disable one finger dragging on mobile devices
-    center: L.latLng(-34.4720387, -58.5388896), // San Isidro
+    center: L.latLng(-34.618, -58.44), // BsAs
     layers: [
       L.tileLayer(
         'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
@@ -50,6 +50,10 @@ export default class GeoInput extends HTMLElement {
     })
     this.map.on('move', () => this.map && this.addressLookup.setBounds(this.map.getBounds()))
     this.addressLookup.addEventListener('arbolado:address/selected', (event) => this.setValue((event as CustomEvent).detail.latLng))
+  }
+
+  setCenter(latitude: number, longitude: number) {
+    this.map?.panTo(new L.LatLng(latitude, longitude))
   }
 
   static get formAssociated() { return true }
