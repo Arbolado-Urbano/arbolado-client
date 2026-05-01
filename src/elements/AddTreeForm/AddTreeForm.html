@@ -13,8 +13,8 @@
       </div>
       <div class="modal-body">
         <!-- Paso 1: Datos personales -->
-        <form novalidate js-step>
-          <h5>Datos personales (1/4)</h5>
+        <form novalidate js-step="id">
+          <h5>Datos personales</h5>
           <arbolado-tab-group js-tabgroup="personal-data">
             <ul class="nav nav-tabs">
               <li class="nav-item">
@@ -77,8 +77,8 @@
           </div>
         </form>
         <!-- Paso 2: Ubicación -->
-        <form novalidate class="d-none" js-step>
-          <h5>Ubicación (2/4)</h5>
+        <form novalidate class="d-none" js-step="location">
+          <h5>Ubicación</h5>
           <div class="mb-3" js-input-wrapper="block">
             <label for="form-block" class="form-label">Manzana (requerido)</label>
             <input name="block" type="text" class="form-control" id="form-block" js-input="block" aria-describedby="form-block-help" required>
@@ -118,8 +118,8 @@
           <!-- Espacio verde checkbox -->
         </form>
         <!-- Paso 3: Identificación de especie -->
-        <form novalidate class="d-none" js-step>
-          <h5>Identificación de especie (requerido) (3/4)</h5>
+        <form novalidate class="d-none" js-step="species">
+          <h5>Identificación de especie (requerido)</h5>
           <arbolado-tab-group>
             <ul class="nav nav-tabs">
               <li class="nav-item">
@@ -183,8 +183,8 @@
           </arbolado-tab-group>
         </form>
         <!-- Paso 4: Datos del árbol -->
-        <form novalidate class="d-none" js-step>
-          <h5>Datos del árbol (opcionales) (4/4)</h5>
+        <form novalidate class="d-none" js-step="data">
+          <h5>Datos del árbol (opcionales)</h5>
           <div class="mb-3" js-input-wrapper="height">
             <label for="form-height" class="form-label">Altura total (m)</label>
             <input name="height" type="number" class="form-control" id="form-height" aria-describedby="form-height-help" js-input="height">
@@ -300,7 +300,7 @@
             </div>
           </div>
         </form>
-        <form novalidate class="d-none" js-step>
+        <form novalidate class="d-none" js-step="end">
           Gracias!
       </div>
       </form>

@@ -7,10 +7,12 @@ import GeoInput from '../GeoInput/GeoInput'
 import PlantNetResponse from '../../types/PlantNetResponse'
 import TabGroup from '../TabGroup'
 
+export type StepLabel = 'id' | 'location' | 'images' | 'species' | 'data' | 'end'
+
 declare type ImageType = 'leaf' | 'flower' | 'fruit' | 'bark' | 'auto'
 
 export default class AddTreeForm extends HTMLElement {
-  private step: number = 0
+  private step: { index: number, label: string } = { index: 0, label: 'id' }
   private steps: NodeListOf<HTMLFormElement>
   private nextBtn: HTMLButtonElement
   private prevBtn: HTMLButtonElement
@@ -76,8 +78,8 @@ export default class AddTreeForm extends HTMLElement {
     this.personalDataTabGroup = this.querySelector("[js-tabgroup=personal-data]") as TabGroup
     this.modal = this.querySelector('[js-modal]') as HTMLElement
 
-    this.nextBtn.addEventListener('click', () => this.goStep(this.step + 1))
-    this.prevBtn.addEventListener('click', () => this.goStep(this.step - 1))
+    this.nextBtn.addEventListener('click', () => this.goStep(this.step.index + 1))
+    this.prevBtn.addEventListener('click', () => this.goStep(this.step.index - 1))
     this.resetBtn.addEventListener('click', this.reset)
     this.identifyBtn.addEventListener('click', this.identifySpecies)
 
@@ -121,11 +123,11 @@ export default class AddTreeForm extends HTMLElement {
     this.submitBtn.addEventListener('click', () => this.submit())
 
     // Skip first step if data was saved to localstorage
-    this.modal.addEventListener('show.bs.modal', () => { if (this.step === 0) this.goToFirstStep() })
+    this.modal.addEventListener('show.bs.modal', () => { if (this.step.index === 0) this.goToFirstStep() })
 
     this.addEventListener('arbolado:form/step', (event) => {
-      const step = event.detail.step
-      if (step === 1) {
+      const step = event.detail.label
+      if (step === 'location') {
         // Reset the height of the geoInput map, because it's within a modal we need to reset it for it to display correctly
         this.geoInput.resetHeight()
         // Just in case the modal is still openeing reset the height again after the modal has been shown
@@ -136,13 +138,14 @@ export default class AddTreeForm extends HTMLElement {
           this.querySelector('[js-input-wrapper=orientation]')?.classList.remove('d-none')
           this.querySelector('[js-input=block]')?.setAttribute('required', 'true')
           this.querySelector('[js-input=orientation]')?.setAttribute('required', 'true')
+          this.geoInput.setCenter(-32.22445134285866, -58.14305122417706)
         } else {
           this.querySelector('[js-input-wrapper=block]')?.classList.add('d-none')
           this.querySelector('[js-input-wrapper=orientation]')?.classList.add('d-none')
           this.querySelector('[js-input=block]')?.removeAttribute('required')
           this.querySelector('[js-input=orientation]')?.removeAttribute('required')
         }
-      } else if (step === 3) {
+      } else if (step === 'species') {
         // Display or hide the data inputs based on whether the species is the "emtpy planter" or not
         if (this.speciesSelect.value?.url === 'plantera-vacia') {
           this.querySelector('[js-input-wrapper=inclination]')?.classList.add('d-none')
@@ -187,7 +190,7 @@ export default class AddTreeForm extends HTMLElement {
 
   private goStep(index: number) {
     if ((index >= this.steps.length) || (index < 0)) return
-    if ((index > this.step) && (!this.isValidCurrentStep())) return
+    if ((index > this.step.index) && (!this.isValidCurrentStep())) return
     this.steps.forEach((step) => step.classList.add('d-none'))
     this.steps[index]?.classList.remove('d-none')
     if (index > 0) {
@@ -209,21 +212,21 @@ export default class AddTreeForm extends HTMLElement {
         this.nextBtn.classList.remove('d-none')
       }
     }
-    this.step = index
-    window.Arbolado.emitEvent(this, "arbolado:form/step", { step: index })
+    this.step = { index, label: this.steps[index].getAttribute('js-step') as StepLabel }
+    window.Arbolado.emitEvent(this, 'arbolado:form/step', this.step)
     this.updateProgress()
   }
 
   private updateProgress() {
-    const currentProgress = ((this.step / (this.steps.length - 1)) * 100).toString()
+    const currentProgress = ((this.step.index / (this.steps.length - 1)) * 100).toString()
     this.progress.wrapper.setAttribute('aria-valuenow', currentProgress)
     this.progress.bar.style.width = `${currentProgress}%`
   }
 
   private isValidCurrentStep() {
-    const stepForm = this.steps[this.step]
+    const stepForm = this.steps[this.step.index]
     stepForm.classList.add('was-validated')
-    if (this.step === 1) {
+    if (this.step.label === "location") {
       if (this.geoInput.value !== null) {
         this.geoInput.classList.remove('is-invalid')
         return stepForm.checkValidity()
@@ -232,7 +235,7 @@ export default class AddTreeForm extends HTMLElement {
         this.geoInput.addEventListener('change', () => this.geoInput.classList.remove('is-invalid'), { once: true })
         return false
       }
-    } else if (this.step === 2) {
+    } else if (this.step.label === "species") {
       if (!this.autoSpecies) {
         if (!this.speciesSelect.value) {
           this.speciesSelect.classList.add('is-invalid')
@@ -425,7 +428,7 @@ export default class AddTreeForm extends HTMLElement {
     const requestUrl = `${import.meta.env.VITE_API_URL}/${this.personalDataTabGroup.currentTab() === 'code' ? 'arboles' : 'aportes'}`
     const response = await window.Arbolado.fetch(requestUrl, 'POST', data)
     if (response?.status == 200) {
-      this.goStep(this.step + 1)
+      this.goStep(this.step.index + 1)
     } else {
       alert('Ocurrió un error, intentá de nuevo más tarde')
     }

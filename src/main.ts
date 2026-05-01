@@ -11,7 +11,7 @@ import TreeDrawer from './elements/TreeDrawer/TreeDrawer'
 import SpeciesSelect from './elements/SpeciesSelect/SpeciesSelect'
 import AddressLookup from './elements/AddressLookup/AddressLookup'
 import GeoInput from './elements/GeoInput/GeoInput'
-import AddTreeForm from './elements/AddTreeForm/AddTreeForm'
+import AddTreeForm, { StepLabel } from './elements/AddTreeForm/AddTreeForm'
 import Captcha from './elements/Captcha'
 import Alert from './elements/Alert/Alert'
 import TabGroup from './elements/TabGroup'
@@ -24,7 +24,7 @@ declare global {
     ios?: { getCurrentPosition: () => void }
   }
   interface HTMLElementEventMap {
-    'arbolado:form/step': CustomEvent<{ step: number }>
+    'arbolado:form/step': CustomEvent<{ label: StepLabel, index: number }>
     'arbolado:species/change': CustomEvent<{ species: Species | null }>
   }
 }
