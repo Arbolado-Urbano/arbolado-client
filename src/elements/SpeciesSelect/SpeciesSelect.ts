@@ -52,7 +52,7 @@ export default class SpeciesSelect extends HTMLElement {
     // Arrow key navigation & enter for selecting a species
     this.addEventListener('keydown', this.handleKeyDown, true)
     // Empty planter selection toggle
-    this.emptyPlanterElement.addEventListener('click', this.handleEmptyPlanterToggle) // TODO: Fix this not firing when the parent form resets
+    this.emptyPlanterElement.addEventListener('click', this.handleEmptyPlanterToggle)
   }
 
   formResetCallback() {
