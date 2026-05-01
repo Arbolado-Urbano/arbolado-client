@@ -30,6 +30,6 @@
     "leaflet.markercluster": "1.5.3",
     "sass": "1.99.0",
     "typescript": "6.0.3",
-    "vite": "8.0.9"
+    "vite": "8.0.10"
   }
 }
