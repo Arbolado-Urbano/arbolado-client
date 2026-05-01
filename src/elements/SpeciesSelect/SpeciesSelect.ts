@@ -14,9 +14,11 @@ export default class SpeciesSelect extends HTMLElement {
   private noSelectionElement: Species
   private emptyPlanterElement: HTMLInputElement
   private emptyPlanter: Species | undefined
+  static formAssociated = true
 
   constructor() {
     super()
+    this.attachInternals()
     this.innerHTML = SpeciesSelectTemplate
     this.handleKeyDown = this.handleKeyDown.bind(this)
     this.renderSpecies = this.renderSpecies.bind(this)
@@ -50,7 +52,11 @@ export default class SpeciesSelect extends HTMLElement {
     // Arrow key navigation & enter for selecting a species
     this.addEventListener('keydown', this.handleKeyDown, true)
     // Empty planter selection toggle
-    this.emptyPlanterElement.addEventListener('click', this.handleEmptyPlanterToggle)
+    this.emptyPlanterElement.addEventListener('click', this.handleEmptyPlanterToggle) // TODO: Fix this not firing when the parent form resets
+  }
+
+  formResetCallback() {
+    this.handleEmptyPlanterToggle()
   }
 
   setValue(species: Species | null) {
