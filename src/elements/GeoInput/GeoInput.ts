@@ -30,6 +30,7 @@ export default class GeoInput extends HTMLElement {
 
   constructor() {
     super()
+    this.attachInternals()
     this.innerHTML = GeoInputTemplate
 
     this.geoBtn = this.querySelector('[js-geo-btn]') as GeoBtn
@@ -50,6 +51,10 @@ export default class GeoInput extends HTMLElement {
     })
     this.map.on('move', () => this.map && this.addressLookup.setBounds(this.map.getBounds()))
     this.addressLookup.addEventListener('arbolado:address/selected', (event) => this.setValue((event as CustomEvent).detail.latLng))
+  }
+
+  formResetCallback() {
+    this.setValue()
   }
 
   setCenter(latitude: number, longitude: number) {
@@ -87,28 +92,33 @@ export default class GeoInput extends HTMLElement {
   * Sets the given latLng as the current value and sets a marker on the map for those coordinates
   * @param latLng - Latitude and longitude coordinates
   */
-  public setValue(latLng: L.LatLng): void {
+  public setValue(latLng?: L.LatLng): void {
     // Get the map object
     if (!this.map) return
-    // If there's no marker on the map...
-    if (!this.marker) {
-      L.Icon.Default.imagePath = '/imgs/markers/'
-      // Create a new marker
-      this.marker = new L.Marker([latLng.lat, latLng.lng], {
-        draggable: true,
-        riseOnHover: true,
-      })
-      this.map.addLayer(this.marker)
+    if (!latLng) {
+      if (this.marker) this.map.removeLayer(this.marker)
+      this.value = null
     } else {
-      // If a marker already exists, move it
-      this.marker.setLatLng([latLng.lat, latLng.lng])
+      // If there's no marker on the map...
+      if (!this.marker) {
+        L.Icon.Default.imagePath = '/imgs/markers/'
+        // Create a new marker
+        this.marker = new L.Marker([latLng.lat, latLng.lng], {
+          draggable: true,
+          riseOnHover: true,
+        })
+        this.map.addLayer(this.marker)
+      } else {
+        // If a marker already exists, move it
+        this.marker.setLatLng([latLng.lat, latLng.lng])
+      }
+      if (!this.map.hasLayer(this.marker)) {
+        this.map.addLayer(this.marker)
+      }
+      // Update the selected coordinates
+      this.latlngUpdated(latLng)
+      // Set the value for the selected coordinates
+      this.value = `${latLng.lat},${latLng.lng}`
     }
-    if (!this.map.hasLayer(this.marker)) {
-      this.map.addLayer(this.marker)
-    }
-    // Update the selected coordinates
-    this.latlngUpdated(latLng)
-    // Set the value for the selected coordinates
-    this.value = `${latLng.lat},${latLng.lng}`
   }
 }
