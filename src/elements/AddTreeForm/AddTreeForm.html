@@ -117,7 +117,17 @@
           </div>
           <!-- Espacio verde checkbox -->
         </form>
-        <!-- Paso 3: Identificación de especie -->
+        <!-- Paso 3: Fotos (sólo para censistas) -->
+        <form novalidate class="d-none" js-step="images">
+          <h5>Fotos</h5>
+          <div class="mb-3">
+            <ul class="list-unstyled row" js-images>
+            </ul>
+            <label for="form-images" class="form-label">Fotos del árbol (opcional)</label>
+            <input class="form-control" type="file" id="form-images" name="images[]" js-input="images[]" accept="image/*" multiple autocomplete="off" capture="environment">
+          </div>
+        </form>
+        <!-- Paso 4: Identificación de especie -->
         <form novalidate class="d-none" js-step="species">
           <h5>Identificación de especie (requerido)</h5>
           <arbolado-tab-group>
@@ -155,13 +165,13 @@
               <div js-tab="auto" class="d-none">
                 <div class="mb-3">
                   <span class="form-label">Fotos</span>
-                  <div id="form-images-help" class="form-text">
+                  <div id="form-species-images-help" class="form-text">
                     Seleccioná fotos del árbol y presioná el botón "Identificar" para intentar detectar automáticamente la especie del árbol.
                   </div>
                   <ul class="list-unstyled row" js-species-images>
                   </ul>
-                  <label for="form-images" class="btn btn-primary" aria-describedby="form-images-help" js-species-image-btn>Agregar fotos</label>
-                  <input class="d-none" type="file" id="form-images" name="images[]" js-input="images[]" accept="image/*" multiple autocomplete="off" capture="environment">
+                  <label for="form-species-images" class="btn btn-primary" aria-describedby="form-species-images-help" js-species-image-btn>Agregar fotos</label>
+                  <input class="d-none" type="file" id="form-species-images" name="species-images[]" js-input="species-images[]" accept="image/*" multiple autocomplete="off" capture="environment">
                 </div>
                 <div class="container">
                   <div class="row gap-1 gap-lg-3">
@@ -182,7 +192,7 @@
             </div>
           </arbolado-tab-group>
         </form>
-        <!-- Paso 4: Datos del árbol -->
+        <!-- Paso 5: Datos del árbol -->
         <form novalidate class="d-none" js-step="data">
           <h5>Datos del árbol (opcionales)</h5>
           <div class="mb-3" js-input-wrapper="height">
@@ -302,8 +312,8 @@
         </form>
         <form novalidate class="d-none" js-step="end">
           Gracias!
+        </form>
       </div>
-      </form>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-dark me-auto" data-bs-dismiss="modal" js-cancel-btn>
           Cancelar
