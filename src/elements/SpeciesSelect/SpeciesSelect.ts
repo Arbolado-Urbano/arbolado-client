@@ -59,6 +59,10 @@ export default class SpeciesSelect extends HTMLElement {
     this.handleEmptyPlanterToggle()
   }
 
+  checkValidity() {
+    return true
+  }
+
   setValue(species: Species | null) {
     this.value = species
     this.updateBtnLabel()
