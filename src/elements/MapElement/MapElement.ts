@@ -16,19 +16,28 @@ export default class MapElement extends HTMLElement {
   private geoBtn: GeoBtn
   private map: L.Map // Map reference
   private mapFitToBoundsOptions: L.FitBoundsOptions = { maxZoom: 15, padding: [15, 15] } // To zoom into search results
+  private baseLayers = {
+    street: L.tileLayer(
+      'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+      {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 21
+      },
+    ),
+    satellite: L.tileLayer(
+      `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=${import.meta.env.VITE_MAPBOX_TOKEN}`,
+      {
+        maxZoom: 19,
+        tileSize: 256,
+        attribution: '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      },
+    ),
+  }
   private options: L.MapOptions = { // Map options
     center: L.latLng(-34.618, -58.44), // BsAs
-    layers: [
-      L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-        {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-          subdomains: 'abcd',
-          maxZoom: 21
-        },
-      ),
-    ],
-    maxZoom: 21,
+    layers: [this.baseLayers.street],
+    maxZoom: 19,
     minZoom: 5,
     zoom: 13,
   }
@@ -84,6 +93,7 @@ export default class MapElement extends HTMLElement {
       this.setMarker(event.latlng)
     })
     map.on('move', () => window.Arbolado.emitEvent(this, 'arbolado:map/move', { bounds: map.getBounds() }))
+    L.control.layers(this.baseLayers, undefined, { position: "bottomright" }).addTo(map)
     return map
   }
 
