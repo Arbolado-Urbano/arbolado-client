@@ -9,12 +9,13 @@ import PlantNetResponse from '../../types/PlantNetResponse'
 import TabGroup from '../TabGroup'
 
 const STEP_LABELS = ['id', 'location', 'images', 'species', 'data', 'end'] as const
-export type StepLabel = typeof STEP_LABELS[number]
+type StepLabel = typeof STEP_LABELS[number]
+export type Step = { label: StepLabel, index: number }
 
 declare type ImageType = 'leaf' | 'flower' | 'fruit' | 'bark' | 'auto'
 
 export default class AddTreeForm extends HTMLElement {
-  private step: { index: number, label: string } = { index: 0, label: 'id' }
+  private step: Step = { index: 0, label: 'id' }
   private steps: Record<StepLabel, HTMLFormElement>
   private nextBtn: HTMLButtonElement
   private prevBtn: HTMLButtonElement
@@ -90,9 +91,9 @@ export default class AddTreeForm extends HTMLElement {
     this.personalDataTabGroup = this.querySelector("[js-tabgroup=personal-data]") as TabGroup
     this.modal = this.querySelector('[js-modal]') as HTMLElement
 
-    this.nextBtn.addEventListener('click', () => this.goStep(this.step.index + 1))
-    this.prevBtn.addEventListener('click', () => this.goStep(this.step.index - 1))
-    this.resetBtn.addEventListener('click', this.reset)
+    this.nextBtn.addEventListener('click', async () => await this.goStep(this.step.index + 1))
+    this.prevBtn.addEventListener('click', async () => await this.goStep(this.step.index - 1))
+    this.resetBtn.addEventListener('click', async () => await this.reset())
     this.identifyBtn.addEventListener('click', this.identifySpecies)
 
     // Display the manual species text input when no speices is selected on the species selection dropdown
@@ -136,11 +137,11 @@ export default class AddTreeForm extends HTMLElement {
     this.submitBtn.addEventListener('click', () => this.submit())
 
     // Skip first step if data was saved to localstorage
-    this.modal.addEventListener('show.bs.modal', () => { if (this.step.index === 0) this.goToFirstStep() })
+    this.modal.addEventListener('show.bs.modal', async () => { if (this.step.index === 0) await this.goToFirstStep() })
 
     this.addEventListener('arbolado:form/step', (event) => {
-      const step = event.detail.label
-      if (step === 'location') {
+      const stepLabel = event.detail.current.label
+      if (stepLabel === 'location') {
         // Reset the height of the geoInput map, because it's within a modal we need to reset it for it to display correctly
         this.geoInput.resetHeight()
         // Just in case the modal is still openeing reset the height again after the modal has been shown
@@ -159,7 +160,7 @@ export default class AddTreeForm extends HTMLElement {
           this.querySelector('[js-input=orientation]')?.removeAttribute('required')
           this.geoInput.setCenter(-34.618, -58.44) // Center on BsAs
         }
-      } else if (step === 'data') {
+      } else if (stepLabel === 'data') {
         // Display or hide the data inputs based on whether the species is the "emtpy planter" or not
         if (this.speciesSelect.value?.url === 'plantera-vacia') {
           this.querySelector('[js-input-wrapper=inclination]')?.classList.add('d-none')
@@ -178,12 +179,12 @@ export default class AddTreeForm extends HTMLElement {
     })
   }
 
-  private goToFirstStep() {
+  private async goToFirstStep() {
     const code = localStorage.getItem('code')
     if (code) {
       this.codeInput.value = code
       this.personalDataTabGroup.show('code')
-      this.goStep(1)
+      await this.goStep(1)
       this.rememberInput.checked = true
     } else {
       const email = localStorage.getItem('email')
@@ -194,17 +195,39 @@ export default class AddTreeForm extends HTMLElement {
         this.nameInput.value = name
         this.websiteInput.value = website ?? ''
         this.personalDataTabGroup.show('email')
-        this.goStep(1)
+        await this.goStep(1)
         this.rememberInput.checked = true
       } else {
-        this.goStep(0)
+        await this.goStep(0)
       }
     }
   }
 
-  private goStep(index: number) {
+  private async goStep(index: number) {
     if ((index >= STEP_LABELS.length) || (index < 0)) return
     if ((index > this.step.index) && (!this.isValidCurrentStep())) return
+    // If we're moving on from the ID step and the user used a code => validate it
+    if (this.personalDataTabGroup.currentTab() === 'code' && this.step.label === 'id') {
+      let token
+      try {
+        token = await this.captchaWidget.execute()
+      } catch (error) {
+        window.Arbolado.alert('danger', 'Ocurrió un error. Intente nuevamente más tarde.')
+        console.error(error)
+      }
+      if (!token) return
+      const data = new FormData()
+      data.set('captcha', token)
+      const requestUrl = `${import.meta.env.VITE_API_URL}/usuarios/${this.codeInput.value}`
+      const response = await window.Arbolado.fetch(requestUrl, 'POST', data)
+      if (!response?.ok) {
+        window.Arbolado.alert('danger', 'Código inválido. Verifícalo o solicita asistencia.')
+        this.codeInput.classList.add('is-invalid')
+        return
+      }
+      this.codeInput.classList.remove('is-invalid')
+    }
+    // If the user is not a censist then the images step will be skipped
     if (index === STEP_LABELS.indexOf('images') && this.personalDataTabGroup.currentTab() !== 'code') {
       if (index > this.step.index) index += 1
       else index -= 1
@@ -230,8 +253,9 @@ export default class AddTreeForm extends HTMLElement {
         this.nextBtn.classList.remove('d-none')
       }
     }
+    const previous = { ...this.step }
     this.step = { index, label: this.steps[STEP_LABELS[index]].getAttribute('js-step') as StepLabel }
-    window.Arbolado.emitEvent(this, 'arbolado:form/step', this.step)
+    window.Arbolado.emitEvent(this, 'arbolado:form/step', { current: this.step, previous })
     this.updateProgress()
   }
 
@@ -279,7 +303,7 @@ export default class AddTreeForm extends HTMLElement {
     return stepForm.checkValidity()
   }
 
-  private reset() {
+  private async reset() {
     this.prevBtn.classList.remove('d-none')
     this.nextBtn.classList.remove('d-none')
     this.cancelBtn.classList.remove('d-none')
@@ -293,7 +317,7 @@ export default class AddTreeForm extends HTMLElement {
       if (index === 0) { return }
       this.steps[stepId].reset()
     })
-    this.goToFirstStep()
+    await this.goToFirstStep()
   }
 
   private processSpeciesImages() {
@@ -458,7 +482,7 @@ export default class AddTreeForm extends HTMLElement {
     const requestUrl = `${import.meta.env.VITE_API_URL}/${this.personalDataTabGroup.currentTab() === 'code' ? 'arboles' : 'aportes'}`
     const response = await window.Arbolado.fetch(requestUrl, 'POST', data)
     if (response?.status == 200) {
-      this.goStep(this.step.index + 1)
+      await this.goStep(this.step.index + 1)
     } else {
       alert('Ocurrió un error, intentá de nuevo más tarde')
     }
