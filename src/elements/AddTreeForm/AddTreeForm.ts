@@ -184,7 +184,7 @@ export default class AddTreeForm extends HTMLElement {
     if (code) {
       this.codeInput.value = code
       this.personalDataTabGroup.show('code')
-      await this.goStep(1)
+      await this.goStep(1, true)
       this.rememberInput.checked = true
     } else {
       const email = localStorage.getItem('email')
@@ -203,11 +203,11 @@ export default class AddTreeForm extends HTMLElement {
     }
   }
 
-  private async goStep(index: number) {
+  private async goStep(index: number, skipCodeValidation?: boolean) {
     if ((index >= STEP_LABELS.length) || (index < 0)) return
     if ((index > this.step.index) && (!this.isValidCurrentStep())) return
     // If we're moving on from the ID step and the user used a code => validate it
-    if (this.personalDataTabGroup.currentTab() === 'code' && this.step.label === 'id') {
+    if (!skipCodeValidation && this.personalDataTabGroup.currentTab() === 'code' && this.step.label === 'id') {
       let token
       try {
         token = await this.captchaWidget.execute()
