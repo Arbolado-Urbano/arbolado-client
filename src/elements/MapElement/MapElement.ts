@@ -17,7 +17,7 @@ export default class MapElement extends HTMLElement {
   private map: L.Map // Map reference
   private mapFitToBoundsOptions: L.FitBoundsOptions = { maxZoom: 15, padding: [15, 15] } // To zoom into search results
   private baseLayers = {
-    mapa: L.tileLayer(
+    Mapa: L.tileLayer(
       'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
       {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
@@ -25,7 +25,7 @@ export default class MapElement extends HTMLElement {
         maxZoom: 21
       },
     ),
-    "satélite": L.tileLayer(
+    Satélite: L.tileLayer(
       `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=${import.meta.env.VITE_MAPBOX_TOKEN}`,
       {
         maxZoom: 19,
@@ -36,7 +36,7 @@ export default class MapElement extends HTMLElement {
   }
   private options: L.MapOptions = { // Map options
     center: L.latLng(-34.618, -58.44), // BsAs
-    layers: [this.baseLayers.mapa],
+    layers: [this.baseLayers.Mapa],
     maxZoom: 19,
     minZoom: 5,
     zoom: 13,
@@ -93,7 +93,17 @@ export default class MapElement extends HTMLElement {
       this.setMarker(event.latlng)
     })
     map.on('move', () => window.Arbolado.emitEvent(this, 'arbolado:map/move', { bounds: map.getBounds() }))
-    L.control.layers(this.baseLayers, undefined, { position: "bottomright" }).addTo(map)
+    // Allow the satellite layer to be selected even if we're too zoomed in
+    const layerControl = new L.Control.Layers(this.baseLayers, {}, { position: 'bottomright' })
+    Object.assign(layerControl, { _checkDisabledLayers: () => { } })
+    layerControl.addTo(map)
+    map.on('baselayerchange', (event) => {
+      if (event.name === 'Mapa') {
+        map.setMaxZoom(21)
+      } else {
+        map.setMaxZoom(19)
+      }
+    })
     return map
   }
 
