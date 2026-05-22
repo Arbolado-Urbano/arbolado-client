@@ -11,7 +11,7 @@ export default class GeoInput extends HTMLElement {
   private map?: L.Map // Map reference
   private marker?: L.Marker // Marker
   private baseLayers = {
-    street: L.tileLayer(
+    mapa: L.tileLayer(
       'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
       {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
@@ -19,7 +19,7 @@ export default class GeoInput extends HTMLElement {
         maxZoom: 21
       },
     ),
-    satellite: L.tileLayer(
+    "satélite": L.tileLayer(
       `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=${import.meta.env.VITE_MAPBOX_TOKEN}`,
       {
         maxZoom: 19,
@@ -31,7 +31,7 @@ export default class GeoInput extends HTMLElement {
   private mapOptions: L.MapOptions = { // Map options
     dragging: !L.Browser.mobile, // Disable one finger dragging on mobile devices
     center: L.latLng(-34.618, -58.44), // BsAs
-    layers: [this.baseLayers.street],
+    layers: [this.baseLayers.mapa],
     maxZoom: 19,
     minZoom: 5,
     zoom: 14,
