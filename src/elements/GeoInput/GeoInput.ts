@@ -11,7 +11,7 @@ export default class GeoInput extends HTMLElement {
   private map?: L.Map // Map reference
   private marker?: L.Marker // Marker
   private baseLayers = {
-    mapa: L.tileLayer(
+    Mapa: L.tileLayer(
       'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
       {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
@@ -19,7 +19,7 @@ export default class GeoInput extends HTMLElement {
         maxZoom: 21
       },
     ),
-    "satélite": L.tileLayer(
+    Satélite: L.tileLayer(
       `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=${import.meta.env.VITE_MAPBOX_TOKEN}`,
       {
         maxZoom: 19,
@@ -31,7 +31,7 @@ export default class GeoInput extends HTMLElement {
   private mapOptions: L.MapOptions = { // Map options
     dragging: !L.Browser.mobile, // Disable one finger dragging on mobile devices
     center: L.latLng(-34.618, -58.44), // BsAs
-    layers: [this.baseLayers.mapa],
+    layers: [this.baseLayers.Mapa],
     maxZoom: 19,
     minZoom: 5,
     zoom: 14,
@@ -59,7 +59,17 @@ export default class GeoInput extends HTMLElement {
       this.setValue(event.latlng)
     })
     this.map.on('move', () => this.map && this.addressLookup.setBounds(this.map.getBounds()))
-    L.control.layers(this.baseLayers, undefined, { position: "bottomleft" }).addTo(this.map)
+    // Allow the satellite layer to be selected even if we're too zoomed in
+    const layerControl = new L.Control.Layers(this.baseLayers, {}, { position: 'bottomright' })
+    Object.assign(layerControl, { _checkDisabledLayers: () => { } })
+    layerControl.addTo(this.map)
+    this.map.on('baselayerchange', (event) => {
+      if (event.name === 'Mapa') {
+        this.map?.setMaxZoom(21)
+      } else {
+        this.map?.setMaxZoom(19)
+      }
+    })
     this.addressLookup.addEventListener('arbolado:address/selected', (event) => this.setValue((event as CustomEvent).detail.latLng))
   }
 
