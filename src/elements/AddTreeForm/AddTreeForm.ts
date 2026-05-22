@@ -218,11 +218,16 @@ export default class AddTreeForm extends HTMLElement {
       if (!token) return
       const data = new FormData()
       data.set('captcha', token)
-      const requestUrl = `${import.meta.env.VITE_API_URL}/usuarios/${this.codeInput.value}`
+      data.set('code', this.codeInput.value)
+      const requestUrl = `${import.meta.env.VITE_API_URL}/usuarios`
       const response = await window.Arbolado.fetch(requestUrl, 'POST', data)
-      if (!response?.ok) {
-        window.Arbolado.alert('danger', 'Código inválido. Verifícalo o solicita asistencia.')
-        this.codeInput.classList.add('is-invalid')
+      if (!response.ok) {
+        if (response.status === 500) {
+          window.Arbolado.alert('danger', 'Ocurrió un error al validar tu código. Intenta nuevamente más tarde.')
+        } else {
+          window.Arbolado.alert('danger', 'Código inválido. Verifícalo o solicita asistencia.')
+          this.codeInput.classList.add('is-invalid')
+        }
         return
       }
       this.codeInput.classList.remove('is-invalid')
