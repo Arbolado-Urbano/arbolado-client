@@ -60,7 +60,7 @@ export default class GeoInput extends HTMLElement {
     })
     this.map.on('move', () => this.map && this.addressLookup.setBounds(this.map.getBounds()))
     // Allow the satellite layer to be selected even if we're too zoomed in
-    const layerControl = new L.Control.Layers(this.baseLayers, {}, { position: 'bottomright' })
+    const layerControl = new L.Control.Layers(this.baseLayers, {}, { position: 'bottomleft' })
     Object.assign(layerControl, { _checkDisabledLayers: () => { } })
     layerControl.addTo(this.map)
     this.map.on('baselayerchange', (event) => {
