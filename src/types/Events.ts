@@ -6,6 +6,7 @@ export type ArboladoEventMap = {
   'arbolado:loading': CustomEvent<{ loading: boolean }>
   'arbolado:ios/location': CustomEvent<{ error: '2' | '3', coords?: never } | { error?: never, coords: GeolocationCoordinates }>
   'arbolado:captcha/callback': CustomEvent<{ token: string }>
+  'arbolado:captcha/loaded': CustomEvent<void>
   'arbolado:queryParams/update': CustomEvent<void>
   'arbolado:overlay/click': CustomEvent<void>
   'arbolado:tab/open': CustomEvent<void>
