@@ -42,10 +42,13 @@
 
 Los siguientes comandos están disponibles una vez instalado [Node.js](https://nodejs.org/en/):
 
-- `npm i` - Instala las dependencias del proyecto.
-- `npm run dev` - Levantar una instancia del serivdor de desarrollo.
-- `npm run build` - Compila el proyecto para producción.
-- `npm run preview` - Previsualiza la versión compilada para producción.
-- `npm run docker:pull` - Descarga las últimas versiones de las imágenes de Docker necesarias.
-- `npm run docker:up` - Levanta una instancia de la API y de la base de datos con Docker.
-- `npm run docker:down` - Detiene las instancias de la API y de la base de datos.
+- `npm i`                 - Instala las dependencias del proyecto.
+- `npm run dev`           - Levantar una instancia del serivdor de desarrollo.
+- `npm run build`         - Compila el proyecto para producción.
+- `npm run build:staging` - Compila el proyecto para staging.
+- `npm run start`         - Previsualiza la versión compilada.
+- `npm run lint`          - Ejecuta el linter para analizar y reportar errores de estilo y calidad de código.
+- `npm run typecheck`     - Ejecuta la validación de tipos de TypeScript sin generar archivos compilados.
+- `npm run docker:pull`   - Descarga las últimas versiones de las imágenes de Docker necesarias.
+- `npm run docker:up`     - Levanta una instancia de la API y de la base de datos con Docker.
+- `npm run docker:down`   - Detiene las instancias de la API y de la base de datos.

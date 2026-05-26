@@ -10,7 +10,8 @@
   "scripts": {
     "start": "vite preview",
     "dev": "vite --host 0.0.0.0",
-    "build": "tsc && vite build",
+    "build": "vite build",
+    "build:staging": "vite build --mode staging",
     "lint": "eslint",
     "typecheck": "tsc",
     "docker:pull": "docker compose -f ./docker-compose.yml pull",
