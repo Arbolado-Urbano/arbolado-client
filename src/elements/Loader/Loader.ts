@@ -5,7 +5,7 @@ export default class Loader extends HTMLElement {
     super()
     this.innerHTML = LoaderTemplate
     document.addEventListener('arbolado:loading', (event) => {
-      if ((event as CustomEvent).detail.loading) this.show()
+      if (event.detail.loading) this.show()
       else this.hide()
     })
   }

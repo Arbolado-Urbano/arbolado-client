@@ -36,8 +36,7 @@ export default class GeoBtn extends HTMLElement {
     window.Arbolado.emitEvent(this, 'arbolado:geo/error', { error: err })
   }
 
-  handleSuccess: PositionCallback = (pos) => {
-    const { coords } = pos
+  handleSuccess = ({ coords }: { coords: GeolocationCoordinates }) => {
     window.Arbolado.emitEvent(this, 'arbolado:geo/success', { lat: coords.latitude, lng: coords.longitude })
   }
 
@@ -45,8 +44,8 @@ export default class GeoBtn extends HTMLElement {
     window.Arbolado.emitEvent(this, 'arbolado:geo/searching')
     if (window.ios) { // If we're running inside the iOS app wrapper:
       // Subscribe to the event that will return the user's location or an error from the iOS app
-      document.addEventListener("arbolado:ios/location", (event) => {
-        const { detail } = event as CustomEvent
+      document.addEventListener('arbolado:ios/location', (event) => {
+        const { detail } = event
         if (detail.error) {
           // Error === 1 means the user has just denied us access to their location. No error message needed.
           if (detail.error === '2') {

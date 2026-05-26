@@ -1,7 +1,5 @@
-import { LatLng } from 'leaflet'
-
 declare type NominatimResponse = {
-  latlng: LatLng
+  latlng: { lat: number, lng: number }
   displayName: string
   type: string
   address: object

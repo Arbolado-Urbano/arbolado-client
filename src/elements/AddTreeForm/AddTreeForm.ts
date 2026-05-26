@@ -142,10 +142,6 @@ export default class AddTreeForm extends HTMLElement {
     this.addEventListener('arbolado:form/step', (event) => {
       const stepLabel = event.detail.current.label
       if (stepLabel === 'location') {
-        // Reset the height of the geoInput map, because it's within a modal we need to reset it for it to display correctly
-        this.geoInput.resetHeight()
-        // Just in case the modal is still openeing reset the height again after the modal has been shown
-        this.modal.addEventListener('shown.bs.modal', () => this.geoInput.resetHeight(), { once: true })
         // Display or hide the block and orientation inputs based on the user's id method
         if (this.personalDataTabGroup.currentTab() === 'code') {
           this.querySelector('[js-input-wrapper=block]')?.classList.remove('d-none')

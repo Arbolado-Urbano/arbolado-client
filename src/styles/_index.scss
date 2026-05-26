@@ -13,9 +13,8 @@
 // Bootstrap
 @import 'bootstrap/scss/bootstrap';
 
-// Leaflet
-@import 'leaflet/dist/leaflet.css';
-@import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+// MapLibre
+@import 'maplibre-gl/dist/maplibre-gl.css';
 
 // Main styles
 @import './main';

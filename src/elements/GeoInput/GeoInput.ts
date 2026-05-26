@@ -1,41 +1,19 @@
-import GeoInputTemplate from './GeoInput.html?raw'
-import GeoBtn from '../GeoBtn/GeoBtn'
+import { Map, Marker } from 'maplibre-gl'
 
-import * as L from 'leaflet'
+import { mapStyles } from '../../constants/mapStyles'
+
+import GeoBtn from '../GeoBtn/GeoBtn'
 import AddressLookup from '../AddressLookup/AddressLookup'
+import { MapLayerSwitcher } from '../MapLayerSwitcher/MapLayerSwitcher'
+
+import GeoInputTemplate from './GeoInput.html?raw'
 
 export default class GeoInput extends HTMLElement {
   _value: string | null = null
   private addressLookup: AddressLookup
   private geoBtn: GeoBtn
-  private map?: L.Map // Map reference
-  private marker?: L.Marker // Marker
-  private baseLayers = {
-    Mapa: L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-      {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 21
-      },
-    ),
-    Satélite: L.tileLayer(
-      `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=${import.meta.env.VITE_MAPBOX_TOKEN}`,
-      {
-        maxZoom: 19,
-        tileSize: 256,
-        attribution: '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-      },
-    ),
-  }
-  private mapOptions: L.MapOptions = { // Map options
-    dragging: !L.Browser.mobile, // Disable one finger dragging on mobile devices
-    center: L.latLng(-34.618, -58.44), // BsAs
-    layers: [this.baseLayers.Mapa],
-    maxZoom: 19,
-    minZoom: 5,
-    zoom: 14,
-  }
+  private map: Map
+  private marker?: Marker
 
   constructor() {
     super()
@@ -45,32 +23,31 @@ export default class GeoInput extends HTMLElement {
     this.geoBtn = this.querySelector('[js-geo-btn]') as GeoBtn
     this.addressLookup = this.querySelector('[js-address-lookup]') as AddressLookup
 
-    this.geoBtn.addEventListener('arbolado:geo/searching', () => this.setLoading(true))
-    this.geoBtn.addEventListener('arbolado:geo/error', () => this.setLoading(false))
-    this.geoBtn.addEventListener('arbolado:geo/success', (event) => {
-      this.setLoading(false)
-      const data = (event as CustomEvent).detail
-      const latLng = new L.LatLng(data.lat, data.lng)
-      this.setValue(latLng)
+    this.map = new Map({
+      container: 'geo-input-map',
+      style: mapStyles,
+      center: [-58.44, -34.618], // BsAs
+      zoom: 14,
+      maxZoom: 21,
+      minZoom: 5,
     })
 
-    this.map = L.map('geo-input-map', this.mapOptions)
-    this.map.on('click', (event: any) => {
-      this.setValue(event.latlng)
+    this.geoBtn.addEventListener('arbolado:geo/searching', () => this.setLoading(true))
+    this.geoBtn.addEventListener('arbolado:geo/error', () => this.setLoading(false))
+    this.geoBtn.addEventListener('arbolado:geo/success', ({ detail }) => {
+      this.setLoading(false)
+      this.setValue(detail)
+    })
+
+    this.map.on('click', ({ lngLat }) => {
+      this.setValue(lngLat)
     })
     this.map.on('move', () => this.map && this.addressLookup.setBounds(this.map.getBounds()))
-    // Allow the satellite layer to be selected even if we're too zoomed in
-    const layerControl = new L.Control.Layers(this.baseLayers, {}, { position: 'bottomleft' })
-    Object.assign(layerControl, { _checkDisabledLayers: () => { } })
-    layerControl.addTo(this.map)
-    this.map.on('baselayerchange', (event) => {
-      if (event.name === 'Mapa') {
-        this.map?.setMaxZoom(21)
-      } else {
-        this.map?.setMaxZoom(19)
-      }
-    })
-    this.addressLookup.addEventListener('arbolado:address/selected', (event) => this.setValue((event as CustomEvent).detail.latLng))
+
+    // Layer switcher
+    this.map.addControl(new MapLayerSwitcher('streets'), 'bottom-right')
+
+    this.addressLookup.addEventListener('arbolado:address/selected', ({ detail }) => this.setValue(detail))
   }
 
   formResetCallback() {
@@ -78,7 +55,7 @@ export default class GeoInput extends HTMLElement {
   }
 
   setCenter(latitude: number, longitude: number) {
-    this.map?.panTo(new L.LatLng(latitude, longitude))
+    this.map?.panTo({ lat: latitude, lng: longitude })
   }
 
   static get formAssociated() { return true }
@@ -93,16 +70,12 @@ export default class GeoInput extends HTMLElement {
     else this.classList.remove('loading')
   }
 
-  resetHeight(): void {
-    this.map?.invalidateSize()
-  }
-
   /**
    * Re-centers the map around the given coordinates
    * @param map - The map object
    * @param latLng - The latlng coordinates
    */
-  private latlngUpdated(latLng: L.LatLng): void {
+  private latlngUpdated(latLng: { lat: number, lng: number }): void {
     // Re-center the map around the given coordinates
     this.map?.panTo(latLng)
     // Set the new coordinates
@@ -112,29 +85,20 @@ export default class GeoInput extends HTMLElement {
   * Sets the given latLng as the current value and sets a marker on the map for those coordinates
   * @param latLng - Latitude and longitude coordinates
   */
-  public setValue(latLng?: L.LatLng): void {
-    // Get the map object
-    if (!this.map) return
+  public setValue(latLng?: { lat: number, lng: number }): void {
     if (!latLng) {
-      if (this.marker) this.map.removeLayer(this.marker)
+      if (this.marker) this.marker.remove()
       this.value = null
     } else {
       // If there's no marker on the map...
       if (!this.marker) {
-        L.Icon.Default.imagePath = '/imgs/markers/'
         // Create a new marker
-        this.marker = new L.Marker([latLng.lat, latLng.lng], {
-          draggable: true,
-          riseOnHover: true,
-        })
-        this.map.addLayer(this.marker)
+        this.marker = new Marker({ draggable: true }).setLngLat([latLng.lng, latLng.lat])
       } else {
         // If a marker already exists, move it
-        this.marker.setLatLng([latLng.lat, latLng.lng])
+        this.marker.setLngLat([latLng.lng, latLng.lat])
       }
-      if (!this.map.hasLayer(this.marker)) {
-        this.map.addLayer(this.marker)
-      }
+      this.marker.addTo(this.map)
       // Update the selected coordinates
       this.latlngUpdated(latLng)
       // Set the value for the selected coordinates

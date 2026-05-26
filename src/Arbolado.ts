@@ -1,6 +1,10 @@
-import { LatLng, LatLngBounds } from 'leaflet'
 import NominatimResponse from './types/NominatimResponse'
+
 import Alert, { AlertType } from './elements/Alert/Alert'
+
+type EventDetail<T> = T extends CustomEvent<infer D> ? D : T extends Event ? void : never;
+
+type OptionalArg<D> = D extends void ? [] : [data: D]
 
 export default class Arbolado {
   overlay: HTMLElement
@@ -29,8 +33,8 @@ export default class Arbolado {
     return template.content.cloneNode(true)
   }
 
-  emitEvent(element: Node, name: string, data?: any) {
-    element.dispatchEvent(new CustomEvent(name, { detail: data }))
+  emitEvent<T extends keyof HTMLElementEventMap>(element: Node, name: T, ...data: OptionalArg<EventDetail<HTMLElementEventMap[T]>>) {
+    element.dispatchEvent(new CustomEvent(name, { detail: data[0] }))
   }
 
   setLoading(loading: boolean) {
@@ -134,7 +138,7 @@ export default class Arbolado {
   }
 
   // Looks up an address or place and returns its coordinates.
-  async addressLookup(query: string, bounds?: LatLngBounds): Promise<NominatimResponse[]> {
+  async addressLookup(query: string, bounds?: maplibregl.LngLatBounds): Promise<NominatimResponse[]> {
     const { VITE_NOMINATIM_URL } = import.meta.env
     const data = new URLSearchParams({
       'accept-language': 'es',
@@ -143,12 +147,12 @@ export default class Arbolado {
       format: 'json',
       q: query,
     })
-    if (bounds) data.set('viewbox', bounds.toBBoxString())
+    if (bounds) data.set('viewbox', `${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`)
     const url = `${VITE_NOMINATIM_URL}?${data.toString()}`
     const response = await window.Arbolado.fetchJson(url, 'GET', undefined, undefined, false)
     return response.map((item: any) => {
       return {
-        latlng: new LatLng(item.lat, item.lon),
+        latlng: { lat: item.lat, lng: item.lon },
         displayName: item.display_name,
         type: item.type,
         address: item.address,
