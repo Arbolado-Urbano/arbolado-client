@@ -33,40 +33,40 @@ export class TreeLayer {
     // Load marker image once
     this.map.loadImage('/imgs/markers/marker-default.png').then(image => this.map.addImage('marker-default.png', image.data))
 
-    // this.map.addLayer({
-    //   id: this.TREES_LAYER,
-    //   type: 'circle',
-    //   source: this.TREES_SOURCE,
-    //   minzoom: 0,
-    //   maxzoom: 17,
-    //   paint: {
-    //     'circle-color': '#5cba9d',
-    //     'circle-radius': [
-    //       'interpolate', ['linear'], ['zoom'],
-    //       10, 1.5,
-    //       14, 4,
-    //       18, 8
-    //     ],
-    //     'circle-stroke-width': [
-    //       'interpolate', ['linear'], ['zoom'],
-    //       10, 0,
-    //       14, 1
-    //     ],
-    //     'circle-stroke-color': '#fff',
-    //   },
-    // })
+    this.map.addLayer({
+      id: `${this.TREES_LAYER}-dots`,
+      type: 'circle',
+      source: this.TREES_SOURCE,
+      minzoom: 0,
+      maxzoom: 15,
+      paint: {
+        'circle-color': '#5cba9d',
+        'circle-radius': [
+          'interpolate', ['linear'], ['zoom'],
+          10, 4,
+          14, 5,
+          18, 8
+        ],
+        'circle-stroke-width': [
+          'interpolate', ['linear'], ['zoom'],
+          10, 0,
+          14, 1
+        ],
+        'circle-stroke-color': '#fff',
+      },
+    })
 
     this.map.addLayer({
       id: this.TREES_LAYER,
       type: 'symbol',
       source: this.TREES_SOURCE,
-      // minzoom: 17,
+      minzoom: 15,
       layout: {
         'icon-image': ['get', 'icon'],
         'icon-size': [
           'interpolate', ['linear'], ['zoom'],
           10, 0.2,
-          15, 0.5,
+          15, 0.3,
           21, 1.5,
         ],
         'icon-anchor': 'bottom',
