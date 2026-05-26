@@ -34,6 +34,7 @@ const speciesStyles: Record<string, SpeciesStyle> = {
   'morus-sp': { icon: 'marker-morus.png', color: '#28316f' },
   'citrus sp': { icon: 'marker-citrus.png', color: '#ffaf1f' },
   'mangifera-sp': { icon: 'marker-naranja.png', color: '#f76619' },
+  'mangifera-indica': { icon: 'marker-naranja.png', color: '#f76619' },
   'citrus-tangerina': { icon: 'marker-citrus.png', color: '#ffaf1f' },
   'plantera-vacia': { icon: 'marker-vacia.png', color: '#d6d6d7' },
   'handroanthus-ochraceus': { icon: 'marker-amarillo.png', color: '#ffd500' },
