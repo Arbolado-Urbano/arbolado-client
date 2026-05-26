@@ -88,7 +88,7 @@ export default class AddTreeForm extends HTMLElement {
       species: this.querySelector('[js-step=species]') as HTMLFormElement,
     }
     this.progress = { wrapper: this.querySelector('[js-progress]') as HTMLElement, bar: this.querySelector('[js-progress-bar]') as HTMLElement }
-    this.personalDataTabGroup = this.querySelector("[js-tabgroup=personal-data]") as TabGroup
+    this.personalDataTabGroup = this.querySelector('[js-tabgroup=personal-data]') as TabGroup
     this.modal = this.querySelector('[js-modal]') as HTMLElement
 
     this.nextBtn.addEventListener('click', async () => await this.goStep(this.step.index + 1))
@@ -208,8 +208,8 @@ export default class AddTreeForm extends HTMLElement {
       try {
         token = await this.captchaWidget.execute()
       } catch (error) {
-        window.Arbolado.alert('danger', 'Ocurrió un error. Intente nuevamente más tarde.')
         console.error(error)
+        window.Arbolado.alert('danger', 'Ocurrió un error. Intenta nuevamente más tarde.')
       }
       if (!token) return
       const data = new FormData()
@@ -269,7 +269,7 @@ export default class AddTreeForm extends HTMLElement {
   private isValidCurrentStep() {
     const stepForm = this.steps[STEP_LABELS[this.step.index]]
     stepForm.classList.add('was-validated')
-    if (this.step.label === "location") {
+    if (this.step.label === 'location') {
       if (this.geoInput.value !== null) {
         this.geoInput.classList.remove('is-invalid')
         return stepForm.checkValidity()
@@ -278,7 +278,7 @@ export default class AddTreeForm extends HTMLElement {
         this.geoInput.addEventListener('change', () => this.geoInput.classList.remove('is-invalid'), { once: true })
         return false
       }
-    } else if (this.step.label === "species") {
+    } else if (this.step.label === 'species') {
       if (!this.autoSpecies) {
         if (!this.speciesSelect.value) {
           this.speciesSelect.classList.add('is-invalid')
@@ -391,8 +391,8 @@ export default class AddTreeForm extends HTMLElement {
     try {
       token = await this.captchaWidget.execute()
     } catch (error) {
-      window.Arbolado.alert('danger', 'Ocurrió un error. Intente nuevamente más tarde.')
       console.error(error)
+      window.Arbolado.alert('danger', 'Ocurrió un error. Intenta nuevamente más tarde.')
     }
     if (!token) return
     const data = new FormData()
@@ -402,13 +402,19 @@ export default class AddTreeForm extends HTMLElement {
     }
     // Add captcha token to data
     data.set('captcha', token)
-    const response = await window.Arbolado.fetchJson(`${import.meta.env.VITE_API_URL}/identificar`, 'POST', data) as PlantNetResponse
-    if (response) {
-      const bestMatchSpecies = response.results[0]?.species
-      this.selectedSpecies = bestMatchSpecies.scientificNameWithoutAuthor
-      this.speciesAutoInput.value = `${bestMatchSpecies?.scientificName} (${bestMatchSpecies?.commonNames.join(', ')})`
-      this.speciesAutoInput.classList.remove('is-invalid')
-    } else {
+    try {
+      const response = await window.Arbolado.fetchAPI('/identificar', 'POST', data)
+      const responseData: PlantNetResponse | undefined = await response.json()
+      if (responseData) {
+        const bestMatchSpecies = responseData.results[0]?.species
+        this.selectedSpecies = bestMatchSpecies.scientificNameWithoutAuthor
+        this.speciesAutoInput.value = `${bestMatchSpecies?.scientificName} (${bestMatchSpecies?.commonNames.join(', ')})`
+        this.speciesAutoInput.classList.remove('is-invalid')
+      } else {
+        throw new Error('No JSON response from PlantNet')
+      }
+    } catch (error) {
+      console.error(error)
       this.speciesAutoError.classList.add('d-block')
     }
   }
@@ -418,8 +424,8 @@ export default class AddTreeForm extends HTMLElement {
     try {
       token = await this.captchaWidget.execute()
     } catch (error) {
-      window.Arbolado.alert('danger', 'Ocurrió un error. Intente nuevamente más tarde.')
       console.error(error)
+      window.Arbolado.alert('danger', 'Ocurrió un error. Intenta nuevamente más tarde.')
     }
     if (!token) return
 
@@ -471,21 +477,21 @@ export default class AddTreeForm extends HTMLElement {
     if (dataFormData.has('health')) data.set('health', dataFormData.get('health')!)
     data.set('captcha', token)
     for (const image of this.selectedSpeciesImages) {
-      data.append("species-images[]", image.image)
+      data.append('species-images[]', image.image)
     }
     if (this.imagesInput.files) {
       for (const image of this.imagesInput.files) {
-        data.append("images[]", image)
+        data.append('images[]', image)
       }
     }
 
     // Submit
-    const requestUrl = `${import.meta.env.VITE_API_URL}/${this.personalDataTabGroup.currentTab() === 'code' ? 'arboles' : 'aportes'}`
-    const response = await window.Arbolado.fetch(requestUrl, 'POST', data)
-    if (response?.status == 200) {
-      await this.goStep(this.step.index + 1)
-    } else {
+    const requestUrl = `/${this.personalDataTabGroup.currentTab() === 'code' ? 'arboles' : 'aportes'}`
+    const response = await window.Arbolado.fetchAPI(requestUrl, 'POST', data)
+    if (!response.ok) {
       alert('Ocurrió un error, intentá de nuevo más tarde')
+    } else {
+      await this.goStep(this.step.index + 1)
     }
   }
 }

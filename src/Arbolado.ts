@@ -1,8 +1,9 @@
-import NominatimResponse from './types/NominatimResponse'
+import { NominatimSearchResult } from './types/NominatimResponse'
+import Tree from './types/Tree'
 
 import Alert, { AlertType } from './elements/Alert/Alert'
 
-type EventDetail<T> = T extends CustomEvent<infer D> ? D : T extends Event ? void : never;
+type EventDetail<T> = T extends CustomEvent<infer D> ? D : T extends Event ? void : never
 
 type OptionalArg<D> = D extends void ? [] : [data: D]
 
@@ -64,15 +65,9 @@ export default class Arbolado {
     }
   }
 
-  async fetchJson(url: string, method: string = 'GET', body?: BodyInit, contentType?: string, loadingIndicator: boolean = true) {
-    const headers: HeadersInit = { 'Accept': 'application/json' }
-    if (contentType) headers['Content-type'] = contentType
-    try {
-      const response = await this.fetch(url, method, body, headers, loadingIndicator)
-      return await response?.json()
-    } catch (error) {
-      console.error(error)
-    }
+  async fetchAPI(path: string, method: string = 'GET', body?: BodyInit, headers: Headers = new Headers(), loadingIndicator: boolean = true) {
+    headers.append('Accept', 'application/json')
+    return await this.fetch(`${import.meta.env.VITE_API_URL}${path}`, method, body, headers, loadingIndicator)
   }
 
   alert(type: AlertType, content: string, timeout?: number) {
@@ -130,15 +125,19 @@ export default class Arbolado {
     if (path[1] !== 'fuente') return
     const fuenteUrl = path[2]
     if (!fuenteUrl) return
-    const trees = await window.Arbolado.fetchJson(`${import.meta.env.VITE_API_URL}/fuentes/${fuenteUrl}`, 'GET')
-    if (!trees?.length) return
-    window.Arbolado.emitEvent(document, 'arbolado:results/updated', { trees })
-    window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
-    return true
+    try {
+      const response = await this.fetchAPI(`/fuentes/${fuenteUrl}`, 'GET')
+      const trees: Tree[] | undefined = await response.json()
+      if (!trees?.length) return
+      this.emitEvent(document, 'arbolado:results/updated', { trees })
+      window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   // Looks up an address or place and returns its coordinates.
-  async addressLookup(query: string, bounds?: maplibregl.LngLatBounds): Promise<NominatimResponse[]> {
+  async addressLookup(query: string, bounds?: maplibregl.LngLatBounds): Promise<NominatimSearchResult[] | undefined> {
     const { VITE_NOMINATIM_URL } = import.meta.env
     const data = new URLSearchParams({
       'accept-language': 'es',
@@ -149,14 +148,12 @@ export default class Arbolado {
     })
     if (bounds) data.set('viewbox', `${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`)
     const url = `${VITE_NOMINATIM_URL}?${data.toString()}`
-    const response = await window.Arbolado.fetchJson(url, 'GET', undefined, undefined, false)
-    return response.map((item: any) => {
-      return {
-        latlng: { lat: item.lat, lng: item.lon },
-        displayName: item.display_name,
-        type: item.type,
-        address: item.address,
-      }
-    })
+    try {
+      const response = await this.fetch(url, 'GET', undefined, { 'Accept': 'application/json' }, false)
+      return await response.json()
+    } catch (error) {
+      console.error(error)
+      this.alert('danger', 'Ocurrió un error. Intenta nuevamente más tarde.')
+    }
   }
 }

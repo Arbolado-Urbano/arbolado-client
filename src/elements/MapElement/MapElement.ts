@@ -94,9 +94,9 @@ export default class MapElement extends HTMLElement {
       const ubicacion = path[2]
       if (ubicacion) {
         const results = await window.Arbolado.addressLookup(ubicacion)
-        if (results[0]) {
-          const { lat, lng } = results[0].latlng
-          this.setMarker([lng, lat])
+        if (results?.[0]?.address) {
+          const { lat, lng } = results[0].address
+          this.setMarker([Number(lng), Number(lat)])
         }
       }
     }
