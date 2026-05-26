@@ -3,6 +3,7 @@ import { Map, GeoJSONSource, LngLatBounds } from 'maplibre-gl'
 import Tree from "../../types/Tree"
 
 import MapElement from './MapElement'
+import { DEFAULTS, getSpeciesStyle, ICON_PATH } from '../../constants/speciesStyles'
 
 export class TreeLayer {
   private readonly TREES_SOURCE = 'trees-source'
@@ -31,7 +32,7 @@ export class TreeLayer {
     })
 
     // Load marker image once
-    this.map.loadImage('/imgs/markers/marker-default.png').then(image => this.map.addImage('marker-default.png', image.data))
+    this.map.loadImage(`${ICON_PATH}${DEFAULTS.icon}`).then(image => this.map.addImage(DEFAULTS.icon, image.data))
 
     this.map.addLayer({
       id: `${this.TREES_LAYER}-dots`,
@@ -40,7 +41,7 @@ export class TreeLayer {
       minzoom: 0,
       maxzoom: 15,
       paint: {
-        'circle-color': '#5cba9d',
+        'circle-color': ['get', 'color'],
         'circle-radius': [
           'interpolate', ['linear'], ['zoom'],
           10, 4,
@@ -97,17 +98,17 @@ export class TreeLayer {
       features: trees.map((tree) => ({
         type: 'Feature',
         geometry: { type: 'Point', coordinates: [tree.lng, tree.lat] },
-        properties: { id: tree.id, icon: !tree.species.icono ? 'marker-default.png' : tree.species.icono },
+        properties: { id: tree.id, ...getSpeciesStyle(tree.species.url) },
       })),
     })
 
-    const uniqueIcons = [...new Set(trees.map(t => t.species.icono ?? 'marker-default.png'))]
-    uniqueIcons.map(name =>
+    const uniqueIcons = [...new Set(trees.map(tree => getSpeciesStyle(tree.species.url).icon))]
+    uniqueIcons.map(iconName =>
       new Promise<void>(async (resolve) => {
-        if (!name) return resolve()
-        if (this.map.hasImage(name)) return resolve()
-        const image = await this.map.loadImage(`/imgs/markers/${name}`)
-        this.map.addImage(name, image.data)
+        if (!iconName) return resolve()
+        if (this.map.hasImage(iconName)) return resolve()
+        const image = await this.map.loadImage(`${ICON_PATH}${iconName}`)
+        this.map.addImage(iconName, image.data)
         resolve()
       })
     )
