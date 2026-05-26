@@ -1,12 +1,11 @@
 import * as bootstrap from 'bootstrap'
-import { LatLng } from 'leaflet'
 
 import SearchFormTemplate from './SearchForm.html?raw'
 
 import SpeciesSelect from '../SpeciesSelect/SpeciesSelect'
 
 export default class SearchForm extends HTMLElement {
-  private latLng?: LatLng
+  private latLng?: { lat: number, lng: number }
   private noResultsModal: bootstrap.Modal
   private searchBtn: HTMLButtonElement
   private searchBtnPopover: bootstrap.Popover
@@ -104,7 +103,7 @@ export default class SearchForm extends HTMLElement {
     if (latLng) {
       try {
         const [lat, lng] = latLng.split(' ').map(Number)
-        this.setMarker(new LatLng(lat, lng))
+        this.setMarker({ lat, lng })
       } catch {
         // Remove the "user_latlng" query param if it's invalid
         window.Arbolado.queryParams.delete('user_latlng')
@@ -182,7 +181,7 @@ export default class SearchForm extends HTMLElement {
     else window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
   }
 
-  public setMarker(latLng: LatLng) {
+  public setMarker(latLng: { lat: number, lng: number }) {
     this.markerAll.checked = false
     this.markerPoint.checked = true
     this.latLng = latLng

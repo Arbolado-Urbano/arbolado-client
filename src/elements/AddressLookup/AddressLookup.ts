@@ -1,5 +1,3 @@
-import { LatLngBounds } from 'leaflet'
-
 import AddressLookupTemplate from './AddressLookup.html?raw'
 
 import NominatimResponse from '../../types/NominatimResponse'
@@ -10,7 +8,7 @@ export default class AddressLookup extends HTMLElement {
   private inputElement: HTMLInputElement
   private resultsElement: HTMLElement
   private itemTemplate: HTMLTemplateElement
-  private bounds?: LatLngBounds
+  private bounds?: maplibregl.LngLatBounds
 
   constructor() {
     super()
@@ -26,7 +24,7 @@ export default class AddressLookup extends HTMLElement {
     this.searchBtn.addEventListener('click', () => this.handleSearch())
   }
 
-  public setBounds(bounds: LatLngBounds) {
+  public setBounds(bounds: maplibregl.LngLatBounds) {
     this.bounds = bounds
   }
 
@@ -73,7 +71,7 @@ export default class AddressLookup extends HTMLElement {
   }
 
   private selectAddress(address: NominatimResponse) {
-    window.Arbolado.emitEvent(this, 'arbolado:address/selected', { latLng: address.latlng })
+    window.Arbolado.emitEvent(this, 'arbolado:address/selected', { ...address.latlng })
     // this.mapElement.setMarker(address.latlng)
     this.inputElement.value = address.displayName
     this.resultsElement.classList.add('d-none')
