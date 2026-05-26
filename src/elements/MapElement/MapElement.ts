@@ -19,7 +19,7 @@ export default class MapElement extends HTMLElement {
     center: [-58.44, -34.618], // BsAs
     zoom: 12,
     maxZoom: 21,
-    minZoom: 5,
+    minZoom: 2,
   })
 
   constructor() {
