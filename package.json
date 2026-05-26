@@ -23,7 +23,7 @@
     "@popperjs/core": "2.11.8",
     "@types/bootstrap": "5.2.10",
     "@types/cloudflare-turnstile": "0.2.2",
-    "@typescript-eslint/parser": "8.59.3",
+    "@typescript-eslint/parser": "8.59.4",
     "bootstrap": "5.3.8",
     "eslint": "10.4.0",
     "eslint-plugin-react-hooks": "7.1.1",
