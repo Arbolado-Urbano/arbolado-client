@@ -88,12 +88,20 @@ export default class SpeciesSelect extends HTMLElement {
   private async loadSpecies() {
     if (this.status === 'loaded') return
     this.status = 'loading'
-    await window.Arbolado.fetchJson(`${import.meta.env.VITE_API_URL}/especies`, 'GET', undefined, undefined, false).then((species: Species[]) => {
+    try {
+      const response = await window.Arbolado.fetchAPI('/especies', 'GET', undefined, undefined, false)
+      const species: Species[] | undefined = await response.json()
+      if (!species) {
+        throw new Error('No JSON response from API')
+      }
       this.emptyPlanter = species.find(item => item.url === 'plantera-vacia')
       this.renderSpecies([this.noSelectionElement, ...species.filter(item => item.id !== this.emptyPlanter?.id)])
       this.status = 'loaded'
       window.Arbolado.emitEvent(this, 'arbolado:species/loaded')
-    })
+    } catch (error) {
+      console.error(error)
+      window.Arbolado.alert('danger', 'Ocurrió un error. Intenta nuevamente más tarde.')
+    }
   }
 
   public async setSpeciesFromURL(): Promise<Species | null> {

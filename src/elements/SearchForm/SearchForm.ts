@@ -2,6 +2,8 @@ import * as bootstrap from 'bootstrap'
 
 import SearchFormTemplate from './SearchForm.html?raw'
 
+import Tree from '../../types/Tree'
+
 import SpeciesSelect from '../SpeciesSelect/SpeciesSelect'
 
 export default class SearchForm extends HTMLElement {
@@ -30,16 +32,16 @@ export default class SearchForm extends HTMLElement {
     // Init form fields
     this.form = this.querySelector('[js-form]') as HTMLFormElement
     this.searchBtn = this.querySelector('[js-search-btn]') as HTMLButtonElement
-    this.radio = this.querySelector('[js-input="radio"]') as HTMLInputElement
-    this.flavors = this.querySelector('[js-input="flavors"]') as HTMLInputElement
-    this.markerAll = this.querySelector('[js-input="marker-all"]') as HTMLInputElement
-    this.markerPoint = this.querySelector('[js-input="marker-point"]') as HTMLInputElement
-    this.cuyana = this.querySelector('[js-input="cuyana"]') as HTMLInputElement
-    this.nea = this.querySelector('[js-input="nea"]') as HTMLInputElement
-    this.noa = this.querySelector('[js-input="noa"]') as HTMLInputElement
-    this.pampeana = this.querySelector('[js-input="pampeana"]') as HTMLInputElement
-    this.patagonica = this.querySelector('[js-input="patagonica"]') as HTMLInputElement
-    this.species = this.querySelector('[js-input="species"]') as SpeciesSelect
+    this.radio = this.querySelector('[js-input=radio]') as HTMLInputElement
+    this.flavors = this.querySelector('[js-input=flavors]') as HTMLInputElement
+    this.markerAll = this.querySelector('[js-input=marker-all]') as HTMLInputElement
+    this.markerPoint = this.querySelector('[js-input=marker-point]') as HTMLInputElement
+    this.cuyana = this.querySelector('[js-input=cuyana]') as HTMLInputElement
+    this.nea = this.querySelector('[js-input=nea]') as HTMLInputElement
+    this.noa = this.querySelector('[js-input=noa]') as HTMLInputElement
+    this.pampeana = this.querySelector('[js-input=pampeana]') as HTMLInputElement
+    this.patagonica = this.querySelector('[js-input=patagonica]') as HTMLInputElement
+    this.species = this.querySelector('[js-input=species]') as SpeciesSelect
     this.filtersSidebar = new bootstrap.Offcanvas(document.querySelector('[js-filters-menu]') as HTMLElement)
     // Emit an event when the user selects "En todo el mapa" so the map can be notified and removes the marker
     this.markerAll.addEventListener('change', () => window.Arbolado.emitEvent(this, 'arbolado:marker/remove'))
@@ -64,7 +66,7 @@ export default class SearchForm extends HTMLElement {
     this.species.addEventListener('arbolado:species/change', this.handleSpeciesChange)
   }
 
-  private handleSpeciesChange(event: HTMLElementEventMap["arbolado:species/change"]) {
+  private handleSpeciesChange(event: HTMLElementEventMap['arbolado:species/change']) {
     if (event.detail.species?.url === 'plantera-vacia') {
       this.flavors.disabled = true
       this.cuyana.disabled = true
@@ -174,11 +176,20 @@ export default class SearchForm extends HTMLElement {
     this.filtersSidebar.hide()
 
     // Make the search
-    let requestUrl = `${import.meta.env.VITE_API_URL}/arboles?${searchQueryParams.toString()}`
-    const trees = await window.Arbolado.fetchJson(requestUrl)
-    window.Arbolado.emitEvent(document, 'arbolado:results/updated', { trees })
-    if (!trees?.length) this.noResultsModal.show()
-    else window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
+    let requestUrl = `/arboles?${searchQueryParams.toString()}`
+    try {
+      const response = await window.Arbolado.fetchAPI(requestUrl)
+      const trees: Tree[] | undefined = await response.json()
+      if (!trees) {
+        throw new Error('No JSON response from API')
+      }
+      window.Arbolado.emitEvent(document, 'arbolado:results/updated', { trees })
+      if (!trees?.length) this.noResultsModal.show()
+      else window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
+    } catch (error) {
+      console.error(error)
+      window.Arbolado.alert('danger', 'Ocurrió un error. Intenta nuevamente más tarde.')
+    }
   }
 
   public setMarker(latLng: { lat: number, lng: number }) {

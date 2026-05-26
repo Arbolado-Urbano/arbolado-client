@@ -165,48 +165,56 @@ export default class TreeModal extends HTMLElement {
   }
 
   async displayTree(treeId: string, updateURL: boolean = true) {
-    const tree: Tree | undefined = await window.Arbolado.fetchJson(`${import.meta.env.VITE_API_URL}/arboles/${treeId}`)
-    if (!tree) return
-    // If there's no streetview URL for the tree, use its coordinates
-    if (!tree.streetview) {
-      tree.streetview = `${this.streetViewUrl}&location=${tree.lat},${tree.lng}`
+    try {
+      const response = await window.Arbolado.fetchAPI(`/arboles/${treeId}`)
+      const tree: Tree | undefined = await response.json()
+      if (!tree) {
+        throw new Error('No JSON response from API')
+      }
+      // If there's no streetview URL for the tree, use its coordinates
+      if (!tree.streetview) {
+        tree.streetview = `${this.streetViewUrl}&location=${tree.lat},${tree.lng}`
+      }
+
+      if (tree.records[0].altura) tree.records[0].altura += ' m'
+      if (tree.records[0].inclinacion) tree.records[0].inclinacion += 'º'
+      if (tree.records[0].diametro_a_p) tree.records[0].diametro_a_p += ' m'
+
+      const treeLink = `/arbol/${tree.id}`
+
+      this.setTreeValue('nombre_cientifico', tree.species.nombre_cientifico)
+      this.setTreeValue('nombre_comun', tree.species.nombre_comun)
+      this.setTreeValue('tipo', tree.species.type.tipo)
+      this.setTreeValue('familia', tree.species.family.familia)
+      this.setTreeValue('origen', tree.species.origen)
+      this.setTreeValue('procedencia_exotica', tree.species.procedencia_exotica)
+      this.setTreeValue('altura', tree.records[0].altura)
+      this.setTreeValue('inclinacion', tree.records[0].inclinacion)
+      this.setTreeValue('diametro_a_p', tree.records[0].diametro_a_p)
+      this.setTreeValue('espacio_verde', tree.espacio_verde ? `Espacio verde: ${tree.espacio_verde}` : undefined)
+      this.setTreeValue('calle', `${tree.calle || ''} ${tree.calle_altura ? tree.calle_altura : 's/n'}`)
+      this.setTreeValue('id', tree.id.toString())
+      this.setTreeValue('link', treeLink, 'href')
+      this.setTreeValue('streetview', tree.streetview, 'src')
+      this.setTreeSources(tree)
+
+      // Open the drawer
+      this.classList.add('show')
+      window.Arbolado.callOnEscPush(this.close)
+      window.Arbolado.toggleOverlay(true)
+      this.open = true
+
+      if (updateURL) {
+        this.previousUrl = window.location.toString()
+        const url = `${window.location.protocol}//${window.location.host}${treeLink}`
+        history.pushState(null, '', url)
+      }
+
+      window.Arbolado.emitEvent(this, 'arbolado:tree/displayed', { tree })
+    } catch (error) {
+      console.error(error)
+      window.Arbolado.alert('danger', 'Ocurrió un error. Intenta nuevamente más tarde.')
     }
-
-    if (tree.records[0].altura) tree.records[0].altura += ' m'
-    if (tree.records[0].inclinacion) tree.records[0].inclinacion += 'º'
-    if (tree.records[0].diametro_a_p) tree.records[0].diametro_a_p += ' m'
-
-    const treeLink = `/arbol/${tree.id}`
-
-    this.setTreeValue('nombre_cientifico', tree.species.nombre_cientifico)
-    this.setTreeValue('nombre_comun', tree.species.nombre_comun)
-    this.setTreeValue('tipo', tree.species.type.tipo)
-    this.setTreeValue('familia', tree.species.family.familia)
-    this.setTreeValue('origen', tree.species.origen)
-    this.setTreeValue('procedencia_exotica', tree.species.procedencia_exotica)
-    this.setTreeValue('altura', tree.records[0].altura)
-    this.setTreeValue('inclinacion', tree.records[0].inclinacion)
-    this.setTreeValue('diametro_a_p', tree.records[0].diametro_a_p)
-    this.setTreeValue('espacio_verde', tree.espacio_verde ? `Espacio verde: ${tree.espacio_verde}` : undefined)
-    this.setTreeValue('calle', `${tree.calle || ''} ${tree.calle_altura ? tree.calle_altura : 's/n'}`)
-    this.setTreeValue('id', tree.id.toString())
-    this.setTreeValue('link', treeLink, 'href')
-    this.setTreeValue('streetview', tree.streetview, 'src')
-    this.setTreeSources(tree)
-
-    // Open the drawer
-    this.classList.add('show')
-    window.Arbolado.callOnEscPush(this.close)
-    window.Arbolado.toggleOverlay(true)
-    this.open = true
-
-    if (updateURL) {
-      this.previousUrl = window.location.toString()
-      const url = `${window.location.protocol}//${window.location.host}${treeLink}`
-      history.pushState(null, '', url)
-    }
-
-    window.Arbolado.emitEvent(this, 'arbolado:tree/displayed', { tree })
   }
 
   private hasFocus(within: boolean = false) {
