@@ -2,7 +2,7 @@ import * as bootstrap from 'bootstrap'
 
 import SearchFormTemplate from './SearchForm.html?raw'
 
-import Tree from '../../types/Tree'
+import { TreeList } from '../../types/Tree'
 
 import SpeciesSelect from '../SpeciesSelect/SpeciesSelect'
 
@@ -179,7 +179,7 @@ export default class SearchForm extends HTMLElement {
     let requestUrl = `/arboles?${searchQueryParams.toString()}`
     try {
       const response = await window.Arbolado.fetchAPI(requestUrl)
-      const trees: Tree[] | undefined = await response.json()
+      const trees: TreeList | undefined = await response.json()
       if (!trees) {
         throw new Error('No JSON response from API')
       }

@@ -1,5 +1,5 @@
 import { NominatimSearchResult } from './types/NominatimResponse'
-import Tree from './types/Tree'
+import { TreeList } from './types/Tree'
 
 import Alert, { AlertType } from './elements/Alert/Alert'
 
@@ -127,7 +127,7 @@ export default class Arbolado {
     if (!fuenteUrl) return
     try {
       const response = await this.fetchAPI(`/fuentes/${fuenteUrl}`, 'GET')
-      const trees: Tree[] | undefined = await response.json()
+      const trees: TreeList | undefined = await response.json()
       if (!trees?.length) return
       this.emitEvent(document, 'arbolado:results/updated', { trees })
       window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
