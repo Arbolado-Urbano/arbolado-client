@@ -1,6 +1,6 @@
 import { Step } from "../elements/AddTreeForm/AddTreeForm"
-import Species from "./Species"
-import { Tree, TreeList } from "./Tree"
+import { Species, SpeciesFilters } from "./Species"
+import { Tree } from "./Tree"
 
 export type ArboladoEventMap = {
   'arbolado:loading': CustomEvent<{ loading: boolean }>
@@ -21,11 +21,7 @@ export type ArboladoEventMap = {
   'arbolado:species/loaded': CustomEvent<void>
   'arbolado:map/loaded': CustomEvent<void>
   'arbolado:map/move': CustomEvent<{ bounds: maplibregl.LngLatBounds }>
-  'arbolado:marker/set': CustomEvent<{ lat: number, lng: number }>
-  'arbolado:marker/search': CustomEvent<void>
-  'arbolado:marker/remove': CustomEvent<void>
-  'arbolado:marker/removed': CustomEvent<void>
-  'arbolado:results/updated': CustomEvent<{ trees: TreeList }>
+  'arbolado:search': CustomEvent<{ filters: SpeciesFilters }>
   'arbolado:tree/selected': CustomEvent<{ id: string }>
   'arbolado:tree/displayed': CustomEvent<{ tree: Tree }>
 }

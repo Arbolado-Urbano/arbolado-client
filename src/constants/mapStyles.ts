@@ -1,4 +1,6 @@
-export const mapStyles: maplibregl.StyleSpecification = {
+import { StyleSpecification } from 'maplibre-gl'
+
+export const mapStyles: StyleSpecification = {
   version: 8,
   sources: {
     streets: {

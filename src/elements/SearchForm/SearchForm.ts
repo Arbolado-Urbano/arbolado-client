@@ -3,38 +3,28 @@ import * as bootstrap from 'bootstrap'
 import SearchFormTemplate from './SearchForm.html?raw'
 
 import SpeciesSelect from '../SpeciesSelect/SpeciesSelect'
-import { TreeList } from '../../types/Tree'
 
 export default class SearchForm extends HTMLElement {
-  private latLng?: { lat: number, lng: number }
-  private noResultsModal: bootstrap.Modal
   private searchBtn: HTMLButtonElement
   private searchBtnPopover: bootstrap.Popover
   private form: HTMLFormElement
   private flavors: HTMLInputElement
-  private markerAll: HTMLInputElement
-  private markerPoint: HTMLInputElement
   private cuyana: HTMLInputElement
   private nea: HTMLInputElement
   private noa: HTMLInputElement
   private pampeana: HTMLInputElement
   private patagonica: HTMLInputElement
   private species: SpeciesSelect
-  private radio: HTMLInputElement
   private filtersSidebar: bootstrap.Offcanvas
 
   constructor() {
     super()
     this.innerHTML = SearchFormTemplate
-    this.noResultsModal = new bootstrap.Modal(document.querySelector('[js-no-results-modal]') as HTMLElement)
     this.handleSpeciesChange = this.handleSpeciesChange.bind(this)
     // Init form fields
     this.form = this.querySelector('[js-form]') as HTMLFormElement
     this.searchBtn = this.querySelector('[js-search-btn]') as HTMLButtonElement
-    this.radio = this.querySelector('[js-input=radio]') as HTMLInputElement
     this.flavors = this.querySelector('[js-input=flavors]') as HTMLInputElement
-    this.markerAll = this.querySelector('[js-input=marker-all]') as HTMLInputElement
-    this.markerPoint = this.querySelector('[js-input=marker-point]') as HTMLInputElement
     this.cuyana = this.querySelector('[js-input=cuyana]') as HTMLInputElement
     this.nea = this.querySelector('[js-input=nea]') as HTMLInputElement
     this.noa = this.querySelector('[js-input=noa]') as HTMLInputElement
@@ -42,8 +32,6 @@ export default class SearchForm extends HTMLElement {
     this.patagonica = this.querySelector('[js-input=patagonica]') as HTMLInputElement
     this.species = this.querySelector('[js-input=species]') as SpeciesSelect
     this.filtersSidebar = new bootstrap.Offcanvas(document.querySelector('[js-filters-menu]') as HTMLElement)
-    // Emit an event when the user selects "En todo el mapa" so the map can be notified and removes the marker
-    this.markerAll.addEventListener('change', () => window.Arbolado.emitEvent(this, 'arbolado:marker/remove'))
     // Submit handler
     this.form.addEventListener('submit', (event) => {
       event.preventDefault()
@@ -92,36 +80,13 @@ export default class SearchForm extends HTMLElement {
   private async updateFormValues() {
     // Set the form field values from the URL query parameters if any
     this.flavors.checked = window.Arbolado.queryParams.get('user_sabores') !== null
-    this.markerAll.checked = window.Arbolado.queryParams.get('user_latlng') === null
-    this.markerPoint.checked = window.Arbolado.queryParams.get('user_latlng') !== null
     this.cuyana.checked = window.Arbolado.queryParams.get('borigen_cuyana') !== null
     this.nea.checked = window.Arbolado.queryParams.get('borigen_nea') !== null
     this.noa.checked = window.Arbolado.queryParams.get('borigen_noa') !== null
     this.pampeana.checked = window.Arbolado.queryParams.get('borigen_pampeana') !== null
     this.patagonica.checked = window.Arbolado.queryParams.get('borigen_patagonica') !== null
-
-    const latLng = window.Arbolado.queryParams.get('user_latlng')
-    if (latLng) {
-      try {
-        const [lat, lng] = latLng.split(' ').map(Number)
-        this.setMarker({ lat, lng })
-      } catch {
-        // Remove the "user_latlng" query param if it's invalid
-        window.Arbolado.queryParams.delete('user_latlng')
-        window.Arbolado.pushQueryParams()
-      }
-    }
-
-    // Check if there's a species selected on the URL
-    const species = await this.species.setSpeciesFromURL()
-
-    // If we have coordinates or a species selected on the URL perform the search
-    if ((this.latLng) || (species)) this.search(false)
-  }
-
-  private getLatLngString() {
-    if (!this.latLng) return ''
-    else return `${this.latLng.lat} ${this.latLng.lng}`
+    this.species.setSpeciesFromURL()
+    this.search(false)
   }
 
   // If checked => the query param "name" will be set with the value "value", otherwise the param will be deleted
@@ -137,36 +102,19 @@ export default class SearchForm extends HTMLElement {
     // Validate the form
     if (!window.Arbolado.validateForm(this.form)) return
 
-    // Get the form's data
-    const data = new FormData(this.form)
-
-    // Check if a marker has been placed in the map
-    if (this.markerPoint.checked) {
-      data.set('marker', this.getLatLngString())
-    } else if (!this.species.value || this.species.value.id === -1) {
-      // If there's no marker and no species selected don't search
-      // Show the popover for the search button that pops up when the search is too big
-      this.searchBtnPopover.enable()
-      this.searchBtnPopover.show()
-      this.searchBtnPopover.disable()
-      return
-    }
-
     // Set the URL query params to update the URL
     this.setQueryParam('user_sabores', this.flavors.checked)
-    this.setQueryParam('user_latlng', this.markerPoint.checked, this.getLatLngString())
     this.setQueryParam('borigen_cuyana', this.cuyana.checked)
     this.setQueryParam('borigen_nea', this.nea.checked)
     this.setQueryParam('borigen_noa', this.noa.checked)
     this.setQueryParam('borigen_pampeana', this.pampeana.checked)
     this.setQueryParam('borigen_patagonica', this.patagonica.checked)
-    if (this.markerPoint.checked) window.Arbolado.queryParams.set('radio', this.radio.value)
 
     const searchQueryParams = new URLSearchParams(window.Arbolado.queryParams)
 
     if (this.species.value?.url) {
       if (updateURL) window.Arbolado.pushURL(`/especie/${this.species.value.url}`)
-      searchQueryParams.set('especie_id', this.species.value.id.toString())
+      searchQueryParams.set('especie_id', this.species.value.url.toString())
     } else {
       if (updateURL) window.Arbolado.pushURL('')
     }
@@ -175,31 +123,17 @@ export default class SearchForm extends HTMLElement {
     this.filtersSidebar.hide()
 
     // Make the search
-    let requestUrl = `/arboles?${searchQueryParams.toString()}`
-    try {
-      const response = await window.Arbolado.fetchAPI(requestUrl)
-      const trees: TreeList | undefined = await response.json()
-      if (!trees) {
-        throw new Error('No JSON response from API')
-      }
-      window.Arbolado.emitEvent(document, 'arbolado:results/updated', { trees })
-      if (!trees?.length) this.noResultsModal.show()
-      else window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
-    } catch (error) {
-      console.error(error)
-      window.Arbolado.alert('danger', 'Ocurrió un error. Intenta nuevamente más tarde.')
-    }
-  }
-
-  public setMarker(latLng: { lat: number, lng: number }) {
-    this.markerAll.checked = false
-    this.markerPoint.checked = true
-    this.latLng = latLng
-  }
-
-  public removeMarker() {
-    this.markerAll.checked = true
-    this.markerPoint.checked = false
-    this.latLng = undefined
+    window.Arbolado.emitEvent(this, 'arbolado:search', {
+      filters: {
+        url: this.species.value?.url,
+        user_sabores: this.flavors.checked,
+        borigen_cuyana: this.cuyana.checked,
+        borigen_nea: this.nea.checked,
+        borigen_noa: this.noa.checked,
+        borigen_pampeana: this.pampeana.checked,
+        borigen_patagonica: this.patagonica.checked,
+      },
+    })
+    window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
   }
 }

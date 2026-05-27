@@ -4,26 +4,6 @@
     <div class="col-12">
       <div class="mb-3">
         <h2>
-          ¿Dónde?
-        </h2>
-        <div class="form-check form-check-inline">
-          <input type="radio" id="marker-all" name="marker" class="form-check-input" value="" js-input="marker-all">
-          <label class="form-check-label" for="marker-all">
-            En todo el mapa
-          </label>
-        </div>
-        <div class="custom-control custom-radio form-check-inline" data-bs-toggle="tooltip" data-bs-title="Hacé click en el mapa para colocar una marca.">
-          <input type="radio" id="marker-point" name="marker" class="form-check-input" value="1" disabled js-input="marker-point">
-          <label class="form-check-label" for="marker-point">
-            Marcar en el mapa
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-12">
-      <div class="mb-3">
-        <h2>
           ¿Qué especie?
         </h2>
         <arbolado-species-select id="input-species" name="species" js-input="species"></arbolado-species-select>
@@ -47,9 +27,9 @@
         <div class="regiones">
           <h2>
             Región de origen
-            <a href="#" id="origen" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Por el momento el mapa permite filtrar especies para las distintas regiones de origen sólo dentro de Argentina, ¡esperamos ampliar esta sección pronto!">
+            <span id="origen" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Por el momento el mapa permite filtrar especies para las distintas regiones de origen sólo dentro de Argentina, ¡esperamos ampliar esta sección pronto!">
               <i class="fas fa-question-circle"></i>
-            </a>
+            </span>
           </h2>
           <div class="form-check form-switch form-check-inline">
             <input type="checkbox" class="form-check-input" id="borigen_pampeana" name="pampeana" value="1" js-input="pampeana">
