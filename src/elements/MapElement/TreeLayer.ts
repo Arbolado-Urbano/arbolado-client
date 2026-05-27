@@ -1,6 +1,6 @@
 import { Map, GeoJSONSource, LngLatBounds } from 'maplibre-gl'
 
-import Tree from "../../types/Tree"
+import { TreeList } from "../../types/Tree"
 
 import MapElement from './MapElement'
 import { DEFAULTS, getSpeciesStyle, ICON_PATH } from '../../constants/speciesStyles'
@@ -10,7 +10,7 @@ export class TreeLayer {
   private readonly TREES_LAYER = 'trees-layer'
   private map: Map
   private parent: MapElement
-  private trees: Tree[] = []
+  private trees: TreeList = []
 
   constructor(map: Map, parent: MapElement) {
     this.map = map
@@ -90,7 +90,7 @@ export class TreeLayer {
     })
   }
 
-  public displayTrees(trees: Tree[] = []) {
+  public displayTrees(trees: TreeList = []) {
     this.trees = trees
     const source = this.map.getSource(this.TREES_SOURCE) as GeoJSONSource
     source.setData({
@@ -98,11 +98,11 @@ export class TreeLayer {
       features: trees.map((tree) => ({
         type: 'Feature',
         geometry: { type: 'Point', coordinates: [tree.lng, tree.lat] },
-        properties: { id: tree.id, ...getSpeciesStyle(tree.species.url) },
+        properties: { id: tree.id, ...getSpeciesStyle(tree.species) },
       })),
     })
 
-    const uniqueIcons = [...new Set(trees.map(tree => getSpeciesStyle(tree.species.url).icon))]
+    const uniqueIcons = [...new Set(trees.map(tree => getSpeciesStyle(tree.species).icon))]
     uniqueIcons.map(iconName =>
       new Promise<void>(async (resolve) => {
         if (!iconName) return resolve()

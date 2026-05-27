@@ -1,4 +1,4 @@
-declare type Tree = {
+export type Tree = {
   id: number
   calle?: string
   calle_altura?: string
@@ -37,4 +37,9 @@ declare type Tree = {
   }[]
 }
 
-export default Tree
+export type TreeList = {
+  id: number
+  lat: number
+  lng: number
+  species: string
+}[]

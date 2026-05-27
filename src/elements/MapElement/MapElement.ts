@@ -1,6 +1,6 @@
 import { Map, NavigationControl } from 'maplibre-gl'
 
-import Tree from '../../types/Tree'
+import { Tree, TreeList } from '../../types/Tree'
 
 import { mapStyles } from '../../constants/mapStyles'
 
@@ -75,12 +75,12 @@ export default class MapElement extends HTMLElement {
     this.marker?.remove()
   }
 
-  public displayTrees(trees: Tree[]) {
+  public displayTrees(trees: TreeList) {
     this.trees?.displayTrees(trees)
   }
 
   public displayTree(tree: Tree) {
-    if (!this.trees?.hasTrees()) this.displayTrees([tree])
+    if (!this.trees?.hasTrees()) this.displayTrees([{ id: tree.id, lat: tree.lat, lng: tree.lng, species: tree.species.url! }])
   }
 
   public selectTree(id: string): void {

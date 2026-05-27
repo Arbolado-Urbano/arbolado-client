@@ -1,7 +1,7 @@
 import TreeDrawerTemplate from './TreeDrawer.html?raw'
 import SourceAccordionTemplate from './SourceAccordion.html?raw'
 
-import Tree from '../../types/Tree'
+import { Tree } from '../../types/Tree'
 
 type TreeData = {
   id: { element: HTMLElement, label?: string },
