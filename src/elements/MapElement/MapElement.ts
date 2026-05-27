@@ -42,7 +42,7 @@ export default class MapElement extends HTMLElement {
     // Set/update marker position on click
     this.map.on('click', (event) => {
       // If a tree was clicked don't reposition the marker
-      if (this.map.queryRenderedFeatures(event.point, { layers: ['trees-layer'] }).length > 0) return
+      if (this.map.queryRenderedFeatures(event.point, { layers: ['icons-layer', 'dots-layer'] }).length > 0) return
       this.setMarker([event.lngLat.lng, event.lngLat.lat])
     })
 

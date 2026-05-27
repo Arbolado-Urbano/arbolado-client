@@ -7,8 +7,8 @@ export default defineConfig({
         codeSplitting: {
           groups: [
             {
-              name: 'maplibre',
-              test: /maplibre-gl/,
+              name: 'vendor',
+              test: /node_modules/,
             },
           ],
         },

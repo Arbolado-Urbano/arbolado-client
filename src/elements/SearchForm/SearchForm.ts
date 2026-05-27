@@ -2,9 +2,8 @@ import * as bootstrap from 'bootstrap'
 
 import SearchFormTemplate from './SearchForm.html?raw'
 
-import { TreeList } from '../../types/Tree'
-
 import SpeciesSelect from '../SpeciesSelect/SpeciesSelect'
+import { TreeList } from '../../types/Tree'
 
 export default class SearchForm extends HTMLElement {
   private latLng?: { lat: number, lng: number }
