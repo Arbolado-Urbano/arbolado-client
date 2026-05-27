@@ -207,6 +207,7 @@ export default class SpeciesSelect extends HTMLElement {
   private renderSpecies(species: Species[]) {
     this.listElement.innerHTML = ''
     this.filtered = [...species]
-    this.filtered.map((species, index) => this.addSpeciesOption(species, index))
+    console.log(this.filtered)
+    this.filtered.forEach((species, index) => this.addSpeciesOption(species, index))
   }
 }
