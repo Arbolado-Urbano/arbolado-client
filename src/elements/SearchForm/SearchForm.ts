@@ -37,8 +37,12 @@ export default class SearchForm extends HTMLElement {
       event.preventDefault()
       this.search()
     })
-    // Set the initial form values
-    this.updateFormValues()
+    // Set the initial form values when the species have loaded
+    if (window.Arbolado.species.length) {
+      this.updateFormValues()
+    } else {
+      document.addEventListener('arbolado:species/loaded', this.updateFormValues)
+    }
     // Update the form values if the user navigates back/forth trough the session's history
     document.addEventListener('arbolado:queryParams/update', () => this.updateFormValues())
     // Set the popover for the search button that pops up when the search is too big
