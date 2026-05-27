@@ -167,6 +167,10 @@ export default class TreeModal extends HTMLElement {
   async displayTree(treeId: string, updateURL: boolean = true) {
     try {
       const response = await window.Arbolado.fetchAPI(`/arboles/${treeId}`)
+      if (!response.ok) {
+        window.Arbolado.alert("danger", "Ocurrió un error al cargar el árbol")
+        return
+      }
       const tree: Tree | undefined = await response.json()
       if (!tree) {
         throw new Error('No JSON response from API')

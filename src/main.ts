@@ -44,16 +44,12 @@ window.Arbolado.ready(async () => {
   const mapElement = document.querySelector('[js-arbolado-map]') as MapElement
   const treeDrawer = document.querySelector('[js-tree-drawer]') as TreeDrawer
   const addressLookup = document.querySelector('[js-address-lookup]') as AddressLookup
-  document.addEventListener('arbolado:results/updated', (event) => mapElement.displayTrees(event.detail.trees))
   mapElement.addEventListener('arbolado:map/loaded', () => {
-    mapElement.addEventListener('arbolado:marker/set', (event) => searchForm.setMarker(event.detail))
-    mapElement.addEventListener('arbolado:tree/selected', (event) => treeDrawer.displayTree(event.detail.id))
-    mapElement.addEventListener('arbolado:marker/search', () => searchForm.search())
-    mapElement.addEventListener('arbolado:map/move', (event) => addressLookup.setBounds(event.detail.bounds))
-    treeDrawer.addEventListener('arbolado:tree/displayed', (event) => mapElement.displayTree(event.detail.tree))
-    mapElement.addEventListener('arbolado:marker/removed', () => searchForm.removeMarker())
-    searchForm.addEventListener('arbolado:marker/remove', () => mapElement.removeMarker())
-    addressLookup.addEventListener('arbolado:address/selected', (event) => mapElement.setMarker([event.detail.lng, event.detail.lat]))
+    mapElement.addEventListener('arbolado:tree/selected', ({ detail }) => treeDrawer.displayTree(detail.id))
+    mapElement.addEventListener('arbolado:map/move', ({ detail }) => addressLookup.setBounds(detail.bounds))
+    treeDrawer.addEventListener('arbolado:tree/displayed', ({ detail: { tree } }) => mapElement.center({ lat: tree.lat, lng: tree.lng }, 20))
+    addressLookup.addEventListener('arbolado:address/selected', ({ detail }) => mapElement.center({ lng: detail.lng, lat: detail.lat }))
+    searchForm.addEventListener('arbolado:search', ({ detail }) => mapElement.filterSpecies(detail.filters))
     // Wait for the map to be fully loaded before initializing these components
     customElements.define('arbolado-tree-drawer', TreeDrawer)
     customElements.define('arbolado-address-lookup', AddressLookup)
@@ -62,7 +58,7 @@ window.Arbolado.ready(async () => {
   })
 
   // Init Bootstrap's tooltips
-  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((element) => new Tooltip(element))
+  document.querySelectorAll('[data-bs-toggle=tooltip]').forEach((element) => new Tooltip(element))
 
   // Check to see if a source is selected on the URL
   await window.Arbolado.loadSourceFromURL()

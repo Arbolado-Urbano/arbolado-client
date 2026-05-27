@@ -1,18 +1,15 @@
-import { Map, NavigationControl } from 'maplibre-gl'
+import { LngLatLike, Map, NavigationControl } from 'maplibre-gl'
 
-import { Tree, TreeList } from '../../types/Tree'
+import { SpeciesFilters } from '../../types/Species'
 
 import { mapStyles } from '../../constants/mapStyles'
 
-import { MapMarker } from './MapMarker'
-import { TreeLayer } from './TreeLayer'
 import GeoBtn from '../GeoBtn/GeoBtn'
 import { MapLayerSwitcher } from '../MapLayerSwitcher/MapLayerSwitcher'
+import { TreeLayer } from './TreeLayer'
 
 export default class MapElement extends HTMLElement {
-  private readonly MARKER_RADIUS = 1000
-  private marker?: MapMarker
-  private trees?: TreeLayer
+  private treesLayer?: TreeLayer
   private map = new Map({
     container: 'map',
     style: mapStyles,
@@ -39,82 +36,28 @@ export default class MapElement extends HTMLElement {
       window.Arbolado.emitEvent(this, 'arbolado:map/move', { bounds })
     })
 
-    // Set/update marker position on click
-    this.map.on('click', (event) => {
-      // If a tree was clicked don't reposition the marker
-      if (this.map.queryRenderedFeatures(event.point, { layers: ['icons-layer', 'dots-layer'] }).length > 0) return
-      this.setMarker([event.lngLat.lng, event.lngLat.lat])
-    })
-
     this.map.on('load', async () => {
-      // Initialize map marker
-      this.marker = new MapMarker(this.map, this)
       // Initialize trees layer
-      this.trees = new TreeLayer(this.map, this)
-      await this.processURL()
-
-      window.Arbolado.emitEvent(this, 'arbolado:map/loaded')
-
+      this.treesLayer = new TreeLayer(this.map, this)
       // Initialize Geo button
       const geoBtn = document.querySelector('[js-map-geo-btn]') as GeoBtn
       geoBtn.addEventListener('arbolado:geo/searching', () => window.Arbolado.setLoading(true))
       geoBtn.addEventListener('arbolado:geo/error', () => window.Arbolado.setLoading(false))
       geoBtn.addEventListener('arbolado:geo/success', (event) => {
-        const { lat, lng } = (event as CustomEvent).detail
-        this.setMarker([lng, lat])
+        const { lat, lng } = event.detail
+        this.center([lng, lat])
         window.Arbolado.setLoading(false)
       })
+
+      window.Arbolado.emitEvent(this, 'arbolado:map/loaded')
     })
   }
 
-  public setMarker(center: [number, number], radius: number = this.MARKER_RADIUS) {
-    this.marker?.set(center, radius)
+  public center(center: LngLatLike, zoom?: number) {
+    this.map.flyTo({ center, zoom })
   }
 
-  public removeMarker() {
-    this.marker?.remove()
-  }
-
-  public displayTrees(trees: TreeList) {
-    this.trees?.displayTrees(trees)
-  }
-
-  public displayTree(tree: Tree) {
-    if (!this.trees?.hasTrees()) this.displayTrees([{ id: tree.id, lat: tree.lat, lng: tree.lng, species: tree.species.url! }])
-  }
-
-  public selectTree(id: string): void {
-    // Emit the selected tree's ID
-    window.Arbolado.emitEvent(this, 'arbolado:tree/selected', { id })
-  }
-
-  private async processURL() {
-    const path = window.location.pathname.split('/')
-    if (path[1] === 'ubicacion') {
-      const ubicacion = path[2]
-      if (ubicacion) {
-        const results = await window.Arbolado.addressLookup(ubicacion)
-        if (results?.[0]?.address) {
-          const { lat, lng } = results[0].address
-          this.setMarker([Number(lng), Number(lat)])
-        }
-      }
-    }
-
-    const markerParam = window.Arbolado.queryParams.get('user_latlng')
-    const radiusParam = window.Arbolado.queryParams.get('radio')
-    if (markerParam) {
-      const parts = markerParam.split(' ')
-      try {
-        const lat = Number(parts[0])
-        const lng = Number(parts[1])
-        if (isNaN(lat) || isNaN(lng)) throw new Error('Invalid coordinates')
-        const radius = Number(radiusParam)
-        this.setMarker([lng, lat], isNaN(radius) ? undefined : radius)
-      } catch {
-        window.Arbolado.queryParams.delete('user_latlng')
-        window.Arbolado.pushQueryParams()
-      }
-    }
+  public filterSpecies(filters: SpeciesFilters) {
+    this.treesLayer?.filterSpecies(filters)
   }
 }

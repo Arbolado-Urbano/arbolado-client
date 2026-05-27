@@ -98,7 +98,7 @@ export default class AddTreeForm extends HTMLElement {
 
     // Display the manual species text input when no speices is selected on the species selection dropdown
     this.speciesSelect.addEventListener('arbolado:species/change', (event) => {
-      if (event.detail.species?.id === -1) {
+      if (event.detail.species?.url === '') {
         this.speciesManualInput.setAttribute('required', 'true')
         this.speciesManualWrapper.classList.remove('d-none')
       } else {
@@ -286,7 +286,7 @@ export default class AddTreeForm extends HTMLElement {
           return false
         } else {
           this.speciesSelect.classList.remove('is-invalid')
-          if (this.speciesSelect.value.id === -1) {
+          if (this.speciesSelect.value.url === '') {
             return !!this.speciesManualInput.value
           }
           return true
@@ -432,13 +432,13 @@ export default class AddTreeForm extends HTMLElement {
     // Species is used in case of automatic or manual input
     let species: string | undefined = undefined
     // SpeciesId is used in case of a selection from the species dropdown
-    let speciesId: number | undefined = undefined
+    let speciesUrl: string | undefined = undefined
     if (this.autoSpecies) {
       species = this.selectedSpecies || ''
-    } else if (this.speciesSelect.value?.id === -1) {
+    } else if (this.speciesSelect.value?.url === '') {
       species = this.speciesManualInput.value
     } else {
-      speciesId = this.speciesSelect.value?.id
+      speciesUrl = this.speciesSelect.value?.url
     }
 
     const idFormData = new FormData(this.steps.id)
@@ -468,7 +468,7 @@ export default class AddTreeForm extends HTMLElement {
     if (locationFormData.has('orientation')) data.set('orientation', locationFormData.get('orientation')!)
     if (this.geoInput.value) data.set('coordinates', this.geoInput.value)
     if (species) data.set('species', species)
-    if (speciesId) data.set('speciesId', speciesId.toString())
+    if (speciesUrl) data.set('speciesUrl', speciesUrl)
     if (dataFormData.has('height')) data.set('height', dataFormData.get('height')!)
     if (dataFormData.has('inclination')) data.set('inclination', dataFormData.get('inclination')!)
     if (dataFormData.has('diameter-trunk')) data.set('diameterTrunk', dataFormData.get('diameter-trunk')!)

@@ -1,5 +1,6 @@
 import { NominatimSearchResult } from './types/NominatimResponse'
 import { TreeList } from './types/Tree'
+import { Species } from './types/Species'
 
 import Alert, { AlertType } from './elements/Alert/Alert'
 
@@ -12,8 +13,10 @@ export default class Arbolado {
   queryParams: URLSearchParams
   callOnEsc: Function[] = []
   bodyScrollHide: number = 0
+  species: Species[] = []
 
   constructor() {
+    this.loadSpecies()
     this.overlay = document.querySelector('[js-overlay]') as HTMLElement
     this.queryParams = new URLSearchParams(window.location.search)
     document.addEventListener('keydown', this.handleEsc.bind(this))
@@ -70,6 +73,19 @@ export default class Arbolado {
     return await this.fetch(`${import.meta.env.VITE_API_URL}${path}`, method, body, headers, loadingIndicator)
   }
 
+  async loadSpecies() {
+    this.setLoading(true)
+    try {
+      const response = await this.fetchAPI('/especies', 'GET', undefined, undefined, false)
+      const species: Species[] | undefined = await response.json()
+      this.species = species?.filter(species => !!species.url) ?? []
+    } catch (error) {
+      console.error(error)
+    }
+    this.setLoading(false)
+    this.emitEvent(document, 'arbolado:species/loaded')
+  }
+
   alert(type: AlertType, content: string, timeout?: number) {
     const alert = new Alert(type, content)
     alert.addEventListener('arbolado:alert/closed', () => alert.remove())
@@ -120,6 +136,7 @@ export default class Arbolado {
     }
   }
 
+  // TODO: Figure out how to keep this working with pmtiles
   async loadSourceFromURL() {
     const path = window.location.pathname.split('/')
     if (path[1] !== 'fuente') return
@@ -129,7 +146,6 @@ export default class Arbolado {
       const response = await this.fetchAPI(`/fuentes/${fuenteUrl}`, 'GET')
       const trees: TreeList | undefined = await response.json()
       if (!trees?.length) return
-      this.emitEvent(document, 'arbolado:results/updated', { trees })
       window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
     } catch (error) {
       console.log(error)

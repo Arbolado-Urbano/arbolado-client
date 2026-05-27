@@ -1,41 +1,27 @@
-import { Map, GeoJSONSource, LngLatBounds, addProtocol, ExpressionSpecification } from 'maplibre-gl'
+import { Map, addProtocol, ExpressionSpecification } from 'maplibre-gl'
 
 import { Protocol } from 'pmtiles'
 
-import { TreeList } from '../../types/Tree'
+import { SpeciesFilters } from '../../types/Species'
+
+import { DEFAULTS, ICON_PATH, SPECIES_COLORS, SPECIES_ICONS } from '../../constants/speciesStyles'
 
 import MapElement from './MapElement'
-import { DEFAULTS, getSpeciesStyle, ICON_PATH, SPECIES_COLORS, SPECIES_ICONS } from '../../constants/speciesStyles'
 
 export class TreeLayer {
   private readonly TREES_SOURCE = 'trees-source'
   private readonly ICONS_LAYER = 'icons-layer'
   private readonly DOTS_LAYER = 'dots-layer'
   private map: Map
-  private parent: MapElement
-  private trees: TreeList = []
 
   constructor(map: Map, parent: MapElement) {
     this.map = map
-    this.parent = parent
-    this.init()
-  }
-
-  public hasTrees() {
-    return this.trees.length > 0
-  }
-
-  private init() {
-    // Register PMTiles protocol
     const protocol = new Protocol()
     addProtocol('pmtiles', protocol.tile)
 
     this.map.addSource(this.TREES_SOURCE, {
       type: 'vector',
       url: `pmtiles:///arboles.pmtiles`,
-      // cluster: true,
-      // clusterMaxZoom: 14,
-      // clusterRadius: 128,
     })
 
     // Load marker images
@@ -55,12 +41,11 @@ export class TreeLayer {
       type: 'circle',
       source: this.TREES_SOURCE,
       'source-layer': 'trees',
-      minzoom: 0,
       maxzoom: 15,
       paint: {
         'circle-color': [
           'match',
-          ['get', 'speciesUrl'],
+          ['get', 'species'],
           ...SPECIES_COLORS.flat(),
           DEFAULTS.color,
         ] as unknown as ExpressionSpecification,
@@ -88,7 +73,7 @@ export class TreeLayer {
       layout: {
         'icon-image': [
           'match',
-          ['get', 'speciesUrl'],
+          ['get', 'species'],
           ...SPECIES_ICONS.flat(),
           DEFAULTS.icon,
         ] as unknown as ExpressionSpecification,
@@ -106,7 +91,8 @@ export class TreeLayer {
 
     this.map.on('click', [this.ICONS_LAYER, this.DOTS_LAYER], (event) => {
       const id = event.features?.[0]?.properties?.id
-      if (id != null) this.parent.selectTree(id)
+      // Emit an event from the parent map with the selected tree's ID
+      window.Arbolado.emitEvent(parent, 'arbolado:tree/selected', { id })
     })
 
     // Pointer cursor on hover
@@ -118,35 +104,34 @@ export class TreeLayer {
     })
   }
 
-  public displayTrees(trees: TreeList = []) {
-    this.trees = trees
-    const source = this.map.getSource(this.TREES_SOURCE) as GeoJSONSource
-    source.setData({
-      type: 'FeatureCollection',
-      features: trees.map((tree) => ({
-        type: 'Feature',
-        geometry: { type: 'Point', coordinates: [tree.lng, tree.lat] },
-        properties: { id: tree.id, ...getSpeciesStyle(tree.species) },
-      })),
-    })
-
-    const uniqueIcons = [...new Set(trees.map(tree => getSpeciesStyle(tree.species).icon))]
-    uniqueIcons.map(iconName =>
-      new Promise<void>(async (resolve) => {
-        if (!iconName) return resolve()
-        if (this.map.hasImage(iconName)) return resolve()
-        const image = await this.map.loadImage(`${ICON_PATH}${iconName}`)
-        this.map.addImage(iconName, image.data)
-        resolve()
-      })
-    )
-
-    if (trees.length) {
-      const bounds = trees.reduce(
-        (b, t) => b.extend([t.lng, t.lat]),
-        new LngLatBounds([trees[0].lng, trees[0].lat], [trees[0].lng, trees[0].lat]),
-      )
-      this.map.fitBounds(bounds, { maxZoom: 18, padding: 15 })
-    }
+  public filterSpecies(filters: SpeciesFilters) {
+    const species = window.Arbolado.species.filter(species => {
+      if (!species.url) return false
+      if (filters.url) {
+        if (species.url !== filters.url) return false
+      }
+      if (filters.user_sabores) {
+        if (species.comestible !== 'Sí' && species.medicinal !== 'Sí') return false
+      }
+      if (filters.borigen_cuyana) {
+        if (!species.region_cuyana) return false
+      }
+      if (filters.borigen_nea) {
+        if (!species.region_nea) return false
+      }
+      if (filters.borigen_noa) {
+        if (!species.region_noa) return false
+      }
+      if (filters.borigen_pampeana) {
+        if (!species.region_pampeana) return false
+      }
+      if (filters.borigen_patagonica) {
+        if (!species.region_patagonica) return false
+      }
+      return true
+    }).map(species => species.url)
+    const filter: ExpressionSpecification = ['in', ['get', 'species'], ['literal', species]]
+    this.map.setFilter(this.ICONS_LAYER, filter)
+    this.map.setFilter(this.DOTS_LAYER, filter)
   }
 }
