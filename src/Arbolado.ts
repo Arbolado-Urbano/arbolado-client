@@ -78,7 +78,7 @@ export default class Arbolado {
     try {
       const response = await this.fetchAPI('/especies', 'GET', undefined, undefined, false)
       const species: Species[] | undefined = await response.json()
-      this.species = species?.filter(species => !!species.url) ?? []
+      this.species = species?.filter(species => !!species.url && !!species.nombre_cientifico) ?? []
     } catch (error) {
       console.error(error)
     }

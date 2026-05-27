@@ -41,7 +41,7 @@ export default class SearchForm extends HTMLElement {
     if (window.Arbolado.species.length) {
       this.updateFormValues()
     } else {
-      document.addEventListener('arbolado:species/loaded', this.updateFormValues)
+      document.addEventListener('arbolado:species/loaded', () => this.updateFormValues())
     }
     // Update the form values if the user navigates back/forth trough the session's history
     document.addEventListener('arbolado:queryParams/update', () => this.updateFormValues())
@@ -102,7 +102,7 @@ export default class SearchForm extends HTMLElement {
     }
   }
 
-  public async search(updateURL: boolean = true) {
+  private async search(updateURL: boolean = true) {
     // Validate the form
     if (!window.Arbolado.validateForm(this.form)) return
 
