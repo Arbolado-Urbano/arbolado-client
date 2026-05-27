@@ -18,18 +18,21 @@
     "docker:up": "docker compose -p arbolado-client -f ./docker-compose.yml up -d",
     "docker:down": "docker compose -p arbolado-client down"
   },
-  "devDependencies": {
-    "@eslint/js": "10.0.1",
+  "dependencies": {
     "@fortawesome/fontawesome-free": "7.2.0",
     "@popperjs/core": "2.11.8",
+    "bootstrap": "5.3.8",
+    "maplibre-gl": "5.24.0",
+    "pmtiles": "4.4.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
     "@types/bootstrap": "5.2.10",
     "@types/cloudflare-turnstile": "0.2.2",
     "@typescript-eslint/parser": "8.59.4",
-    "bootstrap": "5.3.8",
     "eslint": "10.4.0",
     "eslint-plugin-react-hooks": "7.1.1",
     "globals": "17.6.0",
-    "maplibre-gl": "5.24.0",
     "sass": "1.99.0",
     "typescript": "6.0.3",
     "vite": "8.0.13"

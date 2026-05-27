@@ -1,6 +1,6 @@
 import { Step } from "../elements/AddTreeForm/AddTreeForm"
 import Species from "./Species"
-import Tree from "./Tree"
+import { Tree, TreeList } from "./Tree"
 
 export type ArboladoEventMap = {
   'arbolado:loading': CustomEvent<{ loading: boolean }>
@@ -25,7 +25,7 @@ export type ArboladoEventMap = {
   'arbolado:marker/search': CustomEvent<void>
   'arbolado:marker/remove': CustomEvent<void>
   'arbolado:marker/removed': CustomEvent<void>
-  'arbolado:results/updated': CustomEvent<{ trees: Tree[] }>
+  'arbolado:results/updated': CustomEvent<{ trees: TreeList }>
   'arbolado:tree/selected': CustomEvent<{ id: string }>
   'arbolado:tree/displayed': CustomEvent<{ tree: Tree }>
 }

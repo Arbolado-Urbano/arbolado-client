@@ -1,4 +1,4 @@
-import * as bootstrap from 'bootstrap'
+import { Tooltip, Modal } from 'bootstrap'
 
 import { ArboladoEventMap } from './types/Events'
 
@@ -62,9 +62,7 @@ window.Arbolado.ready(async () => {
   })
 
   // Init Bootstrap's tooltips
-  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((element) => new bootstrap.Tooltip(element))
-  // Init Bootstrap's popovers
-  document.querySelectorAll('[data-bs-toggle="popover"]').forEach(element => new bootstrap.Popover(element))
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((element) => new Tooltip(element))
 
   // Check to see if a source is selected on the URL
   await window.Arbolado.loadSourceFromURL()
@@ -73,7 +71,7 @@ window.Arbolado.ready(async () => {
   if ((new URLSearchParams(window.location.search)).has("privacidad")) {
     const privacyModalElement = document.querySelector("#privacy-modal")
     if (privacyModalElement) {
-      new bootstrap.Modal(privacyModalElement).show()
+      new Modal(privacyModalElement).show()
     }
   }
 
@@ -81,7 +79,7 @@ window.Arbolado.ready(async () => {
   if ((new URLSearchParams(window.location.search)).has("ayuda")) {
     const instructionsModalElement = document.querySelector("#instructions-modal")
     if (instructionsModalElement) {
-      new bootstrap.Modal(instructionsModalElement).show()
+      new Modal(instructionsModalElement).show()
     }
   }
 
