@@ -30,26 +30,25 @@ export default class MapElement extends HTMLElement {
 
     // TODO: GEO button and rest of the UI, see if I can load all of them as a layer or something
 
+    // Initialize Geo button
+    const geoBtn = document.querySelector('[js-map-geo-btn]') as GeoBtn
+    geoBtn.addEventListener('arbolado:geo/searching', () => window.Arbolado.setLoading(true))
+    geoBtn.addEventListener('arbolado:geo/error', () => window.Arbolado.setLoading(false))
+    geoBtn.addEventListener('arbolado:geo/success', (event) => {
+      const { lat, lng } = event.detail
+      this.center([lng, lat])
+      window.Arbolado.setLoading(false)
+    })
+
     // Update map bounds on move
     this.map.on('move', () => {
       const bounds = this.map.getBounds()
       window.Arbolado.emitEvent(this, 'arbolado:map/move', { bounds })
     })
 
-    this.map.on('load', async () => {
+    this.map.on('load', () => {
       // Initialize trees layer
       this.treesLayer = new TreeLayer(this.map, this)
-      // Initialize Geo button
-      const geoBtn = document.querySelector('[js-map-geo-btn]') as GeoBtn
-      geoBtn.addEventListener('arbolado:geo/searching', () => window.Arbolado.setLoading(true))
-      geoBtn.addEventListener('arbolado:geo/error', () => window.Arbolado.setLoading(false))
-      geoBtn.addEventListener('arbolado:geo/success', (event) => {
-        const { lat, lng } = event.detail
-        this.center([lng, lat])
-        window.Arbolado.setLoading(false)
-      })
-
-      window.Arbolado.emitEvent(this, 'arbolado:map/loaded')
     })
   }
 
