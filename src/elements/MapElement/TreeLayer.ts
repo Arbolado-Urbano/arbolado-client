@@ -12,10 +12,17 @@ export class TreeLayer {
   private readonly TREES_SOURCE = 'trees-source'
   private readonly ICONS_LAYER = 'icons-layer'
   private readonly DOTS_LAYER = 'dots-layer'
+  private readonly TRANSITION_ZOOM_LEVEL = 16
   private map: Map
 
   constructor(map: Map, parent: MapElement) {
     this.map = map
+    this.init(parent)
+  }
+
+  async init(parent: MapElement) {
+    if (this.map.getSource(this.TREES_SOURCE)) return
+    window.Arbolado.setLoading(true)
     const protocol = new Protocol()
     addProtocol('pmtiles', protocol.tile)
 
@@ -26,22 +33,22 @@ export class TreeLayer {
 
     // Load marker images
     const uniqueIcons = [...new Set(SPECIES_ICONS.map(icon => icon[1])), DEFAULTS.icon]
-    uniqueIcons.map(iconName =>
-      new Promise<void>(async (resolve) => {
-        if (!iconName) return resolve()
-        if (this.map.hasImage(iconName)) return resolve()
+    await Promise.all(uniqueIcons.map(async (iconName) => {
+      if (!iconName || this.map.hasImage(iconName)) return
+      try {
         const image = await this.map.loadImage(`${ICON_PATH}${iconName}`)
         this.map.addImage(iconName, image.data)
-        resolve()
-      })
-    )
+      } catch (error) {
+        console.warn(`Failed to load icon: ${iconName}`, error)
+      }
+    }))
 
     this.map.addLayer({
       id: this.DOTS_LAYER,
       type: 'circle',
       source: this.TREES_SOURCE,
       'source-layer': 'trees',
-      maxzoom: 15,
+      maxzoom: this.TRANSITION_ZOOM_LEVEL,
       paint: {
         'circle-color': [
           'match',
@@ -51,7 +58,7 @@ export class TreeLayer {
         ] as unknown as ExpressionSpecification,
         'circle-radius': [
           'interpolate', ['linear'], ['zoom'],
-          10, 4,
+          10, 1,
           14, 5,
           18, 8
         ],
@@ -69,7 +76,7 @@ export class TreeLayer {
       type: 'symbol',
       source: this.TREES_SOURCE,
       'source-layer': 'trees',
-      minzoom: 15,
+      minzoom: this.TRANSITION_ZOOM_LEVEL,
       layout: {
         'icon-image': [
           'match',
@@ -102,6 +109,9 @@ export class TreeLayer {
     this.map.on('mouseleave', [this.ICONS_LAYER, this.DOTS_LAYER], () => {
       this.map.getCanvas().style.cursor = ''
     })
+
+    window.Arbolado.emitEvent(parent, 'arbolado:map/loaded')
+    window.Arbolado.setLoading(false)
   }
 
   public filterSpecies(filters: SpeciesFilters) {
