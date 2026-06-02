@@ -13,10 +13,7 @@
     "build": "vite build",
     "build:staging": "vite build --mode staging",
     "lint": "eslint",
-    "typecheck": "tsc",
-    "docker:pull": "docker compose -f ./docker-compose.yml pull",
-    "docker:up": "docker compose -p arbolado-client -f ./docker-compose.yml up -d",
-    "docker:down": "docker compose -p arbolado-client down"
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "7.2.0",
@@ -33,7 +30,7 @@
     "eslint": "10.4.0",
     "eslint-plugin-react-hooks": "7.1.1",
     "globals": "17.6.0",
-    "sass": "1.99.0",
+    "sass": "1.100.0",
     "typescript": "6.0.3",
     "vite": "8.0.14"
   }

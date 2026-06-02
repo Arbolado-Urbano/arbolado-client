@@ -28,7 +28,7 @@ export class TreeLayer {
 
     this.map.addSource(this.TREES_SOURCE, {
       type: 'vector',
-      url: `pmtiles:///arboles.pmtiles`,
+      url: `pmtiles://${import.meta.env.DEV ? "" : import.meta.env.VITE_API_URL}/arboles.pmtiles`,
     })
 
     // Load marker images
