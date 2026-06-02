@@ -20,7 +20,7 @@ Este repositorio contiene un cliente que se comunica con [Arbolado API](https://
 
 3. Generar `arboles.pmtiles`
     1. Visitar el endpoint `/arboles` de la API.
-    2. Esperar a que finalice la generación del archivo (aproximadamente 1 minuto con la base de datos actual).
+    2. Esperar a que finalice la generación del archivo (puede demorar algunos minutos).
     3. Copiar `arboles.pmtiles` a la carpeta `public/` de este proyecto.
 
 ## Desarrollo
