@@ -3,6 +3,8 @@ import SpeciesSelectItemTemplate from './SpeciesSelectItem.html?raw'
 
 import { Species } from '../../types/Species'
 
+import { EMPTY_PLANTER_URL } from '../../constants/emptyPlanter'
+
 export default class SpeciesSelect extends HTMLElement {
   public value: Species | null = null
   private filtered: Species[] = []
@@ -160,8 +162,10 @@ export default class SpeciesSelect extends HTMLElement {
     const searchTerm = this.inputElement.value.toLowerCase()
     this.filtered = window.Arbolado.species.filter((species) => {
       return (
-        species.nombre_comun?.toLowerCase().includes(searchTerm) ||
-        species.nombre_cientifico.toLowerCase().includes(searchTerm)
+        species.url !== EMPTY_PLANTER_URL && (
+          species.nombre_comun?.toLowerCase().includes(searchTerm) ||
+          species.nombre_cientifico.toLowerCase().includes(searchTerm)
+        )
       )
     })
     this.listElement.innerHTML = ''
@@ -184,7 +188,7 @@ export default class SpeciesSelect extends HTMLElement {
 
   private addSpeciesOption(species: Species, index: number) {
     const templateClone = window.Arbolado.loadTemplate(SpeciesSelectItemTemplate) as HTMLElement
-    const item = templateClone.querySelector('[js-species-select-item]') as HTMLElement
+    const item = templateClone.querySelector('[js-species-select-item]') as HTMLLIElement
     const btn = templateClone.querySelector('[js-species-select-item-btn]') as HTMLButtonElement
     const scientificName = btn.querySelector('[js-scientific-name]') as HTMLElement
     const commonName = btn.querySelector('[js-common-name]') as HTMLElement
@@ -193,14 +197,18 @@ export default class SpeciesSelect extends HTMLElement {
     btn.id = `${this.btnElement.getAttribute('aria-controls')}-${index}`
     scientificName.innerText = species?.nombre_cientifico ?? ''
     commonName.innerText = species?.nombre_comun ?? ''
-    btn.addEventListener('click', () => this.selectSpecies(species?.url))
+    if (species.url === EMPTY_PLANTER_URL) {
+      item.hidden = true
+    } else {
+      btn.addEventListener('click', () => this.selectSpecies(species?.url))
+    }
     this.listElement.append(templateClone)
   }
 
   private resetFilter() {
     this.inputElement.value = ''
     this.listElement.innerHTML = ''
-    this.emptyPlanter = window.Arbolado.species.find(item => item.url === 'plantera-vacia')
+    this.emptyPlanter = window.Arbolado.species.find(item => item.url === EMPTY_PLANTER_URL)
     this.renderSpecies([this.noSelectionElement, ...window.Arbolado.species.filter(item => item.url !== this.emptyPlanter?.url)])
   }
 

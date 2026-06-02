@@ -2,6 +2,8 @@ import AddTreeFormTemplate from './AddTreeForm.html?raw'
 import SpeciesImageTemplate from './SpeciesImage.html?raw'
 import ImagePreviewTemplate from './ImagePreview.html?raw'
 
+import { EMPTY_PLANTER_URL } from '../../constants/emptyPlanter'
+
 import SpeciesSelect from '../SpeciesSelect/SpeciesSelect'
 import Captcha from '../Captcha'
 import GeoInput from '../GeoInput/GeoInput'
@@ -158,7 +160,7 @@ export default class AddTreeForm extends HTMLElement {
         }
       } else if (stepLabel === 'data') {
         // Display or hide the data inputs based on whether the species is the "emtpy planter" or not
-        if (this.speciesSelect.value?.url === 'plantera-vacia') {
+        if (this.speciesSelect.value?.url === EMPTY_PLANTER_URL) {
           this.querySelector('[js-input-wrapper=inclination]')?.classList.add('d-none')
           this.querySelector('[js-input-wrapper=development]')?.classList.add('d-none')
           this.querySelector('[js-input-wrapper=health]')?.classList.add('d-none')

@@ -123,21 +123,6 @@ export class TreeLayer {
       if (filters.user_sabores) {
         if (species.comestible !== 'Sí' && species.medicinal !== 'Sí') return false
       }
-      if (filters.borigen_cuyana) {
-        if (!species.region_cuyana) return false
-      }
-      if (filters.borigen_nea) {
-        if (!species.region_nea) return false
-      }
-      if (filters.borigen_noa) {
-        if (!species.region_noa) return false
-      }
-      if (filters.borigen_pampeana) {
-        if (!species.region_pampeana) return false
-      }
-      if (filters.borigen_patagonica) {
-        if (!species.region_patagonica) return false
-      }
       return true
     }).map(species => species.url)
     const filter: ExpressionSpecification = ['in', ['get', 'species'], ['literal', species]]
