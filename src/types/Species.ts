@@ -4,7 +4,6 @@ export type Species = {
   nombre_comun?: string
   comestible?: string
   medicinal?: string
-  origen?: string
 }
 
 export type SpeciesFilters = {
