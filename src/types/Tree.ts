@@ -41,5 +41,5 @@ export type TreeList = {
   id: number
   lat: number
   lng: number
-  species: string
+  species: number
 }[]

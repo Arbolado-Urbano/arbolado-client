@@ -433,7 +433,7 @@ export default class AddTreeForm extends HTMLElement {
 
     // Species is used in case of automatic or manual input
     let species: string | undefined = undefined
-    // SpeciesId is used in case of a selection from the species dropdown
+    // SpeciesUrl is used in case of a selection from the species dropdown
     let speciesUrl: string | undefined = undefined
     if (this.autoSpecies) {
       species = this.selectedSpecies || ''

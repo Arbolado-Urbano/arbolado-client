@@ -124,7 +124,7 @@ export class TreeLayer {
         if (species.comestible !== 'Sí' && species.medicinal !== 'Sí') return false
       }
       return true
-    }).map(species => species.url)
+    }).map(species => species.id)
     const filter: ExpressionSpecification = ['in', ['get', 'species'], ['literal', species]]
     this.map.setFilter(this.ICONS_LAYER, filter)
     this.map.setFilter(this.DOTS_LAYER, filter)
