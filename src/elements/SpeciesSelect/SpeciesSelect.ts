@@ -41,7 +41,7 @@ export default class SpeciesSelect extends HTMLElement {
 
     // Setup the "no species selected" option
     const noSelectionLabel = this.getAttribute('data-no-selection-label') ?? 'Todas'
-    this.noSelectionElement = { nombre_cientifico: noSelectionLabel, nombre_comun: '', url: '' }
+    this.noSelectionElement = { id: NaN, nombre_cientifico: noSelectionLabel, nombre_comun: '', url: '' }
 
     // When the dropdown opens focus on the input field
     this.btnElement.addEventListener('shown.bs.dropdown', () => this.inputElement.focus())
@@ -52,7 +52,7 @@ export default class SpeciesSelect extends HTMLElement {
     // Empty planter selection toggle
     this.emptyPlanterElement.addEventListener('click', this.handleEmptyPlanterToggle)
     // Load the species list when they're loaded
-    if (window.Arbolado.species.length) {
+    if (window.Arbolado.species !== undefined) {
       this.resetFilter()
     } else {
       document.addEventListener('arbolado:species/loaded', this.resetFilter)
@@ -95,14 +95,14 @@ export default class SpeciesSelect extends HTMLElement {
   }
 
   private selectSpeciesFromURL(speciesURL: string) {
-    const species = window.Arbolado.species.find((species) => species.url === speciesURL) ?? null
+    const species = window.Arbolado.species?.find((species) => species.url === speciesURL) ?? null
     this.selectSpecies(species?.url)
     return this.value
   }
 
   private selectSpecies(url?: string) {
     let species = null
-    if (url) species = window.Arbolado.species.find((species) => species.url === url) ?? null
+    if (url) species = window.Arbolado.species?.find((species) => species.url === url) ?? null
     this.setValue(species)
   }
 
@@ -160,14 +160,14 @@ export default class SpeciesSelect extends HTMLElement {
 
   private handleInput() {
     const searchTerm = this.inputElement.value.toLowerCase()
-    this.filtered = window.Arbolado.species.filter((species) => {
+    this.filtered = window.Arbolado.species?.filter((species) => {
       return (
         species.url !== EMPTY_PLANTER_URL && (
           species.nombre_comun?.toLowerCase().includes(searchTerm) ||
           species.nombre_cientifico.toLowerCase().includes(searchTerm)
         )
       )
-    })
+    }) ?? []
     this.listElement.innerHTML = ''
     this.filtered.map((species, index) => this.addSpeciesOption(species, index))
   }
@@ -208,8 +208,8 @@ export default class SpeciesSelect extends HTMLElement {
   private resetFilter() {
     this.inputElement.value = ''
     this.listElement.innerHTML = ''
-    this.emptyPlanter = window.Arbolado.species.find(item => item.url === EMPTY_PLANTER_URL)
-    this.renderSpecies([this.noSelectionElement, ...window.Arbolado.species.filter(item => item.url !== this.emptyPlanter?.url)])
+    this.emptyPlanter = window.Arbolado.species?.find(item => item.url === EMPTY_PLANTER_URL)
+    this.renderSpecies([this.noSelectionElement, ...(window.Arbolado.species?.filter(item => item.url !== this.emptyPlanter?.url) ?? [])])
   }
 
   private renderSpecies(species: Species[]) {

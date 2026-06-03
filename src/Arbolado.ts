@@ -13,7 +13,7 @@ export default class Arbolado {
   queryParams: URLSearchParams
   callOnEsc: Function[] = []
   bodyScrollHide: number = 0
-  species: Species[] = []
+  species?: Species[]
 
   constructor() {
     this.loadSpecies()
@@ -77,13 +77,15 @@ export default class Arbolado {
     this.setLoading(true)
     try {
       const response = await this.fetchAPI('/especies', 'GET', undefined, undefined, false)
+      if (!response.ok) throw new Error(await response.text())
       const species: Species[] | undefined = await response.json()
       this.species = species?.filter(species => !!species.url && !!species.nombre_cientifico) ?? []
+      this.emitEvent(document, 'arbolado:species/loaded')
     } catch (error) {
+      this.alert('danger', 'Ocurrió un error al cargar el listado de especies')
       console.error(error)
     }
     this.setLoading(false)
-    this.emitEvent(document, 'arbolado:species/loaded')
   }
 
   alert(type: AlertType, content: string, timeout?: number) {
@@ -148,7 +150,7 @@ export default class Arbolado {
       if (!trees?.length) return
       window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
 

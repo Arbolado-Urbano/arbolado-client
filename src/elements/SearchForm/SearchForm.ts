@@ -30,7 +30,7 @@ export default class SearchForm extends HTMLElement {
       this.search()
     })
     // Set the initial form values when the species have loaded
-    if (window.Arbolado.species.length) {
+    if (window.Arbolado.species !== undefined) {
       this.updateFormValues()
     } else {
       document.addEventListener('arbolado:species/loaded', () => this.updateFormValues())
@@ -79,8 +79,7 @@ export default class SearchForm extends HTMLElement {
     if (!window.Arbolado.validateForm(this.form)) return
 
     // Set the URL query params to update the URL
-    this.setQueryParam('user_sabores', this.flavors.checked)
-
+    if (updateURL) this.setQueryParam('user_sabores', this.flavors.checked)
 
     if (this.species.value?.url) {
       if (updateURL) window.Arbolado.pushURL(`/especie/${this.species.value.url}`)
