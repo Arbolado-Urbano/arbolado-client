@@ -6,10 +6,10 @@ import { mapStyles } from '../../constants/mapStyles'
 
 import GeoBtn from '../GeoBtn/GeoBtn'
 import { MapLayerSwitcher } from '../MapLayerSwitcher/MapLayerSwitcher'
-import { TreeLayer } from './TreeLayer'
+import { TreesLayer } from './TreesLayer'
 
 export default class MapElement extends HTMLElement {
-  private treesLayer?: TreeLayer
+  private treesLayer?: TreesLayer
   private map = new Map({
     container: 'map',
     style: mapStyles,
@@ -48,7 +48,8 @@ export default class MapElement extends HTMLElement {
 
     this.map.on('load', () => {
       // Initialize trees layer
-      this.treesLayer = new TreeLayer(this.map, this)
+      this.treesLayer = new TreesLayer(this.map, this)
+      window.Arbolado.emitEvent(this, 'arbolado:map/loaded')
     })
   }
 

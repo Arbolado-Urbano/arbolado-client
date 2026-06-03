@@ -4,11 +4,11 @@ import { Protocol } from 'pmtiles'
 
 import { SpeciesFilters } from '../../types/Species'
 
-import { DEFAULTS, ICON_PATH, SPECIES_COLORS, SPECIES_ICONS } from '../../constants/speciesStyles'
+import { DEFAULTS, ICON_PATH } from '../../constants/speciesStyles'
 
 import MapElement from './MapElement'
 
-export class TreeLayer {
+export class TreesLayer {
   private readonly TREES_SOURCE = 'trees-source'
   private readonly ICONS_LAYER = 'icons-layer'
   private readonly DOTS_LAYER = 'dots-layer'
@@ -17,11 +17,14 @@ export class TreeLayer {
 
   constructor(map: Map, parent: MapElement) {
     this.map = map
-    this.init(parent)
+    if (window.Arbolado.species !== undefined) {
+      this.init(parent)
+    } else {
+      document.addEventListener('arbolado:species/loaded', () => this.init(parent))
+    }
   }
 
-  async init(parent: MapElement) {
-    if (this.map.getSource(this.TREES_SOURCE)) return
+  init(parent: MapElement) {
     window.Arbolado.setLoading(true)
     const protocol = new Protocol()
     addProtocol('pmtiles', protocol.tile)
@@ -31,9 +34,13 @@ export class TreeLayer {
       url: `pmtiles://${import.meta.env.DEV ? "" : import.meta.env.VITE_API_URL}/arboles.pmtiles`,
     })
 
+    const species = window.Arbolado.species ?? []
+    const icons: [number, string][] = species.filter(species => species.icono).map(species => [species.id, species.icono!])
+    const colors: [number, string][] = species.filter(species => species.color).map(species => [species.id, species.color!])
+
     // Load marker images
-    const uniqueIcons = [...new Set(SPECIES_ICONS.map(icon => icon[1])), DEFAULTS.icon]
-    await Promise.all(uniqueIcons.map(async (iconName) => {
+    const uniqueIcons = [...new Set(icons.map(icon => icon[1])), DEFAULTS.icon]
+    uniqueIcons.map(async (iconName) => {
       if (!iconName || this.map.hasImage(iconName)) return
       try {
         const image = await this.map.loadImage(`${ICON_PATH}${iconName}`)
@@ -41,7 +48,14 @@ export class TreeLayer {
       } catch (error) {
         console.warn(`Failed to load icon: ${iconName}`, error)
       }
-    }))
+    })
+
+    const circleColor = colors.length ? [
+      'match',
+      ['get', 'species'],
+      ...colors.flat(),
+      DEFAULTS.color,
+    ] as unknown as ExpressionSpecification : DEFAULTS.color
 
     this.map.addLayer({
       id: this.DOTS_LAYER,
@@ -50,12 +64,7 @@ export class TreeLayer {
       'source-layer': 'trees',
       maxzoom: this.TRANSITION_ZOOM_LEVEL,
       paint: {
-        'circle-color': [
-          'match',
-          ['get', 'species'],
-          ...SPECIES_COLORS.flat(),
-          DEFAULTS.color,
-        ] as unknown as ExpressionSpecification,
+        'circle-color': circleColor,
         'circle-radius': [
           'interpolate', ['linear'], ['zoom'],
           10, 1,
@@ -71,6 +80,13 @@ export class TreeLayer {
       },
     })
 
+    const iconImage = icons.length ? [
+      'match',
+      ['get', 'species'],
+      ...icons.flat(),
+      DEFAULTS.icon,
+    ] as unknown as ExpressionSpecification : DEFAULTS.icon
+
     this.map.addLayer({
       id: this.ICONS_LAYER,
       type: 'symbol',
@@ -78,12 +94,7 @@ export class TreeLayer {
       'source-layer': 'trees',
       minzoom: this.TRANSITION_ZOOM_LEVEL,
       layout: {
-        'icon-image': [
-          'match',
-          ['get', 'species'],
-          ...SPECIES_ICONS.flat(),
-          DEFAULTS.icon,
-        ] as unknown as ExpressionSpecification,
+        'icon-image': iconImage,
         'icon-size': [
           'interpolate', ['linear'], ['zoom'],
           10, 0.2,
@@ -109,13 +120,11 @@ export class TreeLayer {
     this.map.on('mouseleave', [this.ICONS_LAYER, this.DOTS_LAYER], () => {
       this.map.getCanvas().style.cursor = ''
     })
-
-    window.Arbolado.emitEvent(parent, 'arbolado:map/loaded')
     window.Arbolado.setLoading(false)
   }
 
   public filterSpecies(filters: SpeciesFilters) {
-    const species = window.Arbolado.species.filter(species => {
+    const species = window.Arbolado.species?.filter(species => {
       if (!species.url) return false
       if (filters.url) {
         if (species.url !== filters.url) return false
