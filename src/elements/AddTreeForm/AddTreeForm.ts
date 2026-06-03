@@ -217,8 +217,7 @@ export default class AddTreeForm extends HTMLElement {
       const data = new FormData()
       data.set('captcha', token)
       data.set('code', this.codeInput.value)
-      const requestUrl = `${import.meta.env.VITE_API_URL}/usuarios`
-      const response = await window.Arbolado.fetch(requestUrl, 'POST', data)
+      const response = await window.Arbolado.fetchAPI('/usuarios', 'POST', data)
       if (!response.ok) {
         if (response.status === 500) {
           window.Arbolado.alert('danger', 'Ocurrió un error al validar tu código. Intenta nuevamente más tarde.')
