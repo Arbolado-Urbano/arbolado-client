@@ -19,9 +19,9 @@ Este repositorio contiene un cliente que se comunica con [Arbolado API](https://
 2. Levantar la API. Siguiendo las instrucciones del repositorio [Arbolado API](https://github.com/Arbolado-Urbano/arbolado-api).
 
 3. Generar `arboles.pmtiles`:
-    1. Visitar el endpoint `/arboles` de la API.
+    1. Ejecutar el comando `php artisan pmtiles` en el proyecto de la API.
     2. Esperar a que finalice la generación del archivo (puede demorar algunos minutos).
-    3. Copiar `arboles.pmtiles` a la carpeta `public/` de este proyecto.
+    3. Copiar el archivo `/public/arboles.pmtiles` generado en el proyecto de la API a la carpeta `/public/` de este proyecto.
 
 ## Ejecución para desarrollo
 
