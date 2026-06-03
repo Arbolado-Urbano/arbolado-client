@@ -1,4 +1,5 @@
 export type Species = {
+  id?: number
   url?: string
   nombre_cientifico: string
   nombre_comun?: string

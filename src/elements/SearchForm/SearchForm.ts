@@ -81,11 +81,9 @@ export default class SearchForm extends HTMLElement {
     // Set the URL query params to update the URL
     this.setQueryParam('user_sabores', this.flavors.checked)
 
-    const searchQueryParams = new URLSearchParams(window.Arbolado.queryParams)
 
     if (this.species.value?.url) {
       if (updateURL) window.Arbolado.pushURL(`/especie/${this.species.value.url}`)
-      searchQueryParams.set('especie_id', this.species.value.url.toString())
     } else {
       if (updateURL) window.Arbolado.pushURL('')
     }
