@@ -8,8 +8,3 @@ export type Species = {
   comestible?: string
   medicinal?: string
 }
-
-export type SpeciesFilters = {
-  url?: string
-  user_sabores?: boolean
-}
