@@ -91,11 +91,9 @@ export default class SearchForm extends HTMLElement {
     this.filtersSidebar.hide()
 
     // Make the search
-    window.Arbolado.emitEvent(this, 'arbolado:search', {
-      filters: {
-        url: this.species.value?.url,
-        user_sabores: this.flavors.checked,
-      },
+    window.Arbolado.filter({
+      speciesUrl: this.species.value?.url,
+      flavors: this.flavors.checked,
     })
     window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
   }

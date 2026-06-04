@@ -1,5 +1,5 @@
 import { NominatimSearchResult } from './types/NominatimResponse'
-import { TreeList } from './types/Tree'
+import { Filters } from './types/Filters'
 import { Species } from './types/Species'
 
 import Alert, { AlertType } from './elements/Alert/Alert'
@@ -138,16 +138,20 @@ export default class Arbolado {
     }
   }
 
-  // TODO: Figure out how to keep this working with pmtiles
+  filter(filters: Filters) {
+    window.Arbolado.emitEvent(document, 'arbolado:search', { filters })
+  }
+
   async loadSourceFromURL() {
     const path = window.location.pathname.split('/')
     if (path[1] !== 'fuente') return
-    const fuenteUrl = path[2]
-    if (!fuenteUrl) return
+    const fuenteSlug = path[2]
+    if (!fuenteSlug) return
     try {
-      const response = await this.fetchAPI(`/fuentes/${fuenteUrl}`, 'GET')
-      const trees: TreeList | undefined = await response.json()
-      if (!trees?.length) return
+      const response = await this.fetchAPI(`/fuentes/${fuenteSlug}`, 'GET')
+      const source: { id: number } | undefined = await response.json()
+      if (!source) return
+      this.filter({ sourceId: source.id })
       window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
     } catch (error) {
       console.error(error)

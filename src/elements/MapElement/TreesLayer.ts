@@ -2,7 +2,7 @@ import { Map, addProtocol, ExpressionSpecification } from 'maplibre-gl'
 
 import { Protocol } from 'pmtiles'
 
-import { SpeciesFilters } from '../../types/Species'
+import { Filters } from '../../types/Filters'
 
 import { DEFAULTS, ICON_PATH } from '../../constants/speciesStyles'
 
@@ -31,24 +31,24 @@ export class TreesLayer {
 
     this.map.addSource(this.TREES_SOURCE, {
       type: 'vector',
-      url: `pmtiles://${import.meta.env.DEV ? "" : import.meta.env.VITE_API_URL}/arboles.pmtiles`,
+      url: `pmtiles://${import.meta.env.DEV ? '' : import.meta.env.VITE_API_URL}/arboles.pmtiles`,
     })
 
     const species = window.Arbolado.species ?? []
-    const icons: [number, string][] = species.filter(species => species.icono).map(species => [species.id, species.icono!])
+    // const icons: [number, string][] = species.filter(species => species.icono).map(species => [species.id, species.icono!])
     const colors: [number, string][] = species.filter(species => species.color).map(species => [species.id, species.color!])
 
     // Load marker images
-    const uniqueIcons = [...new Set(icons.map(icon => icon[1])), DEFAULTS.icon]
-    uniqueIcons.map(async (iconName) => {
-      if (!iconName || this.map.hasImage(iconName)) return
-      try {
-        const image = await this.map.loadImage(`${ICON_PATH}${iconName}`)
-        this.map.addImage(iconName, image.data)
-      } catch (error) {
-        console.warn(`Failed to load icon: ${iconName}`, error)
-      }
-    })
+    // const uniqueIcons = [...new Set(icons.map(icon => icon[1])), DEFAULTS.icon]
+    // uniqueIcons.map(async (iconName) => {
+    //   if (!iconName || this.map.hasImage(iconName)) return
+    //   try {
+    //     const image = await this.map.loadImage(`${ICON_PATH}${iconName}`)
+    //     this.map.addImage(iconName, image.data)
+    //   } catch (error) {
+    //     console.warn(`Failed to load icon: ${iconName}`, error)
+    //   }
+    // })
 
     const circleColor = colors.length ? [
       'match',
@@ -62,7 +62,7 @@ export class TreesLayer {
       type: 'circle',
       source: this.TREES_SOURCE,
       'source-layer': 'trees',
-      maxzoom: this.TRANSITION_ZOOM_LEVEL,
+      // maxzoom: this.TRANSITION_ZOOM_LEVEL,
       paint: {
         'circle-color': circleColor,
         'circle-radius': [
@@ -80,31 +80,31 @@ export class TreesLayer {
       },
     })
 
-    const iconImage = icons.length ? [
-      'match',
-      ['get', 'species'],
-      ...icons.flat(),
-      DEFAULTS.icon,
-    ] as unknown as ExpressionSpecification : DEFAULTS.icon
+    // const iconImage = icons.length ? [
+    //   'match',
+    //   ['get', 'species'],
+    //   ...icons.flat(),
+    //   DEFAULTS.icon,
+    // ] as unknown as ExpressionSpecification : DEFAULTS.icon
 
     this.map.addLayer({
       id: this.ICONS_LAYER,
       type: 'symbol',
       source: this.TREES_SOURCE,
       'source-layer': 'trees',
-      minzoom: this.TRANSITION_ZOOM_LEVEL,
-      layout: {
-        'icon-image': iconImage,
-        'icon-size': [
-          'interpolate', ['linear'], ['zoom'],
-          10, 0.2,
-          15, 0.3,
-          21, 1.5,
-        ],
-        'icon-anchor': 'bottom',
-        'icon-allow-overlap': true,
-        'icon-ignore-placement': true,
-      },
+      // minzoom: this.TRANSITION_ZOOM_LEVEL,
+      // layout: {
+      //   'icon-image': iconImage,
+      //   'icon-size': [
+      //     'interpolate', ['linear'], ['zoom'],
+      //     10, 0.2,
+      //     15, 0.3,
+      //     21, 1.5,
+      //   ],
+      //   'icon-anchor': 'bottom',
+      //   'icon-allow-overlap': true,
+      //   'icon-ignore-placement': true,
+      // },
     })
 
     this.map.on('click', [this.ICONS_LAYER, this.DOTS_LAYER], (event) => {
@@ -123,18 +123,21 @@ export class TreesLayer {
     window.Arbolado.setLoading(false)
   }
 
-  public filterSpecies(filters: SpeciesFilters) {
+  public filterSpecies(filters: Filters) {
     const species = window.Arbolado.species?.filter(species => {
       if (!species.url) return false
-      if (filters.url) {
-        if (species.url !== filters.url) return false
+      if (filters.speciesUrl) {
+        if (species.url !== filters.speciesUrl) return false
       }
-      if (filters.user_sabores) {
+      if (filters.flavors) {
         if (species.comestible !== 'Sí' && species.medicinal !== 'Sí') return false
       }
       return true
     }).map(species => species.id)
-    const filter: ExpressionSpecification = ['in', ['get', 'species'], ['literal', species]]
+    let filter: ExpressionSpecification = ['in', ['get', 'species'], ['literal', species]]
+    if (filters.sourceId) {
+      filter = ['all', ['in', ['literal', `,${filters.sourceId},`], ['get', 'sources']], filter]
+    }
     this.map.setFilter(this.ICONS_LAYER, filter)
     this.map.setFilter(this.DOTS_LAYER, filter)
   }

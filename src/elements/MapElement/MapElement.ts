@@ -1,6 +1,6 @@
 import { LngLatLike, Map, NavigationControl } from 'maplibre-gl'
 
-import { SpeciesFilters } from '../../types/Species'
+import { Filters } from '../../types/Filters'
 
 import { mapStyles } from '../../constants/mapStyles'
 
@@ -57,7 +57,7 @@ export default class MapElement extends HTMLElement {
     this.map.flyTo({ center, zoom })
   }
 
-  public filterSpecies(filters: SpeciesFilters) {
+  public filterSpecies(filters: Filters) {
     this.treesLayer?.filterSpecies(filters)
   }
 }

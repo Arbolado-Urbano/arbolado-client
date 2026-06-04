@@ -1,4 +1,4 @@
-import { Tooltip, Modal } from 'bootstrap'
+import { Modal } from 'bootstrap'
 
 import { ArboladoEventMap } from './types/Events'
 
@@ -39,8 +39,7 @@ customElements.define('arbolado-captcha', Captcha)
 customElements.define('arbolado-alert', Alert)
 customElements.define('arbolado-tab-group', TabGroup)
 
-window.Arbolado.ready(async () => {
-  const searchForm = document.querySelector('[js-arbolado-form]') as SearchForm
+window.Arbolado.ready(() => {
   const mapElement = document.querySelector('[js-arbolado-map]') as MapElement
   const treeDrawer = document.querySelector('[js-tree-drawer]') as TreeDrawer
   const addressLookup = document.querySelector('[js-address-lookup]') as AddressLookup
@@ -49,7 +48,7 @@ window.Arbolado.ready(async () => {
     mapElement.addEventListener('arbolado:map/move', ({ detail }) => addressLookup.setBounds(detail.bounds))
     treeDrawer.addEventListener('arbolado:tree/displayed', ({ detail: { tree } }) => mapElement.center({ lat: tree.lat, lng: tree.lng }, 20))
     addressLookup.addEventListener('arbolado:address/selected', ({ detail }) => mapElement.center({ lng: detail.lng, lat: detail.lat }))
-    searchForm.addEventListener('arbolado:search', ({ detail }) => mapElement.filterSpecies(detail.filters))
+    document.addEventListener('arbolado:search', ({ detail }) => mapElement.filterSpecies(detail.filters))
     // Wait for the map to be fully loaded before initializing these components
     customElements.define('arbolado-tree-drawer', TreeDrawer)
     customElements.define('arbolado-address-lookup', AddressLookup)
@@ -57,11 +56,8 @@ window.Arbolado.ready(async () => {
     customElements.define('arbolado-form', SearchForm)
   })
 
-  // Init Bootstrap's tooltips
-  document.querySelectorAll('[data-bs-toggle=tooltip]').forEach((element) => new Tooltip(element))
-
   // Check to see if a source is selected on the URL
-  await window.Arbolado.loadSourceFromURL()
+  window.Arbolado.loadSourceFromURL()
 
   // Check if the privacy policy modal should be displayed
   if ((new URLSearchParams(window.location.search)).has("privacidad")) {
