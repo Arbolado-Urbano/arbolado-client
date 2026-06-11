@@ -1,4 +1,4 @@
-import { Map, addProtocol, ExpressionSpecification } from 'maplibre-gl'
+import { Map, addProtocol, ExpressionSpecification, LngLatBounds } from 'maplibre-gl'
 
 import { Protocol } from 'pmtiles'
 
@@ -67,14 +67,14 @@ export class TreesLayer {
         'circle-color': circleColor,
         'circle-radius': [
           'interpolate', ['linear'], ['zoom'],
-          10, 1,
+          12, .8,
           14, 5,
-          18, 8
+          21, 8
         ],
         'circle-stroke-width': [
           'interpolate', ['linear'], ['zoom'],
-          10, 0,
-          14, 1
+          12, 0,
+          18, 1
         ],
         'circle-stroke-color': '#fff',
       },
@@ -138,7 +138,51 @@ export class TreesLayer {
     if (filters.sourceId) {
       filter = ['all', ['in', ['literal', `,${filters.sourceId},`], ['get', 'sources']], filter]
     }
+    this.map.once('idle', () => this.zoomToFilteredResults())
     this.map.setFilter(this.ICONS_LAYER, filter)
     this.map.setFilter(this.DOTS_LAYER, filter)
+  }
+
+  private zoomToFilteredResults() {
+    const filter = this.map.getFilter(this.DOTS_LAYER)
+    if (!filter) return
+    const features = this.map.querySourceFeatures(this.TREES_SOURCE, { sourceLayer: 'trees', filter, })
+
+    if (!features.length) return
+
+    let radius
+    if (features.length < 5000) {
+      radius = [
+        'interpolate', ['linear'], ['zoom'],
+        10, 2,
+        14, 6,
+        21, 8
+      ]
+    } else if (features.length < 20000) {
+      radius = [
+        'interpolate', ['linear'], ['zoom'],
+        10, 2,
+        14, 6,
+        21, 8
+      ]
+    } else {
+      radius = [
+        'interpolate', ['linear'], ['zoom'],
+        12, .8,
+        14, 5,
+        21, 8
+      ]
+    }
+
+    this.map.setPaintProperty(this.DOTS_LAYER, 'circle-radius', radius)
+    const bounds = new LngLatBounds()
+    features.forEach(f => {
+      if (f.geometry.type === 'Point') {
+        const coords = f.geometry.coordinates
+        bounds.extend(coords as [number, number])
+      }
+    })
+
+    this.map.fitBounds(bounds, { padding: 60, maxZoom: 14, duration: 800 })
   }
 }
