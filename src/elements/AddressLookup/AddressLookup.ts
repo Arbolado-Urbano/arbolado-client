@@ -1,8 +1,6 @@
-import { LatLngBounds } from 'leaflet'
+import { NominatimSearchResult } from '../../types/NominatimResponse'
 
 import AddressLookupTemplate from './AddressLookup.html?raw'
-
-import NominatimResponse from '../../types/NominatimResponse'
 
 export default class AddressLookup extends HTMLElement {
   private loadingElement: HTMLElement
@@ -10,8 +8,8 @@ export default class AddressLookup extends HTMLElement {
   private inputElement: HTMLInputElement
   private resultsElement: HTMLElement
   private itemTemplate: HTMLTemplateElement
-  private bounds?: LatLngBounds
-  
+  private bounds?: maplibregl.LngLatBounds
+
   constructor() {
     super()
 
@@ -26,7 +24,7 @@ export default class AddressLookup extends HTMLElement {
     this.searchBtn.addEventListener('click', () => this.handleSearch())
   }
 
-  public setBounds(bounds: LatLngBounds) {
+  public setBounds(bounds: maplibregl.LngLatBounds) {
     this.bounds = bounds
   }
 
@@ -52,7 +50,7 @@ export default class AddressLookup extends HTMLElement {
     // Search withing the map bounds
     const results = await window.Arbolado.addressLookup(this.inputElement.value, this.bounds)
     // Load the search results
-    if (results.length) {
+    if (results?.length) {
       this.resultsElement.classList.remove('d-none')
       this.loadResults(results)
     } else {
@@ -61,21 +59,20 @@ export default class AddressLookup extends HTMLElement {
     this.toggleLoading(false)
   }
 
-  private loadResults(results: NominatimResponse[]) {
+  private loadResults(results: NominatimSearchResult[]) {
     this.resultsElement.innerHTML = ''
     for (const result of results) {
       const templateClone = this.itemTemplate.content.cloneNode(true) as HTMLElement
       const btn = templateClone.querySelector('[js-address-lookup-item-btn]') as HTMLButtonElement
-      btn.innerText = result.displayName
+      btn.innerText = result.display_name
       btn.addEventListener('click', () => this.selectAddress(result))
       this.resultsElement.appendChild(templateClone)
     }
   }
 
-  private selectAddress(address: NominatimResponse) {
-    window.Arbolado.emitEvent(this, 'arbolado:address/selected', { latLng: address.latlng })
-    // this.mapElement.setMarker(address.latlng)
-    this.inputElement.value = address.displayName
+  private selectAddress(address: NominatimSearchResult) {
+    window.Arbolado.emitEvent(this, 'arbolado:address/selected', { lat: Number(address.lat), lng: Number(address.lon) })
+    this.inputElement.value = address.display_name
     this.resultsElement.classList.add('d-none')
   }
 }

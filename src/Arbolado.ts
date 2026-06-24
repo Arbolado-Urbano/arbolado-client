@@ -1,14 +1,22 @@
-import { LatLng, LatLngBounds } from 'leaflet'
-import NominatimResponse from './types/NominatimResponse'
+import { NominatimSearchResult } from './types/NominatimResponse'
+import { Filters } from './types/Filters'
+import { Species } from './types/Species'
+
 import Alert, { AlertType } from './elements/Alert/Alert'
 
+type EventDetail<T> = T extends CustomEvent<infer D> ? D : T extends Event ? void : never
+
+type OptionalArg<D> = D extends void ? [] : [data: D]
+
 export default class Arbolado {
-  overlay: HTMLElement 
+  overlay: HTMLElement
   queryParams: URLSearchParams
   callOnEsc: Function[] = []
   bodyScrollHide: number = 0
-  
+  species?: Species[]
+
   constructor() {
+    this.loadSpecies()
     this.overlay = document.querySelector('[js-overlay]') as HTMLElement
     this.queryParams = new URLSearchParams(window.location.search)
     document.addEventListener('keydown', this.handleEsc.bind(this))
@@ -29,8 +37,8 @@ export default class Arbolado {
     return template.content.cloneNode(true)
   }
 
-  emitEvent(element: Node, name: string, data?: any) {
-    element.dispatchEvent(new CustomEvent(name, { detail: data }))
+  emitEvent<T extends keyof HTMLElementEventMap>(element: Node, name: T, ...data: OptionalArg<EventDetail<HTMLElementEventMap[T]>>) {
+    element.dispatchEvent(new CustomEvent(name, { detail: data[0] }))
   }
 
   setLoading(loading: boolean) {
@@ -52,25 +60,32 @@ export default class Arbolado {
   async fetch(url: string, method: string = 'GET', body?: BodyInit, headers?: HeadersInit, loadingIndicator: boolean = true) {
     if (loadingIndicator) this.setLoading(true)
     try {
-      const response = await fetch(url, { method, headers, body })
-      if ((response.status >= 400)) throw response
-      return response
+      return await fetch(url, { method, headers, body })
     } catch (error) {
-      console.error(error)
+      throw error
     } finally {
       if (loadingIndicator) this.setLoading(false)
     }
   }
 
-  async fetchJson(url: string, method: string = 'GET', body?: BodyInit, contentType?: string, loadingIndicator: boolean = true) {
-    const headers: HeadersInit = { 'Accept': 'application/json' }
-    if (contentType) headers['Content-type'] = contentType
+  async fetchAPI(path: string, method: string = 'GET', body?: BodyInit, headers: Headers = new Headers(), loadingIndicator: boolean = true) {
+    headers.append('Accept', 'application/json')
+    return await this.fetch(`${import.meta.env.VITE_API_URL}${path}`, method, body, headers, loadingIndicator)
+  }
+
+  async loadSpecies() {
+    this.setLoading(true)
     try {
-      const response = await this.fetch(url, method, body, headers, loadingIndicator)
-      return await response?.json()
+      const response = await this.fetchAPI('/especies', 'GET', undefined, undefined, false)
+      if (!response.ok) throw new Error(await response.text())
+      const species: Species[] | undefined = await response.json()
+      this.species = species?.filter(species => !!species.url && !!species.nombre_cientifico) ?? []
+      this.emitEvent(document, 'arbolado:species/loaded')
     } catch (error) {
+      this.alert('danger', 'Ocurrió un error al cargar el listado de especies')
       console.error(error)
     }
+    this.setLoading(false)
   }
 
   alert(type: AlertType, content: string, timeout?: number) {
@@ -123,20 +138,28 @@ export default class Arbolado {
     }
   }
 
+  filter(filters: Filters) {
+    window.Arbolado.emitEvent(document, 'arbolado:search', { filters })
+  }
+
   async loadSourceFromURL() {
     const path = window.location.pathname.split('/')
     if (path[1] !== 'fuente') return
-    const fuenteUrl = path[2]
-    if (!fuenteUrl) return
-    const trees = await window.Arbolado.fetchJson(`${import.meta.env.VITE_API_URL}/fuentes/${fuenteUrl}`, 'GET')
-    if (!trees?.length) return
-    window.Arbolado.emitEvent(document, 'arbolado:results/updated', { trees })
-    window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
-    return true
+    const fuenteSlug = path[2]
+    if (!fuenteSlug) return
+    try {
+      const response = await this.fetchAPI(`/fuentes/${fuenteSlug}`, 'GET')
+      const source: { id: number } | undefined = await response.json()
+      if (!source) return
+      this.filter({ sourceId: source.id })
+      window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   // Looks up an address or place and returns its coordinates.
-  async addressLookup(query: string, bounds?: LatLngBounds): Promise<NominatimResponse[]> {
+  async addressLookup(query: string, bounds?: maplibregl.LngLatBounds): Promise<NominatimSearchResult[] | undefined> {
     const { VITE_NOMINATIM_URL } = import.meta.env
     const data = new URLSearchParams({
       'accept-language': 'es',
@@ -145,16 +168,14 @@ export default class Arbolado {
       format: 'json',
       q: query,
     })
-    if (bounds) data.set('viewbox', bounds.toBBoxString())
+    if (bounds) data.set('viewbox', `${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`)
     const url = `${VITE_NOMINATIM_URL}?${data.toString()}`
-    const response = await window.Arbolado.fetchJson(url, 'GET', undefined, undefined, false)
-    return response.map((item: any) => {
-      return {
-        latlng: new LatLng(item.lat, item.lon),
-        displayName: item.display_name,
-        type: item.type,
-        address: item.address,
-      }
-    })
+    try {
+      const response = await this.fetch(url, 'GET', undefined, { 'Accept': 'application/json' }, false)
+      return await response.json()
+    } catch (error) {
+      console.error(error)
+      this.alert('danger', 'Ocurrió un error. Intenta nuevamente más tarde.')
+    }
   }
 }

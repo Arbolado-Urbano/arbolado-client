@@ -2,7 +2,7 @@ import AlertTemplate from './Alert.html?raw'
 
 export default class Alert extends HTMLElement {
   contentElement: HTMLElement
-  
+
   constructor(type: AlertType, content: string = '') {
     super()
     this.innerHTML = AlertTemplate
@@ -29,7 +29,7 @@ export default class Alert extends HTMLElement {
     this.classList.add('show')
     if (time) setTimeout(this.hide.bind(this), time)
   }
-  
+
   hide() {
     // Wait for the animation to finish before dispatching the "closed" event
     this.addEventListener('transitionend', () => window.Arbolado.emitEvent(this, 'arbolado:alert/closed'), { once: true })

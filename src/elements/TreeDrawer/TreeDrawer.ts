@@ -1,7 +1,7 @@
 import TreeDrawerTemplate from './TreeDrawer.html?raw'
 import SourceAccordionTemplate from './SourceAccordion.html?raw'
 
-import Tree from '../../types/Tree'
+import { Tree } from '../../types/Tree'
 
 type TreeData = {
   id: { element: HTMLElement, label?: string },
@@ -13,17 +13,19 @@ type TreeData = {
   procedencia_exotica: { element: HTMLElement, label?: string },
   regiones: { element: HTMLElement, label?: string },
   altura: { element: HTMLElement, label?: string },
-  espacio_verde: { element: HTMLElement, label?: string  },
-  calle: { element: HTMLElement, label?: string  },
+  inclinacion: { element: HTMLElement, label?: string },
+  diametro_a_p: { element: HTMLElement, label?: string },
+  espacio_verde: { element: HTMLElement, label?: string },
+  calle: { element: HTMLElement, label?: string },
   nombre: { element: HTMLElement, label?: string },
-  fecha_creacion: { element: HTMLElement, label?: string  },
-  descripcion: { element: HTMLElement, label?: string  },
-  url: { element: HTMLAnchorElement, label?: string  },
-  facebook: { element: HTMLAnchorElement, label?: string  },
-  instagram: { element: HTMLAnchorElement, label?: string  },
-  twitter: { element: HTMLAnchorElement, label?: string  },
-  streetview: { element: HTMLIFrameElement, label?: string  },
-  link: { element: HTMLAnchorElement, label?: string  },
+  fecha_creacion: { element: HTMLElement, label?: string },
+  descripcion: { element: HTMLElement, label?: string },
+  url: { element: HTMLAnchorElement, label?: string },
+  facebook: { element: HTMLAnchorElement, label?: string },
+  instagram: { element: HTMLAnchorElement, label?: string },
+  twitter: { element: HTMLAnchorElement, label?: string },
+  streetview: { element: HTMLIFrameElement, label?: string },
+  link: { element: HTMLAnchorElement, label?: string },
 }
 type treeDataKey = keyof TreeData
 
@@ -33,7 +35,7 @@ export default class TreeModal extends HTMLElement {
   private closeBtn: HTMLButtonElement
   private treeData: TreeData
   private previousUrl?: string
-  
+
   constructor() {
     super()
     this.innerHTML = TreeDrawerTemplate
@@ -57,9 +59,11 @@ export default class TreeModal extends HTMLElement {
       procedencia_exotica: { element: this.querySelector('[js-tree-data="procedencia_exotica"]') as HTMLElement, label: 'Procedencia:' },
       regiones: { element: this.querySelector('[js-tree-data="regiones"]') as HTMLElement, label: 'Región de origen:' },
       altura: { element: this.querySelector('[js-tree-data="altura"]') as HTMLElement, label: 'Altura:' },
+      inclinacion: { element: this.querySelector('[js-tree-data="inclinacion"]') as HTMLElement, label: 'Inclinación:' },
+      diametro_a_p: { element: this.querySelector('[js-tree-data="diametro_a_p"]') as HTMLElement, label: 'Diámetro:' },
       espacio_verde: { element: this.querySelector('[js-tree-data="espacio_verde"]') as HTMLElement },
       calle: { element: this.querySelector('[js-tree-data="calle"]') as HTMLElement },
-      nombre: { element: this.querySelector('[js-tree-data="nombre"]') as HTMLElement, label: 'Datos aprotados por' },
+      nombre: { element: this.querySelector('[js-tree-data="nombre"]') as HTMLElement, label: 'Datos aportados por' },
       fecha_creacion: { element: this.querySelector('[js-tree-data="fecha_creacion"]') as HTMLElement },
       descripcion: { element: this.querySelector('[js-tree-data="descripcion"]') as HTMLElement },
       url: { element: this.querySelector('[js-tree-data="url"]') as HTMLAnchorElement },
@@ -110,7 +114,7 @@ export default class TreeModal extends HTMLElement {
       this.close(false)
     }
   }
-  
+
   private setTreeSources(tree: Tree) {
     const sourcesElement = this.querySelector('[js-sources]') as HTMLDivElement
     sourcesElement.innerHTML = ''
@@ -161,44 +165,60 @@ export default class TreeModal extends HTMLElement {
   }
 
   async displayTree(treeId: string, updateURL: boolean = true) {
-    const tree: Tree | undefined = await window.Arbolado.fetchJson(`${import.meta.env.VITE_API_URL}/arboles/${treeId}`)
-    if (!tree) return
-    // If there's no streetview URL for the tree, use its coordinates
-    if (!tree.streetview) {
-      tree.streetview = `${this.streetViewUrl}&location=${tree.lat},${tree.lng}`
+    try {
+      const response = await window.Arbolado.fetchAPI(`/arboles/${treeId}`)
+      if (!response.ok) {
+        window.Arbolado.alert("danger", "Ocurrió un error al cargar el árbol")
+        return
+      }
+      const tree: Tree | undefined = await response.json()
+      if (!tree) {
+        throw new Error('No JSON response from API')
+      }
+      // If there's no streetview URL for the tree, use its coordinates
+      if (!tree.streetview) {
+        tree.streetview = `${this.streetViewUrl}&location=${tree.lat},${tree.lng}`
+      }
+
+      if (tree.records[0].altura) tree.records[0].altura += ' m'
+      if (tree.records[0].inclinacion) tree.records[0].inclinacion += 'º'
+      if (tree.records[0].diametro_a_p) tree.records[0].diametro_a_p += ' m'
+
+      const treeLink = `/arbol/${tree.id}`
+
+      this.setTreeValue('nombre_cientifico', tree.species.nombre_cientifico)
+      this.setTreeValue('nombre_comun', tree.species.nombre_comun)
+      this.setTreeValue('tipo', tree.species.type.tipo)
+      this.setTreeValue('familia', tree.species.family.familia)
+      this.setTreeValue('origen', tree.species.origen)
+      this.setTreeValue('procedencia_exotica', tree.species.procedencia_exotica)
+      this.setTreeValue('altura', tree.records[0].altura)
+      this.setTreeValue('inclinacion', tree.records[0].inclinacion)
+      this.setTreeValue('diametro_a_p', tree.records[0].diametro_a_p)
+      this.setTreeValue('espacio_verde', tree.espacio_verde ? `Espacio verde: ${tree.espacio_verde}` : undefined)
+      this.setTreeValue('calle', `${tree.calle || ''} ${tree.calle_altura ? tree.calle_altura : 's/n'}`)
+      this.setTreeValue('id', tree.id.toString())
+      this.setTreeValue('link', treeLink, 'href')
+      this.setTreeValue('streetview', tree.streetview, 'src')
+      this.setTreeSources(tree)
+
+      // Open the drawer
+      this.classList.add('show')
+      window.Arbolado.callOnEscPush(this.close)
+      window.Arbolado.toggleOverlay(true)
+      this.open = true
+
+      if (updateURL) {
+        this.previousUrl = window.location.toString()
+        const url = `${window.location.protocol}//${window.location.host}${treeLink}`
+        history.pushState(null, '', url)
+      }
+
+      window.Arbolado.emitEvent(this, 'arbolado:tree/displayed', { tree })
+    } catch (error) {
+      console.error(error)
+      window.Arbolado.alert('danger', 'Ocurrió un error. Intenta nuevamente más tarde.')
     }
-
-    if (tree.records[0].altura) tree.records[0].altura += ' m'
-
-    const treeLink = `/arbol/${tree.id}`
-    
-    this.setTreeValue('nombre_cientifico', tree.species.nombre_cientifico)
-    this.setTreeValue('nombre_comun', tree.species.nombre_comun)
-    this.setTreeValue('tipo', tree.species.type.tipo)
-    this.setTreeValue('familia', tree.species.family.familia)
-    this.setTreeValue('origen', tree.species.origen)
-    this.setTreeValue('procedencia_exotica', tree.species.procedencia_exotica)
-    this.setTreeValue('altura', tree.records[0].altura)
-    this.setTreeValue('espacio_verde', tree.espacio_verde ? `Espacio verde: ${tree.espacio_verde}` : undefined)
-    this.setTreeValue('calle', `${tree.calle || ''} ${tree.calle_altura ? tree.calle_altura : 's/n'}`)
-    this.setTreeValue('id', tree.id.toString())
-    this.setTreeValue('link', treeLink, 'href')
-    this.setTreeValue('streetview', tree.streetview, 'src')
-    this.setTreeSources(tree)
-
-    // Open the drawer
-    this.classList.add('show')
-    window.Arbolado.callOnEscPush(this.close)
-    window.Arbolado.toggleOverlay(true)
-    this.open = true
-
-    if (updateURL) {
-      this.previousUrl = window.location.toString()
-      const url = `${window.location.protocol}//${window.location.host}${treeLink}`
-      history.pushState(null, '', url)
-    }
-
-    window.Arbolado.emitEvent(this, 'arbolado:tree/displayed', { tree })
   }
 
   private hasFocus(within: boolean = false) {

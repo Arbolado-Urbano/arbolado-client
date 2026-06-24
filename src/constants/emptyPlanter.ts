@@ -1,0 +1,1 @@
+export const EMPTY_PLANTER_URL = 'plantera-vacia'

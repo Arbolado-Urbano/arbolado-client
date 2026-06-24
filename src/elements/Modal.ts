@@ -17,10 +17,10 @@ export default class Modal extends HTMLElement {
     document.querySelectorAll(`[js-modal-open="${this.label}"]`).forEach((openBtn) => {
       (openBtn as HTMLElement).addEventListener('click', this.show)
     })
-    
+
     const contentElement = this.querySelector('[js-modal-content]') as HTMLElement
     contentElement.addEventListener('click', this.insideClickHandler)
-    
+
     this.querySelectorAll('[js-modal-close]').forEach((closeBtn) => {
       (closeBtn as HTMLElement).addEventListener('click', this.hide)
     })

@@ -1,125 +1,108 @@
-import GeoInputTemplate from './GeoInput.html?raw'
+import { Map, Marker } from 'maplibre-gl'
+
+import { mapStyles } from '../../constants/mapStyles'
+
 import GeoBtn from '../GeoBtn/GeoBtn'
-
-import * as L from 'leaflet'
 import AddressLookup from '../AddressLookup/AddressLookup'
+import { MapLayerSwitcher } from '../MapLayerSwitcher/MapLayerSwitcher'
 
-const { VITE_MAPBOX_TOKEN: accessToken } = import.meta.env
+import GeoInputTemplate from './GeoInput.html?raw'
 
 export default class GeoInput extends HTMLElement {
-  _internals: ElementInternals
   _value: string | null = null
   private addressLookup: AddressLookup
   private geoBtn: GeoBtn
-  private map?: L.Map // Map reference
-  private marker?: L.Marker // Marker
-  private mapOptions: L.MapOptions = { // Map options
-    dragging: !L.Browser.mobile, // Disable one finger dragging on mobile devices
-    center: L.latLng(-34.4720387,-58.5388896), // San Isidro
-    layers: [
-      L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-        {
-          accessToken,
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-          subdomains: 'abcd',
-          maxZoom: 21
-        },
-      ),
-    ],
-    maxZoom: 21,
-    minZoom: 5,
-    zoom: 14,
-  }
+  private map: Map
+  private marker?: Marker
 
   constructor() {
     super()
+    this.attachInternals()
     this.innerHTML = GeoInputTemplate
 
-    this._internals = this.attachInternals()
     this.geoBtn = this.querySelector('[js-geo-btn]') as GeoBtn
     this.addressLookup = this.querySelector('[js-address-lookup]') as AddressLookup
 
-    this.geoBtn.addEventListener('arbolado:geo/searching', () => this.setLoading(true))
-    this.geoBtn.addEventListener('arbolado:geo/error', () => this.setLoading(false))
-    this.geoBtn.addEventListener('arbolado:geo/success', (event) => {
-      this.setLoading(false)
-      const data = (event as CustomEvent).detail
-      const latLng = new L.LatLng(data.lat, data.lng)
-      this.setValue(latLng)
+    this.map = new Map({
+      container: 'geo-input-map',
+      style: mapStyles,
+      center: [-58.44, -34.618], // BsAs
+      zoom: 14,
+      maxZoom: 21,
+      minZoom: 5,
     })
 
-    this.map = L.map('geo-input-map', this.mapOptions)
-    this.map.on('click', (event: any) => {
-      this.setValue(event.latlng)
+    this.geoBtn.addEventListener('arbolado:geo/searching', () => this.setLoading(true))
+    this.geoBtn.addEventListener('arbolado:geo/error', () => this.setLoading(false))
+    this.geoBtn.addEventListener('arbolado:geo/success', ({ detail }) => {
+      this.setLoading(false)
+      this.setValue(detail)
+    })
+
+    this.map.on('click', ({ lngLat }) => {
+      this.setValue(lngLat)
     })
     this.map.on('move', () => this.map && this.addressLookup.setBounds(this.map.getBounds()))
-    this.addressLookup.addEventListener('arbolado:address/selected', (event) => this.setValue((event as CustomEvent).detail.latLng))
+
+    // Layer switcher
+    this.map.addControl(new MapLayerSwitcher('streets'), 'bottom-right')
+
+    this.addressLookup.addEventListener('arbolado:address/selected', ({ detail }) => this.setValue(detail))
+  }
+
+  formResetCallback() {
+    this.setValue()
+  }
+
+  setCenter(latitude: number, longitude: number) {
+    this.map.panTo({ lat: latitude, lng: longitude })
   }
 
   static get formAssociated() { return true }
-  get form() { return this._internals.form }
-  get name() { return this.getAttribute('name') }
-  get type() { return this.localName }
-  get validity() { return this._internals.validity }
-  get validationMessage() { return this._internals.validationMessage }
-  get willValidate() { return this._internals.willValidate }
   get value() { return this._value }
   set value(value) {
     this._value = value
-    this._internals.setFormValue(this._value)
-    this.checkValidity()
     window.Arbolado.emitEvent(this, 'change')
   }
-  checkValidity() { return this._internals.checkValidity() }
-  reportValidity() { return this._internals.reportValidity() }
 
   setLoading(loading: boolean) {
     if (loading) this.classList.add('loading')
     else this.classList.remove('loading')
   }
 
-  resetHeight(): void {
-    this.map?.invalidateSize()
-  }
-  
   /**
    * Re-centers the map around the given coordinates
    * @param map - The map object
    * @param latLng - The latlng coordinates
    */
-  private latlngUpdated(latLng: L.LatLng): void {
+  private latlngUpdated(latLng: { lat: number, lng: number }): void {
     // Re-center the map around the given coordinates
     this.map?.panTo(latLng)
     // Set the new coordinates
   }
-  
+
   /**
   * Sets the given latLng as the current value and sets a marker on the map for those coordinates
   * @param latLng - Latitude and longitude coordinates
   */
-  public setValue(latLng: L.LatLng): void {
-    // Get the map object
-    if (!this.map) return
-    // If there's no marker on the map...
-    if (!this.marker) {
-      L.Icon.Default.imagePath = '/imgs/markers/'
-      // Create a new marker
-      this.marker = new L.Marker([latLng.lat, latLng.lng], {
-        draggable: true,
-        riseOnHover: true,
-      })
-      this.map.addLayer(this.marker)
+  public setValue(latLng?: { lat: number, lng: number }): void {
+    if (!latLng) {
+      if (this.marker) this.marker.remove()
+      this.value = null
     } else {
-      // If a marker already exists, move it
-      this.marker.setLatLng([latLng.lat, latLng.lng])
+      // If there's no marker on the map...
+      if (!this.marker) {
+        // Create a new marker
+        this.marker = new Marker({ draggable: true }).setLngLat([latLng.lng, latLng.lat])
+      } else {
+        // If a marker already exists, move it
+        this.marker.setLngLat([latLng.lng, latLng.lat])
+      }
+      this.marker.addTo(this.map)
+      // Update the selected coordinates
+      this.latlngUpdated(latLng)
+      // Set the value for the selected coordinates
+      this.value = `${latLng.lat},${latLng.lng}`
     }
-    if (!this.map.hasLayer(this.marker)) {
-      this.map.addLayer(this.marker)
-    }
-    // Update the selected coordinates
-    this.latlngUpdated(latLng)
-    // Set the value for the selected coordinates
-    this.value = `${latLng.lat},${latLng.lng}`
   }
 }

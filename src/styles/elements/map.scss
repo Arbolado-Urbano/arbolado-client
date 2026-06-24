@@ -18,9 +18,7 @@
   display: flex;
 }
 
-@include media-breakpoint-down(lg) {
-  .map-container {
-    height: 600px;
-  }
-}
 
+.maplibregl-popup {
+  padding-bottom: 1rem;
+}
