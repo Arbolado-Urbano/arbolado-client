@@ -71,13 +71,14 @@ export class TreesLayer {
         ],
         'circle-stroke-width': [
           'interpolate', ['linear'], ['zoom'],
-          6, 1,
-          7, 0.3,
+          4, 1,
+          5, 0.1,
+          10, 0.1,
           11, 0.3,
           12, 1, // zoom inicial
           13, 1
         ],
-        'circle-stroke-color': '#ffffffc0',
+        'circle-stroke-color': '#ffffff7a',
       },
     })
 
@@ -155,24 +156,26 @@ export class TreesLayer {
     if (features.length < 5000) {
       radius = [
         'interpolate', ['linear'], ['zoom'],
-        10, 2,
+        5, 4,
+        10, 3,
         14, 6,
         21, 8
       ]
     } else if (features.length < 20000) {
       radius = [
         'interpolate', ['linear'], ['zoom'],
-        10, 2,
+        5, 4,
+        10, 3,
         14, 6,
         21, 8
       ]
     } else {
       radius = [
         'interpolate', ['linear'], ['zoom'],
-        2, 6,
         5, 4,
         9, 3,
-        11, 1,
+        10, 3,
+        11, 2,
         12, 2,
         13, 3,
         14, 3,

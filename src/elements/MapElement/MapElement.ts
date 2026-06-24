@@ -51,6 +51,9 @@ export default class MapElement extends HTMLElement {
       this.treesLayer = new TreesLayer(this.map, this)
       window.Arbolado.emitEvent(this, 'arbolado:map/loaded')
     })
+
+    this.map.on("zoom", () => console.log(this.map.getZoom()))
+
   }
 
   public center(center: LngLatLike, zoom?: number) {
