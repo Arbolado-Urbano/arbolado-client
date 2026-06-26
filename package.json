@@ -4,9 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "engines": {
-    "node": "24.15.0"
+    "node": "24"
   },
-  "packageManager": "npm@11.15.0",
   "scripts": {
     "start": "vite preview",
     "dev": "vite --host 0.0.0.0",
@@ -24,14 +23,14 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
-    "@types/bootstrap": "5.2.10",
+    "@types/bootstrap": "5.2.11",
     "@types/cloudflare-turnstile": "0.2.2",
-    "@typescript-eslint/parser": "8.60.0",
-    "eslint": "10.4.0",
+    "@typescript-eslint/parser": "8.61.1",
+    "eslint": "10.5.0",
     "eslint-plugin-react-hooks": "7.1.1",
     "globals": "17.6.0",
-    "sass": "1.100.0",
+    "sass": "1.101.0",
     "typescript": "6.0.3",
-    "vite": "8.0.14"
+    "vite": "8.0.16"
   }
 }
