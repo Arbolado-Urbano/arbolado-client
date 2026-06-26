@@ -9,11 +9,21 @@ import { DEFAULTS, ICON_PATH } from '../../constants/speciesStyles'
 import MapElement from './MapElement'
 
 export class TreesLayer {
+  private map: Map
   private readonly TREES_SOURCE = 'trees-source'
   private readonly ICONS_LAYER = 'icons-layer'
   private readonly DOTS_LAYER = 'dots-layer'
   private readonly TRANSITION_ZOOM_LEVEL = 16
-  private map: Map
+  private readonly INITIAL_DOT_SIZES = [
+    2, 6,
+    5, 4,
+    9, 3,
+    11, 1,
+    12, 2,
+    13, 3,
+    14, 3,
+    21, 8,
+  ]
 
   constructor(map: Map, parent: MapElement) {
     this.map = map
@@ -67,15 +77,13 @@ export class TreesLayer {
         'circle-color': circleColor,
         'circle-radius': [
           'interpolate', ['linear'], ['zoom'],
-          1, 1 // valor de carga inicial
+          ...this.INITIAL_DOT_SIZES
         ],
         'circle-stroke-width': [
           'interpolate', ['linear'], ['zoom'],
-          6, 1,
-          7, 0.3,
-          11, 0.3,
-          12, 1, // zoom inicial
-          13, 1
+          10, 0,
+          12, 0.3, // zoom inicial
+          20, 1,
         ],
         'circle-stroke-color': '#ffffffc0',
       },
@@ -151,33 +159,15 @@ export class TreesLayer {
 
     if (!features.length) return
 
-    let radius
-    if (features.length < 5000) {
-      radius = [
-        'interpolate', ['linear'], ['zoom'],
+    let radius: any[] = ['interpolate', ['linear'], ['zoom']]
+    if (features.length < 20000) {
+      radius = radius.concat([
         10, 2,
         14, 6,
         21, 8
-      ]
-    } else if (features.length < 20000) {
-      radius = [
-        'interpolate', ['linear'], ['zoom'],
-        10, 2,
-        14, 6,
-        21, 8
-      ]
+      ])
     } else {
-      radius = [
-        'interpolate', ['linear'], ['zoom'],
-        2, 6,
-        5, 4,
-        9, 3,
-        11, 1,
-        12, 2,
-        13, 3,
-        14, 3,
-        21, 8
-      ]
+      radius = radius.concat(this.INITIAL_DOT_SIZES)
     }
 
     this.map.setPaintProperty(this.DOTS_LAYER, 'circle-radius', radius)
