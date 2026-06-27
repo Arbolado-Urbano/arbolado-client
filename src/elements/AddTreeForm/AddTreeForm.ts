@@ -48,6 +48,7 @@ export default class AddTreeForm extends HTMLElement {
   private speciesAutoError: HTMLDivElement
   private modal: HTMLElement
   private personalDataTabGroup: TabGroup
+  private mapCenter = { lat: -34.618, lng: -58.44 }
 
   constructor() {
     super()
@@ -150,14 +151,13 @@ export default class AddTreeForm extends HTMLElement {
           this.querySelector('[js-input-wrapper=orientation]')?.classList.remove('d-none')
           this.querySelector('[js-input=block]')?.setAttribute('required', 'true')
           this.querySelector('[js-input=orientation]')?.setAttribute('required', 'true')
-          this.geoInput.setCenter(-32.22445134285866, -58.14305122417706) // Center on Colón
         } else {
           this.querySelector('[js-input-wrapper=block]')?.classList.add('d-none')
           this.querySelector('[js-input-wrapper=orientation]')?.classList.add('d-none')
           this.querySelector('[js-input=block]')?.removeAttribute('required')
           this.querySelector('[js-input=orientation]')?.removeAttribute('required')
-          this.geoInput.setCenter(-34.618, -58.44) // Center on BsAs
         }
+        this.geoInput.setCenter(this.mapCenter.lat, this.mapCenter.lng) // Center the map input
       } else if (stepLabel === 'data') {
         // Display or hide the data inputs based on whether the species is the "emtpy planter" or not
         if (this.speciesSelect.value?.url === EMPTY_PLANTER_URL) {
@@ -225,6 +225,14 @@ export default class AddTreeForm extends HTMLElement {
           window.Arbolado.alert('danger', 'Código inválido. Verifícalo o solicita asistencia.')
           this.codeInput.classList.add('is-invalid')
         }
+        return
+      }
+      try {
+        const { lat, lng }: { slug: string, lat: number, lng: number } = await response.json()
+        this.mapCenter = { lat, lng }
+      } catch (error) {
+        console.error(error)
+        window.Arbolado.alert('danger', 'Ocurrió un error al validar tu código. Intenta nuevamente más tarde.')
         return
       }
       this.codeInput.classList.remove('is-invalid')
