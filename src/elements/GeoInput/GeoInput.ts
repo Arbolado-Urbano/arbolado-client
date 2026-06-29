@@ -55,7 +55,7 @@ export default class GeoInput extends HTMLElement {
   }
 
   setCenter(latitude: number, longitude: number) {
-    this.map.panTo({ lat: latitude, lng: longitude }, { zoom: 11 })
+    this.map.panTo({ lat: latitude, lng: longitude }, { zoom: 13 })
   }
 
   static get formAssociated() { return true }

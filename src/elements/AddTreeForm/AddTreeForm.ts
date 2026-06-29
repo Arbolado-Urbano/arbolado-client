@@ -102,7 +102,7 @@ export default class AddTreeForm extends HTMLElement {
 
     // Display the manual species text input when no speices is selected on the species selection dropdown
     this.speciesSelect.addEventListener('arbolado:species/change', (event) => {
-      if (event.detail.species?.url === '') {
+      if (!event.detail.species) {
         this.speciesManualInput.setAttribute('required', 'true')
         this.speciesManualWrapper.classList.remove('d-none')
       } else {
@@ -302,9 +302,11 @@ export default class AddTreeForm extends HTMLElement {
     } else if (this.step.label === 'species') {
       if (!this.autoSpecies) {
         if (!this.speciesSelect.value) {
-          this.speciesSelect.classList.add('is-invalid')
-          this.speciesSelect.addEventListener('arbolado:species/change', () => this.speciesSelect.classList.remove('is-invalid'), { once: true })
-          return false
+          if (!this.speciesManualInput.value) {
+            this.speciesSelect.classList.add('is-invalid')
+            this.speciesSelect.addEventListener('arbolado:species/change', () => this.speciesSelect.classList.remove('is-invalid'), { once: true })
+            return false
+          }
         } else {
           this.speciesSelect.classList.remove('is-invalid')
           if (this.speciesSelect.value.url === '') {
@@ -455,11 +457,11 @@ export default class AddTreeForm extends HTMLElement {
     // SpeciesUrl is used in case of a selection from the species dropdown
     let speciesUrl: string | undefined = undefined
     if (this.autoSpecies) {
-      species = this.selectedSpecies || ''
-    } else if (this.speciesSelect.value?.url === '') {
+      species = this.selectedSpecies ?? ''
+    } else if (!this.speciesSelect.value) {
       species = this.speciesManualInput.value
     } else {
-      speciesUrl = this.speciesSelect.value?.url
+      speciesUrl = this.speciesSelect.value.url
     }
 
     const idFormData = new FormData(this.steps.id)
