@@ -17,6 +17,7 @@ export type Step = { label: StepLabel, index: number }
 declare type ImageType = 'leaf' | 'flower' | 'fruit' | 'bark' | 'auto'
 
 export default class AddTreeForm extends HTMLElement {
+  private static readonly defaultMapCenter = { lat: -34.618, lng: -58.44 } // BsAs
   private step: Step = { index: 0, label: 'id' }
   private steps: Record<StepLabel, HTMLFormElement>
   private nextBtn: HTMLButtonElement
@@ -48,7 +49,7 @@ export default class AddTreeForm extends HTMLElement {
   private speciesAutoError: HTMLDivElement
   private modal: HTMLElement
   private personalDataTabGroup: TabGroup
-  private mapCenter = { lat: -34.618, lng: -58.44 }
+  private mapCenter = AddTreeForm.defaultMapCenter
 
   constructor() {
     super()
@@ -139,7 +140,6 @@ export default class AddTreeForm extends HTMLElement {
 
     this.submitBtn.addEventListener('click', () => this.submit())
 
-    // Skip first step if data was saved to localstorage
     this.modal.addEventListener('show.bs.modal', async () => { if (this.step.index === 0) await this.goToFirstStep() })
 
     this.addEventListener('arbolado:form/step', (event) => {
@@ -157,7 +157,6 @@ export default class AddTreeForm extends HTMLElement {
           this.querySelector('[js-input=block]')?.removeAttribute('required')
           this.querySelector('[js-input=orientation]')?.removeAttribute('required')
         }
-        this.geoInput.setCenter(this.mapCenter.lat, this.mapCenter.lng) // Center the map input
       } else if (stepLabel === 'data') {
         // Display or hide the data inputs based on whether the species is the "emtpy planter" or not
         if (this.speciesSelect.value?.url === EMPTY_PLANTER_URL) {
@@ -174,14 +173,21 @@ export default class AddTreeForm extends HTMLElement {
           this.querySelector('[js-input-wrapper=diameter]')?.classList.remove('d-none')
         }
       }
+      this.geoInput.setCenter(this.mapCenter.lat, this.mapCenter.lng) // Center the map input
     })
   }
 
   private async goToFirstStep() {
+    // Skip first step if data was saved to localstorage
     const code = localStorage.getItem('code')
     if (code) {
       this.codeInput.value = code
       this.personalDataTabGroup.show('code')
+      const latlng = localStorage.getItem('latlng')
+      if (latlng) {
+        const [lat, lng] = latlng.split(',').map(Number)
+        this.mapCenter = { lat, lng }
+      }
       await this.goStep(1, true)
       this.rememberInput.checked = true
     } else {
@@ -204,38 +210,44 @@ export default class AddTreeForm extends HTMLElement {
   private async goStep(index: number, skipCodeValidation?: boolean) {
     if ((index >= STEP_LABELS.length) || (index < 0)) return
     if ((index > this.step.index) && (!this.isValidCurrentStep())) return
-    // If we're moving on from the ID step and the user used a code => validate it
-    if (!skipCodeValidation && this.personalDataTabGroup.currentTab() === 'code' && this.step.label === 'id') {
-      let token
-      try {
-        token = await this.captchaWidget.execute()
-      } catch (error) {
-        console.error(error)
-        window.Arbolado.alert('danger', 'Ocurrió un error. Intenta nuevamente más tarde.')
-      }
-      if (!token) return
-      const data = new FormData()
-      data.set('captcha', token)
-      data.set('code', this.codeInput.value)
-      const response = await window.Arbolado.fetchAPI('/usuarios', 'POST', data)
-      if (!response.ok) {
-        if (response.status === 500) {
-          window.Arbolado.alert('danger', 'Ocurrió un error al validar tu código. Intenta nuevamente más tarde.')
-        } else {
-          window.Arbolado.alert('danger', 'Código inválido. Verifícalo o solicita asistencia.')
-          this.codeInput.classList.add('is-invalid')
+    if (this.step.label === 'id') {
+      if (this.personalDataTabGroup.currentTab() === 'code') {
+        // If we're moving on from the ID step and the user used a code => validate it
+        if (!skipCodeValidation) {
+          let token
+          try {
+            token = await this.captchaWidget.execute()
+          } catch (error) {
+            console.error(error)
+            window.Arbolado.alert('danger', 'Ocurrió un error. Intenta nuevamente más tarde.')
+          }
+          if (!token) return
+          const data = new FormData()
+          data.set('captcha', token)
+          data.set('code', this.codeInput.value)
+          const response = await window.Arbolado.fetchAPI('/usuarios', 'POST', data)
+          if (!response.ok) {
+            if (response.status === 500) {
+              window.Arbolado.alert('danger', 'Ocurrió un error al validar tu código. Intenta nuevamente más tarde.')
+            } else {
+              window.Arbolado.alert('danger', 'Código inválido. Verifícalo o solicita asistencia.')
+              this.codeInput.classList.add('is-invalid')
+            }
+            return
+          }
+          try {
+            const { lat, lng }: { slug: string, lat: number, lng: number } = await response.json()
+            this.mapCenter = { lat, lng }
+          } catch (error) {
+            console.error(error)
+            window.Arbolado.alert('danger', 'Ocurrió un error al validar tu código. Intenta nuevamente más tarde.')
+            return
+          }
+          this.codeInput.classList.remove('is-invalid')
         }
-        return
+      } else {
+        this.mapCenter = AddTreeForm.defaultMapCenter // Restore to default just in case
       }
-      try {
-        const { lat, lng }: { slug: string, lat: number, lng: number } = await response.json()
-        this.mapCenter = { lat, lng }
-      } catch (error) {
-        console.error(error)
-        window.Arbolado.alert('danger', 'Ocurrió un error al validar tu código. Intenta nuevamente más tarde.')
-        return
-      }
-      this.codeInput.classList.remove('is-invalid')
     }
     // If the user is not a censist then the images step will be skipped
     if (index === STEP_LABELS.indexOf('images') && this.personalDataTabGroup.currentTab() !== 'code') {
@@ -454,6 +466,7 @@ export default class AddTreeForm extends HTMLElement {
     const locationFormData = new FormData(this.steps.location)
     const dataFormData = new FormData(this.steps.data)
 
+    localStorage.removeItem('latlng')
     localStorage.removeItem('code')
     localStorage.removeItem('email')
     localStorage.removeItem('name')
@@ -461,6 +474,7 @@ export default class AddTreeForm extends HTMLElement {
     if (idFormData.get('remember') === 'on') {
       if (this.personalDataTabGroup.currentTab() === 'code') {
         if (idFormData.has('code')) localStorage.setItem('code', idFormData.get('code')!.toString())
+        localStorage.setItem('latlng', `${this.mapCenter.lat},${this.mapCenter.lng}`)
       } else {
         if (idFormData.has('email')) localStorage.setItem('email', idFormData.get('email')!.toString())
         if (idFormData.has('name')) localStorage.setItem('name', idFormData.get('name')!.toString())
