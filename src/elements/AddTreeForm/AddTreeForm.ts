@@ -103,7 +103,7 @@ export default class AddTreeForm extends HTMLElement {
 
     // Display the manual species text input when no speices is selected on the species selection dropdown
     this.speciesSelect.addEventListener('arbolado:species/change', (event) => {
-      if (!event.detail.species) {
+      if (event.detail.species === undefined) {
         this.speciesManualInput.setAttribute('required', 'true')
         this.speciesManualWrapper.classList.remove('d-none')
       } else {
@@ -309,18 +309,20 @@ export default class AddTreeForm extends HTMLElement {
       }
     } else if (this.step.label === 'species') {
       if (!this.autoSpecies) {
-        if (!this.speciesSelect.value) {
-          if (!this.speciesManualInput.value) {
+        // If no auto species check if the user selected a species
+        if (this.speciesSelect.value === undefined) {
+          // If manual input has been selected check if something was typed there
+          return !!this.speciesManualInput.value
+        } else {
+          // If manual input was not selected check if a species was selected
+          if (!this.speciesSelect.value) {
             this.speciesSelect.classList.add('is-invalid')
             this.speciesSelect.addEventListener('arbolado:species/change', () => this.speciesSelect.classList.remove('is-invalid'), { once: true })
             return false
+          } else {
+            this.speciesSelect.classList.remove('is-invalid')
+            return true
           }
-        } else {
-          this.speciesSelect.classList.remove('is-invalid')
-          if (this.speciesSelect.value.url === '') {
-            return !!this.speciesManualInput.value
-          }
-          return true
         }
       } else {
         if (this.speciesAutoInput.value === '') {
@@ -466,10 +468,10 @@ export default class AddTreeForm extends HTMLElement {
     let speciesUrl: string | undefined = undefined
     if (this.autoSpecies) {
       species = this.selectedSpecies ?? ''
-    } else if (!this.speciesSelect.value) {
+    } else if (this.speciesSelect.value === undefined) {
       species = this.speciesManualInput.value
     } else {
-      speciesUrl = this.speciesSelect.value.url
+      speciesUrl = this.speciesSelect.value?.url
     }
 
     const idFormData = new FormData(this.steps.id)
