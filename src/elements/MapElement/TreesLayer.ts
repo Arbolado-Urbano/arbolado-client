@@ -42,6 +42,7 @@ export class TreesLayer {
     this.map.addSource(this.TREES_SOURCE, {
       type: 'vector',
       url: `pmtiles://${import.meta.env.DEV ? '' : import.meta.env.VITE_API_URL}/arboles.pmtiles`,
+      volatile: false,
     })
 
     const species = window.Arbolado.species ?? []
