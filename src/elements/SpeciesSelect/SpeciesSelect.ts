@@ -6,7 +6,7 @@ import { Species } from '../../types/Species'
 import { EMPTY_PLANTER_URL } from '../../constants/emptyPlanter'
 
 export default class SpeciesSelect extends HTMLElement {
-  public value: Species | null = null
+  public value: Species | null | undefined = null
   private filtered: Species[] = []
   private btnElement: HTMLButtonElement
   private inputElement: HTMLInputElement
@@ -67,7 +67,7 @@ export default class SpeciesSelect extends HTMLElement {
     return true
   }
 
-  setValue(species: Species | null) {
+  setValue(species: Species | null | undefined) {
     this.value = species
     this.updateBtnLabel()
     window.Arbolado.emitEvent(this, 'arbolado:species/change', { species: this.value })
@@ -101,7 +101,7 @@ export default class SpeciesSelect extends HTMLElement {
   }
 
   private selectSpecies(url?: string) {
-    let species = null
+    let species = undefined
     if (url) species = window.Arbolado.species?.find((species) => species.url === url) ?? null
     this.setValue(species)
   }

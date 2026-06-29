@@ -18,7 +18,7 @@ export type ArboladoEventMap = {
   'arbolado:geo/success': CustomEvent<{ lat: number, lng: number }>
   'arbolado:geo/error': CustomEvent<{ error: GeolocationPositionError | '2' | '3' }>
   'arbolado:form/step': CustomEvent<{ previous: Step, current: Step }>
-  'arbolado:species/change': CustomEvent<{ species: Species | null }>
+  'arbolado:species/change': CustomEvent<{ species: Species | null | undefined }>
   'arbolado:species/loaded': CustomEvent<void>
   'arbolado:map/loaded': CustomEvent<void>
   'arbolado:map/move': CustomEvent<{ bounds: maplibregl.LngLatBounds }>
