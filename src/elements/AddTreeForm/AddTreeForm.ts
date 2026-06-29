@@ -50,6 +50,7 @@ export default class AddTreeForm extends HTMLElement {
   private modal: HTMLElement
   private personalDataTabGroup: TabGroup
   private mapCenter = AddTreeForm.defaultMapCenter
+  private censusSlug: string | undefined
 
   constructor() {
     super()
@@ -145,20 +146,26 @@ export default class AddTreeForm extends HTMLElement {
     this.addEventListener('arbolado:form/step', (event) => {
       const stepLabel = event.detail.current.label
       if (stepLabel === 'location') {
-        // Display or hide the block and orientation inputs based on the user's id method
+        this.querySelector('[js-input-wrapper=block]')?.classList.add('d-none')
+        this.querySelector('[js-input-wrapper=street]')?.classList.add('d-none')
+        this.querySelector('[js-input-wrapper=street-number]')?.classList.add('d-none')
+        this.querySelector('[js-input=block]')?.removeAttribute('required')
+        this.querySelector('[js-input=street]')?.removeAttribute('required')
+        this.querySelector('[js-input=street-number]')?.removeAttribute('required')
+        // Display or hide additional location inputs if the users is a censist
         if (this.personalDataTabGroup.currentTab() === 'code') {
-          this.querySelector('[js-input-wrapper=block]')?.classList.remove('d-none')
-          this.querySelector('[js-input-wrapper=orientation]')?.classList.remove('d-none')
-          this.querySelector('[js-input=block]')?.setAttribute('required', 'true')
-          this.querySelector('[js-input=orientation]')?.setAttribute('required', 'true')
-        } else {
-          this.querySelector('[js-input-wrapper=block]')?.classList.add('d-none')
-          this.querySelector('[js-input-wrapper=orientation]')?.classList.add('d-none')
-          this.querySelector('[js-input=block]')?.removeAttribute('required')
-          this.querySelector('[js-input=orientation]')?.removeAttribute('required')
+          this.querySelector('[js-input-wrapper=street]')?.classList.remove('d-none')
+          this.querySelector('[js-input=street]')?.setAttribute('required', 'true')
+          if (this.censusSlug === 'municip-colon') { // Colón
+            this.querySelector('[js-input-wrapper=block]')?.classList.remove('d-none')
+            this.querySelector('[js-input=block]')?.setAttribute('required', 'true')
+          } else if (this.censusSlug === '25demayo') { // 25 de mayo
+            this.querySelector('[js-input-wrapper=street-number]')?.classList.remove('d-none')
+            this.querySelector('[js-input=street-number]')?.setAttribute('required', 'true')
+          }
         }
       } else if (stepLabel === 'data') {
-        // Display or hide the data inputs based on whether the species is the "emtpy planter" or not
+        // Display or hide additional data inputs based on whether the species is the "emtpy planter" or not
         if (this.speciesSelect.value?.url === EMPTY_PLANTER_URL) {
           this.querySelector('[js-input-wrapper=inclination]')?.classList.add('d-none')
           this.querySelector('[js-input-wrapper=development]')?.classList.add('d-none')
@@ -236,7 +243,8 @@ export default class AddTreeForm extends HTMLElement {
             return
           }
           try {
-            const { lat, lng }: { slug: string, lat: number, lng: number } = await response.json()
+            const { lat, lng, slug }: { slug: string, lat: number, lng: number } = await response.json()
+            this.censusSlug = slug
             this.mapCenter = { lat, lng }
           } catch (error) {
             console.error(error)
@@ -490,7 +498,8 @@ export default class AddTreeForm extends HTMLElement {
     if (idFormData.has('name')) data.set('name', idFormData.get('name')!)
     if (idFormData.has('website')) data.set('website', idFormData.get('website')!)
     if (locationFormData.has('block')) data.set('block', locationFormData.get('block')!)
-    if (locationFormData.has('orientation')) data.set('orientation', locationFormData.get('orientation')!)
+    if (locationFormData.has('street')) data.set('street', locationFormData.get('street')!)
+    if (locationFormData.has('street-number')) data.set('streetNumber', locationFormData.get('street-number')!)
     if (this.geoInput.value) data.set('coordinates', this.geoInput.value)
     if (species) data.set('species', species)
     if (speciesUrl) data.set('speciesUrl', speciesUrl)
