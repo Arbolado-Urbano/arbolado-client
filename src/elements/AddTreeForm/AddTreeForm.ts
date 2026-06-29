@@ -195,6 +195,8 @@ export default class AddTreeForm extends HTMLElement {
         const [lat, lng] = latlng.split(',').map(Number)
         this.mapCenter = { lat, lng }
       }
+      const census = localStorage.getItem('census')
+      if (census) this.censusSlug = census
       await this.goStep(1, true)
       this.rememberInput.checked = true
     } else {
@@ -256,6 +258,7 @@ export default class AddTreeForm extends HTMLElement {
       } else {
         this.mapCenter = AddTreeForm.defaultMapCenter // Restore to default just in case
       }
+      this.rememberData()
     }
     // If the user is not a censist then the images step will be skipped
     if (index === STEP_LABELS.indexOf('images') && this.personalDataTabGroup.currentTab() !== 'code') {
@@ -452,6 +455,25 @@ export default class AddTreeForm extends HTMLElement {
     }
   }
 
+  private rememberData() {
+    const idFormData = new FormData(this.steps.id)
+    if (idFormData.get('remember') === 'on') {
+      if (idFormData.has('code')) localStorage.setItem('code', idFormData.get('code')!.toString())
+      localStorage.setItem('latlng', `${this.mapCenter.lat},${this.mapCenter.lng}`)
+      if (this.censusSlug) localStorage.setItem('census', this.censusSlug)
+      if (idFormData.has('email')) localStorage.setItem('email', idFormData.get('email')!.toString())
+      if (idFormData.has('name')) localStorage.setItem('name', idFormData.get('name')!.toString())
+      if (idFormData.has('website')) localStorage.setItem('website', idFormData.get('website')!.toString())
+    } else {
+      localStorage.removeItem('census')
+      localStorage.removeItem('latlng')
+      localStorage.removeItem('code')
+      localStorage.removeItem('email')
+      localStorage.removeItem('name')
+      localStorage.removeItem('website')
+    }
+  }
+
   private async submit() {
     let token
     try {
@@ -477,22 +499,6 @@ export default class AddTreeForm extends HTMLElement {
     const idFormData = new FormData(this.steps.id)
     const locationFormData = new FormData(this.steps.location)
     const dataFormData = new FormData(this.steps.data)
-
-    localStorage.removeItem('latlng')
-    localStorage.removeItem('code')
-    localStorage.removeItem('email')
-    localStorage.removeItem('name')
-    localStorage.removeItem('website')
-    if (idFormData.get('remember') === 'on') {
-      if (this.personalDataTabGroup.currentTab() === 'code') {
-        if (idFormData.has('code')) localStorage.setItem('code', idFormData.get('code')!.toString())
-        localStorage.setItem('latlng', `${this.mapCenter.lat},${this.mapCenter.lng}`)
-      } else {
-        if (idFormData.has('email')) localStorage.setItem('email', idFormData.get('email')!.toString())
-        if (idFormData.has('name')) localStorage.setItem('name', idFormData.get('name')!.toString())
-        if (idFormData.has('website')) localStorage.setItem('website', idFormData.get('website')!.toString())
-      }
-    }
 
     const data = new FormData()
     if (idFormData.has('code')) data.set('code', idFormData.get('code')!)
