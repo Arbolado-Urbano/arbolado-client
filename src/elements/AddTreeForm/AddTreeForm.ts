@@ -2,12 +2,14 @@ import AddTreeFormTemplate from './AddTreeForm.html?raw'
 import SpeciesImageTemplate from './SpeciesImage.html?raw'
 import ImagePreviewTemplate from './ImagePreview.html?raw'
 
+import PlantNetResponse from '../../types/PlantNetResponse'
+import { Source } from '../../types/Source'
+
 import { EMPTY_PLANTER_URL } from '../../constants/emptyPlanter'
 
 import SpeciesSelect from '../SpeciesSelect/SpeciesSelect'
 import Captcha from '../Captcha'
 import GeoInput from '../GeoInput/GeoInput'
-import PlantNetResponse from '../../types/PlantNetResponse'
 import TabGroup from '../TabGroup'
 
 const STEP_LABELS = ['id', 'location', 'images', 'species', 'data', 'end'] as const
@@ -154,13 +156,15 @@ export default class AddTreeForm extends HTMLElement {
         this.querySelector('[js-input=street-number]')?.removeAttribute('required')
         // Display or hide additional location inputs if the users is a censist
         if (this.personalDataTabGroup.currentTab() === 'code') {
-          this.querySelector('[js-input-wrapper=street]')?.classList.remove('d-none')
-          this.querySelector('[js-input=street]')?.setAttribute('required', 'true')
           if (this.censusSlug === 'municip-colon') { // Colón
+            this.querySelector('[js-input-wrapper=street]')?.classList.remove('d-none')
             this.querySelector('[js-input-wrapper=block]')?.classList.remove('d-none')
+            this.querySelector('[js-input=street]')?.setAttribute('required', 'true')
             this.querySelector('[js-input=block]')?.setAttribute('required', 'true')
           } else if (this.censusSlug === '25demayo') { // 25 de mayo
+            this.querySelector('[js-input-wrapper=street]')?.classList.remove('d-none')
             this.querySelector('[js-input-wrapper=street-number]')?.classList.remove('d-none')
+            this.querySelector('[js-input=street]')?.setAttribute('required', 'true')
             this.querySelector('[js-input=street-number]')?.setAttribute('required', 'true')
           }
         }
@@ -245,9 +249,9 @@ export default class AddTreeForm extends HTMLElement {
             return
           }
           try {
-            const { lat, lng, slug }: { slug: string, lat: number, lng: number } = await response.json()
+            const { lat, lng, slug }: Source = await response.json()
             this.censusSlug = slug
-            this.mapCenter = { lat, lng }
+            if (lat && lng) this.mapCenter = { lat, lng }
           } catch (error) {
             console.error(error)
             window.Arbolado.alert('danger', 'Ocurrió un error al validar tu código. Intenta nuevamente más tarde.')
