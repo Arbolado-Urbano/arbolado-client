@@ -79,9 +79,9 @@
         <!-- Paso 2: Ubicación -->
         <form novalidate class="d-none" js-step="location">
           <h5>Ubicación</h5>
-          <div class="mb-3" js-input-wrapper="block">
+          <div class="mb-3 d-none" js-input-wrapper="block">
             <label for="form-block" class="form-label">Manzana (requerido)</label>
-            <input name="block" type="text" class="form-control" id="form-block" js-input="block" aria-describedby="form-block-help" required>
+            <input name="block" type="text" class="form-control" id="form-block" js-input="block" aria-describedby="form-block-help">
             <div class="invalid-feedback">
               Por favor ingresá la manzana.
             </div>
@@ -89,20 +89,24 @@
               Ingresá el código de la manzana en la que está ubicado el árbol.
             </div>
           </div>
-          <div class="mb-3" js-input-wrapper="orientation">
-            <label for="form-orientation" class="form-label">Orientación (requerido)</label>
-            <select class="form-select" id="form-orientation" name="orientation" js-input="orientation" required>
-              <option selected hidden value="">Seleccione...</option>
-              <option value="N">Norte</option>
-              <option value="S">Sur</option>
-              <option value="E">Este</option>
-              <option value="O">Oeste</option>
-            </select>
+          <div class="mb-3 d-none" js-input-wrapper="street">
+            <label for="form-street" class="form-label">Calle (requerido)</label>
+            <input name="street" type="text" class="form-control" id="form-street" js-input="street" aria-describedby="form-street-help">
             <div class="invalid-feedback">
-              Por favor ingresá la orientación en la manzana del árbol.
+              Por favor ingresá una calle.
             </div>
-            <div id="form-orientation-help" class="form-text">
-              Ingresá la orientación del árbol dentro de la manzana en la que está ubicado.
+            <div id="form-street-help" class="form-text">
+              Ingresá la calle sobre la que está ubicado el árbol.
+            </div>
+          </div>
+          <div class="mb-3 d-none" js-input-wrapper="street-number">
+            <label for="form-street-number" class="form-label">Altura (requerido)</label>
+            <input name="street-number" type="text" class="form-control" id="form-street-number" js-input="street-number" aria-describedby="form-street-number-help">
+            <div class="invalid-feedback">
+              Por favor ingresá una altura.
+            </div>
+            <div id="form-street-number-help" class="form-text">
+              Ingresá la altura de la calle sobre la que está ubicado el árbol.
             </div>
           </div>
           <div class="mb-3">
@@ -115,7 +119,6 @@
               Por favor seleccioná la ubicación del árbol.
             </div>
           </div>
-          <!-- Espacio verde checkbox -->
         </form>
         <!-- Paso 3: Fotos (sólo para censistas) -->
         <form novalidate class="d-none" js-step="images">
