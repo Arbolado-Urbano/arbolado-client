@@ -54,10 +54,9 @@ window.Arbolado.ready(() => {
     customElements.define('arbolado-address-lookup', AddressLookup)
     customElements.define('arbolado-geo-btn', GeoBtn)
     customElements.define('arbolado-form', SearchForm)
+    // Check to see if a source is selected on the URL
+    window.Arbolado.loadSourceFromURL()
   })
-
-  // Check to see if a source is selected on the URL
-  window.Arbolado.loadSourceFromURL()
 
   // Check if the privacy policy modal should be displayed
   if ((new URLSearchParams(window.location.search)).has("privacidad")) {

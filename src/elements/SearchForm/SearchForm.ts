@@ -62,7 +62,9 @@ export default class SearchForm extends HTMLElement {
     // Set the form field values from the URL query parameters if any
     this.flavors.checked = window.Arbolado.queryParams.get('user_sabores') !== null
     this.species.setSpeciesFromURL()
-    this.search(false)
+    if (this.species.value?.url || this.flavors.checked) {
+      this.search(false)
+    }
   }
 
   // If checked => the query param "name" will be set with the value "value", otherwise the param will be deleted
