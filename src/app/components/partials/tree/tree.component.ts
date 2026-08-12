@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 import { faFacebookF, faFacebookSquare, faInstagram, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { faExternalLinkAlt, faLink, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
@@ -58,7 +58,11 @@ export class TreeComponent {
       }
 
       // Sanitize the streetview URL
-      tree.streetview = this.sanitizer.bypassSecurityTrustResourceUrl(tree.streetview);
+      // TODO: make the cache.service return a copy of the responses so we don't
+      // have to do this check and we prevent possible future bugs
+      if (typeof tree.streetview === 'string') {
+        tree.streetview = this.sanitizer.bypassSecurityTrustResourceUrl(tree.streetview);
+      }
 
       // Set the tree
       this.tree = tree;

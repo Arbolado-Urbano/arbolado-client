@@ -22,6 +22,7 @@ export class HomeComponent {
   @ViewChild('addTreeModal') private addTreeModal;
   @ViewChild('tree') private treeComponent;
   @ViewChild('map') private mapComponent;
+  @ViewChild('form') private formComponent;
   @ViewChild('main', { read: ElementRef }) private mainElement;
   public addressSearch = '';
   public addressResults = [];
@@ -42,8 +43,8 @@ export class HomeComponent {
     private titleService: Title,
     private nominatimService: NominatimService,
   ) {
-    this.species = route.snapshot.data.species;
     this.titleService.setTitle('Arbolado Urbano');
+    this.species = this.route.snapshot.data.species;
   }
 
   /**

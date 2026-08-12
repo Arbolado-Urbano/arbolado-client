@@ -45,17 +45,16 @@ export class ApiService {
   public search(data): Observable<any> {
     this.setLoading(true); // Update loading status
 
-    const params = new HttpParams()
-      .set('borigen_cuyana', data.region.cuyana)
-      .set('borigen_nea', data.region.nea)
-      .set('borigen_noa', data.region.noa)
-      .set('borigen_pampeana', data.region.pampeana)
-      .set('borigen_patagonica', data.region.patagonica)
-      .set('especie_id', data.species)
-      .set('radio', environment.searchRadius.toString())
-      .set('user_latlng', data.marker)
-      .set('user_origen', data.origin)
-      .set('user_sabores', data.flavors);
+    let params = new HttpParams();
+
+    for (const key in data) {
+      if (data.hasOwnProperty(key)) {
+        const value = data[key];
+        if (value) {
+          params = params.set(key, value);
+        }
+      }
+    }
 
     return this.http.get<any>(`${API_URL}/arboles`, { params }).pipe(
       catchError((err) => throwError(err)),

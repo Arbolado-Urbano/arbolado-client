@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output, OnDestroy, AfterViewInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import * as L from 'leaflet';
 
@@ -9,7 +10,7 @@ import { environment } from '../../../../environments/environment';
   styleUrls: ['./map.component.scss'],
   templateUrl: './map.component.html',
 })
-export class MapComponent implements OnInit {
+export class MapComponent implements AfterViewInit, OnDestroy {
   // Event emitter for when the user sets or resets a marker on the map
   @Output() public markerSet: EventEmitter<L.LatLng> = new EventEmitter();
   // Event emitter for when the user clicks on a tree
@@ -60,16 +61,23 @@ export class MapComponent implements OnInit {
     }),
   };
 
-  constructor() {
+  constructor(private route: ActivatedRoute) {
     this.treeMarkers = L.markerClusterGroup(this.clusterOptions);
   }
 
-  public ngOnInit(): void {
-    this.map = L.map('map', this.options);
-    this.map.addLayer(this.treeMarkers);
-    this.map.on('click', (event: any) => {
-      this.setMarker(event.latlng);
-    });
+  public ngAfterViewInit(): void {
+    // setTimeout used to prevent the map from not loading when navigation happens
+    setTimeout(() => {
+      this.map = L.map('map', this.options);
+      this.map.addLayer(this.treeMarkers);
+      this.map.on('click', (event: any) => {
+        this.setMarker(event.latlng);
+      });
+    }, 500);
+  }
+
+  public ngOnDestroy(): void {
+    this.map.remove();
   }
 
   /**

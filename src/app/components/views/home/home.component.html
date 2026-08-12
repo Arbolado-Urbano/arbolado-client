@@ -14,7 +14,7 @@
         </h1>
       </div>
 
-      <app-form [species]="species" [latlng]="latlng" (treesLoaded)="updateTrees($event)" (allMapSelected)="removeMarker()">
+      <app-form #form [species]="species" [latlng]="latlng" (treesLoaded)="updateTrees($event)" (allMapSelected)="removeMarker()">
       </app-form>
 
       <div class="row mt-4">

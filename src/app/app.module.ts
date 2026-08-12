@@ -1,4 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule, Title } from '@angular/platform-browser';
@@ -26,10 +26,12 @@ import { EmptyTreesComponent } from './components/modals/empty-trees/empty-trees
 
 // Resolvers
 import { SpeciesResolver } from './resolvers/species.resolver';
+import { TreesResolver } from './resolvers/trees.resolver';
 
 // Services
 import { ApiService } from './services/api.service';
 import { NominatimService } from './services/nominatim.service';
+import { CacheService } from './services/cache.service';
 
 // ngx-bootstrap
 import { CollapseModule } from 'ngx-bootstrap/collapse';
@@ -80,9 +82,11 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     FontAwesomeModule,
   ],
   providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: CacheService, multi: true },
     ApiService,
     NominatimService,
     SpeciesResolver,
+    TreesResolver,
     Title,
   ],
 })
