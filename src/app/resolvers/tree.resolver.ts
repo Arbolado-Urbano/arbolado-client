@@ -9,9 +9,7 @@ export class TreeResolver implements Resolve<any> {
   constructor(private apiService: ApiService) {}
 
   public resolve(route: ActivatedRouteSnapshot): any {
-    return new Promise((resolve, reject) => {
-      const id = route.paramMap.get('id');
-      this.apiService.getTree(id).subscribe((tree) => resolve(tree));
-    });
+    const id = route.paramMap.get('id');
+    return this.apiService.getTree(id);
   }
 }
