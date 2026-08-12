@@ -85,7 +85,7 @@
       <p>
         El siguiente código sirve para identificar a este árbol:
         <kbd class="mr-1">{{ tree.id }}</kbd>
-        <a [href]="'https://www.arboladourbano.com/' + tree.id" target="_blank">
+        <a [routerLink]="['/arbol', tree.id]" target="_blank">
           <fa-icon [icon]="icons.faExternalLinkAlt"></fa-icon>
         </a>
       </p>

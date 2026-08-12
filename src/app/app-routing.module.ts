@@ -5,6 +5,7 @@ import { HomeComponent } from './components/views/home/home.component';
 
 import { SpeciesResolver } from './resolvers/species.resolver';
 import { TreesResolver } from './resolvers/trees.resolver';
+import { TreeResolver } from './resolvers/tree.resolver';
 
 const routes: Routes = [
   {
@@ -21,6 +22,15 @@ const routes: Routes = [
     },
     runGuardsAndResolvers: 'paramsOrQueryParamsChange', // Execute resolver when params change
   },
+  {
+    component: HomeComponent,
+    path: 'arbol/:id',
+    resolve: {
+      tree: TreeResolver,
+      species: SpeciesResolver,
+    },
+    runGuardsAndResolvers: 'paramsOrQueryParamsChange', // Execute resolver when params change
+  },
 ];
 
 @NgModule({
@@ -28,7 +38,7 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes, {
     // enableTracing :true, // For debugging
     scrollPositionRestoration: 'enabled',
-    useHash: false,
+    useHash: true,
     relativeLinkResolution: 'legacy'
   })],
 })

@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 
@@ -16,7 +16,7 @@ import { environment } from '../../../../environments/environment';
   styleUrls: ['./home.component.scss'],
   templateUrl: './home.component.html',
 })
-export class HomeComponent {
+export class HomeComponent implements AfterViewInit {
   @ViewChild('aboutModal') private aboutModal;
   @ViewChild('emptyTreesModal') private emptyTreesModal;
   @ViewChild('addTreeModal') private addTreeModal;
@@ -45,6 +45,14 @@ export class HomeComponent {
   ) {
     this.titleService.setTitle('Arbolado Urbano');
     this.species = this.route.snapshot.data.species;
+  }
+
+  public ngAfterViewInit(): void {
+    const tree = this.route.snapshot.data.tree;
+    console.log(tree);
+    if (tree) {
+      this.treeComponent.displayTree(tree);
+    }
   }
 
   /**
@@ -101,7 +109,7 @@ export class HomeComponent {
    * Updates the selected tree
    */
   public updateTree(treeId): void {
-    this.treeComponent.displayTree(treeId);
+    this.treeComponent.loadTree(treeId);
   }
 
   /**

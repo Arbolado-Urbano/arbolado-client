@@ -27,6 +27,7 @@ import { EmptyTreesComponent } from './components/modals/empty-trees/empty-trees
 // Resolvers
 import { SpeciesResolver } from './resolvers/species.resolver';
 import { TreesResolver } from './resolvers/trees.resolver';
+import { TreeResolver } from './resolvers/tree.resolver';
 
 // Services
 import { ApiService } from './services/api.service';
@@ -87,6 +88,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     NominatimService,
     SpeciesResolver,
     TreesResolver,
+    TreeResolver,
     Title,
   ],
 })

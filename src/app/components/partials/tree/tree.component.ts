@@ -46,33 +46,39 @@ export class TreeComponent {
   }
 
   /**
-   * Displays a tree's information
+   * Loads and displays a tree's information
    * @param treeId - ID of the tree to display
    */
-  public displayTree(treeId: number): void {
+  public loadTree(treeId: number): void {
     // Get the tree's info
-    this.apiService.getTree(treeId).subscribe((tree) => {
-      // If there's no streetview URL for the tree, use its coordinates
-      if (!tree.streetview) {
-        tree.streetview = `${this.streetviewUrl}&location=${tree.lat},${tree.lng}`;
-      }
+    this.apiService.getTree(treeId).subscribe((tree) => { this.displayTree(tree); });
+  }
 
-      // Sanitize the streetview URL
-      // TODO: make the cache.service return a copy of the responses so we don't
-      // have to do this check and we prevent possible future bugs
-      if (typeof tree.streetview === 'string') {
-        tree.streetview = this.sanitizer.bypassSecurityTrustResourceUrl(tree.streetview);
-      }
+  /**
+   * Displays a tree's information
+   * @param tree - Object with the tree's information
+   */
+  public displayTree(tree: any): void {
+    // If there's no streetview URL for the tree, use its coordinates
+    if (!tree.streetview) {
+      tree.streetview = `${this.streetviewUrl}&location=${tree.lat},${tree.lng}`;
+    }
 
-      // Set the tree
-      this.tree = tree;
+    // Sanitize the streetview URL
+    // TODO: make the cache.service return a copy of the responses so we don't
+    // have to do this check and we prevent possible future bugs
+    if (typeof tree.streetview === 'string') {
+      tree.streetview = this.sanitizer.bypassSecurityTrustResourceUrl(tree.streetview);
+    }
 
-      // Display the tree panel
-      this.display = true;
+    // Set the tree
+    this.tree = tree;
 
-      // Needed for the display = true change to be detected
-      // https://stackoverflow.com/a/40759857/3780276
-      this.cdRef.detectChanges();
-    });
+    // Display the tree panel
+    this.display = true;
+
+    // Needed for the display = true change to be detected
+    // https://stackoverflow.com/a/40759857/3780276
+    this.cdRef.detectChanges();
   }
 }
