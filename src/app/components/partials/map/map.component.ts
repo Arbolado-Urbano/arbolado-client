@@ -20,20 +20,6 @@ export class MapComponent {
   public mapFitToBoundsOptions: L.FitBoundsOptions = { maxZoom: 15, animate: true }; // To zoom into search results
   public options = { // Map options
     center: [-34.618, -58.44], // BsAs
-    clusterOptions: {
-      disableClusteringAtZoom: environment.mapDisableClusteringAt,
-      maxClusterRadius: 100, // px
-      polygonOptions: {
-        color: environment.highlightColor,
-        fillColor: environment.highlightColor,
-        fillOpacity: 0.1,
-        opacity: 1,
-        weight: 1,
-      },
-      showCoverageOnHover: true,
-      spiderfyDistanceMultiplier: 2,
-      zoomToBoundsOnClick: true,
-    },
     layers: [
       L.tileLayer(
         'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
@@ -51,18 +37,32 @@ export class MapComponent {
     minZoom: 5,
     zoom: 12,
   };
+  public clusterOptions = {
+    disableClusteringAtZoom: environment.mapDisableClusteringAt,
+    maxClusterRadius: 100, // px
+    polygonOptions: {
+      color: environment.highlightColor,
+      fillColor: environment.highlightColor,
+      fillOpacity: 0.1,
+      opacity: 1,
+      weight: 1,
+    },
+    showCoverageOnHover: true,
+    spiderfyDistanceMultiplier: 2,
+    zoomToBoundsOnClick: true,
+  };
   public marker: L.Marker; // Marker
   public circle: L.Circle; // Circle around marker indicating search radius
   public treeMarkers: L.FeatureGroup = L.featureGroup(); // Trees from search result
-  private defaultIcon: L.Icon; // Default tree icon
-
-  constructor() {
-    this.defaultIcon = new L.Icon({
+  private icons = {
+    default: new L.Icon({
       iconAnchor: [15, 31],
       iconSize: [30, 34],
       iconUrl: `assets/imgs/markers/marker.png`,
-    });
-  }
+    }),
+  };
+
+  constructor() {}
 
   /**
    * Stores a reference of the Leaflet map
@@ -87,19 +87,22 @@ export class MapComponent {
     this.treeMarkers.clearLayers(); // Remove all previous trees
     for (const tree of trees) {
       // Select the tree's icon or use the default if none
-      let icon = this.defaultIcon;
+      let icon = this.icons.default;
       if (tree.icono) {
-        icon = new L.Icon({
-          iconAnchor: [15, 31],
-          iconSize: [30, 34],
-          iconUrl: `assets/imgs/markers/${tree.icono}`,
-        });
+        if (!this.icons[tree.icono]) {
+          this.icons[tree.icono] = new L.Icon({
+            iconAnchor: [15, 31],
+            iconSize: [30, 34],
+            iconUrl: `assets/imgs/markers/${tree.icono}`,
+          });
+        }
+        icon = this.icons[tree.icono];
       }
       // Add a tree marker for the tree to the treeMarkers
       this.treeMarkers.addLayer(
         new L.Marker([tree.lat, tree.lng], { icon }).on('click', () => {
           this.selectTree(tree.id); // When the marker is clicked => select it
-        }),
+        })
       );
     }
 
@@ -131,8 +134,8 @@ export class MapComponent {
   }
 
   /**
-   * Sets a marker on the map based on a click event coordinates
-   * @param event - Click event
+   * Sets a marker on the map based on coordinates
+   * @param latlng - Latitude and longitude coordinates
    */
   public setMarker(latlng: L.LatLng): void {
     // Get the map object

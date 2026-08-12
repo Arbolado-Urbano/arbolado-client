@@ -4,7 +4,7 @@
   [leafletOptions]="options"
   [leafletLayers]="layers"
   [leafletMarkerCluster]="treeMarkers.getLayers()"
-  [leafletMarkerClusterOptions]="options.clusterOptions"
+  [leafletMarkerClusterOptions]="clusterOptions"
   [leafletFitBounds]="mapFitToBounds"
   [leafletFitBoundsOptions]="mapFitToBoundsOptions"
   (leafletClick)="setMarker($event.latlng)"
