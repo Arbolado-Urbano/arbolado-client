@@ -4,8 +4,6 @@ import { FormControl, FormGroup } from '@angular/forms';
 
 import { faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 
-import { ApiService } from '../../../services/api.service';
-
 import { environment } from '../../../../environments/environment';
 
 import { LatLng } from 'leaflet';
@@ -32,11 +30,7 @@ export class FormComponent implements OnChanges, OnInit, AfterViewInit {
     faTrashAlt,
   };
 
-  constructor(
-    private apiService: ApiService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {}
+  constructor(private router: Router, private route: ActivatedRoute) {}
 
   public ngOnInit(): void {
     const flavors = this.route.snapshot.queryParamMap.get('user_sabores');
@@ -65,7 +59,7 @@ export class FormComponent implements OnChanges, OnInit, AfterViewInit {
 
     // When the marker FormControl is set to "0" => emit an event indicating this
     this.form.controls.marker.valueChanges.subscribe((value) => {
-      if (value === '0') {
+      if (value === '') {
         this.allMapSelected.emit();
       }
     });
@@ -73,9 +67,9 @@ export class FormComponent implements OnChanges, OnInit, AfterViewInit {
 
   public ngAfterViewInit(): void {
     this.route.data.subscribe((data) => {
-      console.log(data);
-      const trees = data.trees ? data.trees : [];
-      this.treesLoaded.emit(trees);
+      if (data.trees) {
+        this.treesLoaded.emit(data.trees);
+      }
     });
   }
 
