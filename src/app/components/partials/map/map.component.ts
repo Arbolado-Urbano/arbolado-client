@@ -73,6 +73,14 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       this.map.on('click', (event: any) => {
         this.setMarker(event.latlng);
       });
+      const marker = this.route.snapshot.queryParamMap.get('user_latlng');
+      const radius = this.route.snapshot.queryParamMap.get('radio');
+
+      if (marker) {
+        const markerLatLng = marker.split(' ');
+        const latlng = new L.LatLng(Number(markerLatLng[0]), Number(markerLatLng[1]));
+        this.setMarker(latlng, Number(radius));
+      }
     }, 500);
   }
 
@@ -144,7 +152,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
    * Sets a marker on the map based on coordinates
    * @param latlng - Latitude and longitude coordinates
    */
-  public setMarker(latlng: L.LatLng): void {
+  public setMarker(latlng: L.LatLng, radius: number = environment.searchRadius): void {
     // Get the map object
     if (this.map) {
       // If there's no marker on the map...
@@ -160,7 +168,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         // Create a circle around it to show the search radius
         this.circle = new L.Circle(
           [latlng.lat, latlng.lng],
-          environment.searchRadius,
+          radius,
           {
             color: '#000',
             fillColor: '#ddd',
