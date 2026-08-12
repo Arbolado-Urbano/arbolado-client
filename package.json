@@ -5,9 +5,15 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:prod": "ng build --prod",
+    "build:staging": "ng build --configuration=staging",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "prepublish:prod": "npm run build:prod",
+    "prepublish:staging": "npm run build:staging",
+    "publish:prod": "rsync -ruv --progress ./dist/arboles-client/* arbolado:~/public_html/new",
+    "publish:staging": "rsync -ruv --progress ./dist/arboles-client/* arbolado:~/public_html/staging/"
   },
   "private": true,
   "dependencies": {
