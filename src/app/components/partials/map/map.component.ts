@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit } from '@angular/core';
 
 import * as L from 'leaflet';
 
@@ -9,17 +9,15 @@ import { environment } from '../../../../environments/environment';
   styleUrls: ['./map.component.scss'],
   templateUrl: './map.component.html',
 })
-export class MapComponent {
+export class MapComponent implements OnInit {
   // Event emitter for when the user sets or resets a marker on the map
   @Output() public markerSet: EventEmitter<L.LatLng> = new EventEmitter();
   // Event emitter for when the user clicks on a tree
   @Output() public treeSelected: EventEmitter<L.LatLng> = new EventEmitter();
   public map: L.Map; // Map reference
-  public layers = []; // Map layers
-  public mapFitToBounds: L.LatLngBounds; // To zoom into search results
-  public mapFitToBoundsOptions: L.FitBoundsOptions = { maxZoom: 15, animate: true }; // To zoom into search results
-  public options = { // Map options
-    center: [-34.618, -58.44], // BsAs
+  public mapFitToBoundsOptions: L.FitBoundsOptions = { maxZoom: 15, padding: [15, 15] }; // To zoom into search results
+  public options: L.MapOptions = { // Map options
+    center: L.latLng(-34.618, -58.44), // BsAs
     layers: [
       L.tileLayer(
         'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
@@ -53,7 +51,7 @@ export class MapComponent {
   };
   public marker: L.Marker; // Marker
   public circle: L.Circle; // Circle around marker indicating search radius
-  public treeMarkers: L.FeatureGroup = L.featureGroup(); // Trees from search result
+  public treeMarkers: L.MarkerClusterGroup; // Trees from search result
   private icons = {
     default: new L.Icon({
       iconAnchor: [15, 31],
@@ -62,14 +60,16 @@ export class MapComponent {
     }),
   };
 
-  constructor() {}
+  constructor() {
+    this.treeMarkers = L.markerClusterGroup(this.clusterOptions);
+  }
 
-  /**
-   * Stores a reference of the Leaflet map
-   * @param map - Reference to the Leaflet map
-   */
-  public onMapReady(map: L.Map): void {
-    this.map = map;
+  public ngOnInit(): void {
+    this.map = L.map('map', this.options);
+    this.map.addLayer(this.treeMarkers);
+    this.map.on('click', (event: any) => {
+      this.setMarker(event.latlng);
+    });
   }
 
   /**
@@ -108,7 +108,7 @@ export class MapComponent {
 
     // Center the map on the results
     if ((this.map) && (this.treeMarkers.getLayers().length)) {
-      this.mapFitToBounds = this.treeMarkers.getBounds();
+      this.map.fitBounds(this.treeMarkers.getBounds(), this.mapFitToBoundsOptions);
     }
   }
 
@@ -116,9 +116,8 @@ export class MapComponent {
    * Removes the search marker and it's "search radius" circle from the map
    */
   public removeMarker(): void {
-    this.layers = [];
-    delete this.marker;
-    delete this.circle;
+    this.map.removeLayer(this.marker);
+    this.map.removeLayer(this.circle);
   }
 
   /**
@@ -148,7 +147,7 @@ export class MapComponent {
           draggable: true,
           riseOnHover: true,
         });
-        this.layers.push(this.marker);
+        this.map.addLayer(this.marker);
 
         // Create a circle around it to show the search radius
         this.circle = new L.Circle(
@@ -160,7 +159,7 @@ export class MapComponent {
             fillOpacity: 0.3,
           },
         );
-        this.layers.push(this.circle);
+        this.map.addLayer(this.circle);
 
         // When the marker is dragged move the circle to it
         this.marker.on('dragend', (dragEvent) => {
@@ -173,6 +172,11 @@ export class MapComponent {
         // If a marker already exists, move it and its circle
         this.marker.setLatLng([latlng.lat, latlng.lng]);
         this.circle.setLatLng([latlng.lat, latlng.lng]);
+      }
+
+      if (!this.map.hasLayer(this.marker)) {
+        this.map.addLayer(this.marker);
+        this.map.addLayer(this.circle);
       }
 
       // Update the selected coordinates

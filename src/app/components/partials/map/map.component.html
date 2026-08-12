@@ -1,12 +1,1 @@
-<div
-  class="map-container"
-  leaflet
-  [leafletOptions]="options"
-  [leafletLayers]="layers"
-  [leafletMarkerCluster]="treeMarkers.getLayers()"
-  [leafletMarkerClusterOptions]="clusterOptions"
-  [leafletFitBounds]="mapFitToBounds"
-  [leafletFitBoundsOptions]="mapFitToBoundsOptions"
-  (leafletClick)="setMarker($event.latlng)"
-  (leafletMapReady)="onMapReady($event)">
-</div>
+<div id="map" class="map-container"></div>
