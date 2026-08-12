@@ -66,9 +66,11 @@ export class FormComponent implements OnChanges, OnInit, AfterViewInit {
   }
 
   public ngAfterViewInit(): void {
-    this.route.data.subscribe((data) => {
-      if (data.trees) {
-        this.treesLoaded.emit(data.trees);
+    // When the query params change => emit the new trees results array
+    this.route.queryParams.subscribe(() => {
+      const trees = this.route.snapshot.data.trees;
+      if (trees) {
+        this.treesLoaded.emit(trees);
       }
     });
   }

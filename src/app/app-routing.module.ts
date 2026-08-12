@@ -39,7 +39,7 @@ const routes: Routes = [
     // enableTracing :true, // For debugging
     scrollPositionRestoration: 'enabled',
     useHash: true,
-    relativeLinkResolution: 'legacy'
+    relativeLinkResolution: 'legacy',
   })],
 })
 export class AppRoutingModule { }
