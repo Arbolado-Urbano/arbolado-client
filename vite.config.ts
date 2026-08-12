@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
+  server: {
+    allowedHosts: ["dev.ares.uy"],
+  },
   build: {
     rollupOptions: {
       output: {
