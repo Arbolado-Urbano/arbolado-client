@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { ActivatedRoute, Router, NavigationExtras } from '@angular/router';
 import { FormControl, FormGroup } from '@angular/forms';
 
@@ -15,7 +15,7 @@ import { LatLng } from 'leaflet';
   styleUrls: ['./form.component.scss'],
   templateUrl: './form.component.html',
 })
-export class FormComponent implements OnChanges, AfterViewInit {
+export class FormComponent implements OnChanges, OnInit, AfterViewInit {
   // Event emitter for when the search results have been loaded
   @Output() public treesLoaded: EventEmitter<any[]> = new EventEmitter();
   // Event emitter for when the user wants to remove the map marker
@@ -36,19 +36,31 @@ export class FormComponent implements OnChanges, AfterViewInit {
     private apiService: ApiService,
     private router: Router,
     private route: ActivatedRoute
-  ) {
+  ) {}
+
+  public ngOnInit(): void {
+    const flavors = this.route.snapshot.queryParamMap.get('user_sabores');
+    const marker = this.route.snapshot.queryParamMap.get('user_latlng');
+    const origin = this.route.snapshot.queryParamMap.get('user_origen');
+    const cuyana = this.route.snapshot.queryParamMap.get('borigen_cuyana');
+    const nea = this.route.snapshot.queryParamMap.get('borigen_nea');
+    const noa = this.route.snapshot.queryParamMap.get('borigen_noa');
+    const pampeana = this.route.snapshot.queryParamMap.get('borigen_pampeana');
+    const patagonica = this.route.snapshot.queryParamMap.get('borigen_patagonica');
+    const species = this.route.snapshot.queryParamMap.get('especie_id');
+
     this.form = new FormGroup({
-      flavors: new FormControl(),
-      marker: new FormControl(''),
-      origin: new FormControl(),
+      flavors: new FormControl(flavors),
+      marker: new FormControl(marker ? marker : ''),
+      origin: new FormControl(origin),
       region: new FormGroup({
-        cuyana: new FormControl(),
-        nea: new FormControl(),
-        noa: new FormControl(),
-        pampeana: new FormControl(),
-        patagonica: new FormControl(),
+        cuyana: new FormControl(cuyana),
+        nea: new FormControl(nea),
+        noa: new FormControl(noa),
+        pampeana: new FormControl(pampeana),
+        patagonica: new FormControl(patagonica),
       }),
-      species: new FormControl(''),
+      species: new FormControl(species ? Number(species) : ''),
     });
 
     // When the marker FormControl is set to "0" => emit an event indicating this
@@ -61,10 +73,9 @@ export class FormComponent implements OnChanges, AfterViewInit {
 
   public ngAfterViewInit(): void {
     this.route.data.subscribe((data) => {
-      const trees = data.trees;
-      if (trees) {
-        this.treesLoaded.emit(trees);
-      }
+      console.log(data);
+      const trees = data.trees ? data.trees : [];
+      this.treesLoaded.emit(trees);
     });
   }
 
@@ -121,14 +132,14 @@ export class FormComponent implements OnChanges, AfterViewInit {
     // Set the filters
     const navigationExtras: NavigationExtras = {
       queryParams: {
-        user_sabores: data.flavors,
+        user_sabores: data.flavors ? data.flavors : undefined,
         user_latlng: data.marker ? data.marker : undefined,
-        user_origen: data.origin,
-        borigen_cuyana: data.cuyana,
-        borigen_nea: data.nea,
-        borigen_noa: data.noa,
-        borigen_pampeana: data.pampeana,
-        borigen_patagonica: data.patagonica,
+        user_origen: data.origin ? data.origin : undefined,
+        borigen_cuyana: data.region.cuyana ? data.region.cuyana : undefined,
+        borigen_nea: data.region.nea ? data.region.nea : undefined,
+        borigen_noa: data.region.noa ? data.region.noa : undefined,
+        borigen_pampeana: data.region.pampeana ? data.region.pampeana : undefined,
+        borigen_patagonica: data.region.patagonica ? data.region.patagonica : undefined,
         especie_id: data.species ? data.species : undefined,
         radio: data.marker ? environment.searchRadius.toString() : undefined,
       },

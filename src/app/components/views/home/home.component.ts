@@ -49,7 +49,6 @@ export class HomeComponent implements AfterViewInit {
 
   public ngAfterViewInit(): void {
     const tree = this.route.snapshot.data.tree;
-    console.log(tree);
     if (tree) {
       this.treeComponent.displayTree(tree);
     }
