@@ -1,6 +1,8 @@
-import { NominatimSearchResult } from './types/NominatimResponse'
-import { Filters } from './types/Filters'
-import { Species } from './types/Species'
+import { type LngLatBounds } from 'maplibre-gl'
+
+import { type NominatimSearchResult } from './types/NominatimResponse'
+import { type Filters } from './types/Filters'
+import { type Species } from './types/Species'
 
 import Alert, { AlertType } from './elements/Alert/Alert'
 
@@ -159,7 +161,7 @@ export default class Arbolado {
   }
 
   // Looks up an address or place and returns its coordinates.
-  async addressLookup(query: string, bounds?: maplibregl.LngLatBounds): Promise<NominatimSearchResult[] | undefined> {
+  async addressLookup(query: string, bounds?: LngLatBounds): Promise<NominatimSearchResult[] | undefined> {
     const { VITE_NOMINATIM_URL } = import.meta.env
     const data = new URLSearchParams({
       'accept-language': 'es',

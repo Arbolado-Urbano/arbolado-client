@@ -1,7 +1,9 @@
-import { Step } from "../elements/AddTreeForm/AddTreeForm"
-import { Filters } from "./Filters"
-import { Species } from "./Species"
-import { Tree } from "./Tree"
+import { type LngLatBounds } from "maplibre-gl"
+
+import { type Step } from "../elements/AddTreeForm/AddTreeForm"
+import { type Filters } from "./Filters"
+import { type Species } from "./Species"
+import { type Tree } from "./Tree"
 
 export type ArboladoEventMap = {
   'arbolado:loading': CustomEvent<{ loading: boolean }>
@@ -21,7 +23,7 @@ export type ArboladoEventMap = {
   'arbolado:species/change': CustomEvent<{ species: Species | null | undefined }>
   'arbolado:species/loaded': CustomEvent<void>
   'arbolado:map/loaded': CustomEvent<void>
-  'arbolado:map/move': CustomEvent<{ bounds: maplibregl.LngLatBounds }>
+  'arbolado:map/move': CustomEvent<{ bounds: LngLatBounds }>
   'arbolado:search': CustomEvent<{ filters: Filters }>
   'arbolado:tree/selected': CustomEvent<{ id: string }>
   'arbolado:tree/displayed': CustomEvent<{ tree: Tree }>
