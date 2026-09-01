@@ -1,5 +1,8 @@
 import { Modal } from 'bootstrap'
 
+import { setWorkerUrl } from 'maplibre-gl'
+import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
+
 import { ArboladoEventMap } from './types/Events'
 
 import Arbolado from './Arbolado'
@@ -16,6 +19,8 @@ import Captcha from './elements/Captcha'
 import Alert from './elements/Alert/Alert'
 import TabGroup from './elements/TabGroup'
 import GeoBtn from './elements/GeoBtn/GeoBtn'
+
+setWorkerUrl(workerUrl)
 
 declare global {
   interface Window {
