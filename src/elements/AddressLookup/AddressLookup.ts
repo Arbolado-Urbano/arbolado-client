@@ -1,4 +1,6 @@
-import { NominatimSearchResult } from '../../types/NominatimResponse'
+import { type LngLatBounds } from 'maplibre-gl'
+
+import { type NominatimSearchResult } from '../../types/NominatimResponse'
 
 import AddressLookupTemplate from './AddressLookup.html?raw'
 
@@ -8,7 +10,7 @@ export default class AddressLookup extends HTMLElement {
   private inputElement: HTMLInputElement
   private resultsElement: HTMLElement
   private itemTemplate: HTMLTemplateElement
-  private bounds?: maplibregl.LngLatBounds
+  private bounds?: LngLatBounds
 
   constructor() {
     super()
@@ -24,7 +26,7 @@ export default class AddressLookup extends HTMLElement {
     this.searchBtn.addEventListener('click', () => this.handleSearch())
   }
 
-  public setBounds(bounds: maplibregl.LngLatBounds) {
+  public setBounds(bounds: LngLatBounds) {
     this.bounds = bounds
   }
 

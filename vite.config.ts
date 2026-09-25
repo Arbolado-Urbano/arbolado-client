@@ -1,6 +1,12 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
+  server: {
+    allowedHosts: ["dev.ares.uy"],
+  },
+  optimizeDeps: {
+    exclude: ["maplibre-gl"],
+  },
   build: {
     rollupOptions: {
       output: {

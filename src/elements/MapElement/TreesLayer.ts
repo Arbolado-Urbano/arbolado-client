@@ -1,10 +1,10 @@
-import { Map, addProtocol, ExpressionSpecification, LngLatBounds } from 'maplibre-gl'
+import { Map, addProtocol, ExpressionSpecification, LngLatBounds, DataDrivenPropertyValueSpecification } from 'maplibre-gl'
 
 import { Protocol } from 'pmtiles'
 
 import { Filters } from '../../types/Filters'
 
-import { DEFAULTS, ICON_PATH } from '../../constants/speciesStyles'
+import { DEFAULTS, /*ICON_PATH*/ } from '../../constants/speciesStyles'
 
 import MapElement from './MapElement'
 
@@ -13,7 +13,7 @@ export class TreesLayer {
   private readonly TREES_SOURCE = 'trees-source'
   private readonly ICONS_LAYER = 'icons-layer'
   private readonly DOTS_LAYER = 'dots-layer'
-  private readonly TRANSITION_ZOOM_LEVEL = 16
+  // private readonly TRANSITION_ZOOM_LEVEL = 16
   private readonly INITIAL_DOT_SIZES = [
     2, 6,
     5, 4,
@@ -160,15 +160,17 @@ export class TreesLayer {
 
     if (!features.length) return
 
-    let radius: any[] = ['interpolate', ['linear'], ['zoom']]
+    let radius: DataDrivenPropertyValueSpecification<number> | undefined
+    const radiusBase: DataDrivenPropertyValueSpecification<number> = ['interpolate', ['linear'], ['zoom']]
     if (features.length < 20000) {
-      radius = radius.concat([
+      radius = [
+        ...radiusBase,
         10, 2,
         14, 6,
         21, 8
-      ])
+      ]
     } else {
-      radius = radius.concat(this.INITIAL_DOT_SIZES)
+      radius = [...radiusBase, ...this.INITIAL_DOT_SIZES]
     }
 
     this.map.setPaintProperty(this.DOTS_LAYER, 'circle-radius', radius)
