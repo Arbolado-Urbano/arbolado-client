@@ -1,4 +1,4 @@
-import { type LngLatBounds } from "maplibre-gl"
+import { type LngLatBounds } from "mapbox-gl"
 
 import { type Step } from "../elements/AddTreeForm/AddTreeForm"
 import { type Filters } from "./Filters"

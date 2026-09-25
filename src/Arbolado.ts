@@ -1,4 +1,4 @@
-import { type LngLatBounds } from 'maplibre-gl'
+import { type LngLatBounds } from 'mapbox-gl'
 
 import { type NominatimSearchResult } from './types/NominatimResponse'
 import { type Filters } from './types/Filters'
@@ -12,10 +12,11 @@ type OptionalArg<D> = D extends void ? [] : [data: D]
 
 export default class Arbolado {
   overlay: HTMLElement
-  queryParams: URLSearchParams
   callOnEsc: Function[] = []
   bodyScrollHide: number = 0
   species?: Species[]
+  queryParams: URLSearchParams
+  private _filters: Filters = {}
 
   constructor() {
     this.loadSpecies()
@@ -57,6 +58,15 @@ export default class Arbolado {
   pushQueryParams() {
     const url = `${window.location.protocol}//${window.location.host}${window.location.pathname}?${this.queryParams.toString()}`
     history.pushState(null, '', url)
+  }
+
+  get filters() {
+    return this._filters
+  }
+
+  set filters(filters: Filters) {
+    this._filters = filters
+    window.Arbolado.emitEvent(document, 'arbolado:search', { filters })
   }
 
   async fetch(url: string, method: string = 'GET', body?: BodyInit, headers?: HeadersInit, loadingIndicator: boolean = true) {
@@ -140,20 +150,13 @@ export default class Arbolado {
     }
   }
 
-  filter(filters: Filters) {
-    window.Arbolado.emitEvent(document, 'arbolado:search', { filters })
-  }
-
-  async loadSourceFromURL() {
+  loadSourceFromURL() {
     const path = window.location.pathname.split('/')
     if (path[1] !== 'fuente') return
-    const fuenteSlug = path[2]
-    if (!fuenteSlug) return
+    const sourceUrl = path[2]
+    if (!sourceUrl) return
     try {
-      const response = await this.fetchAPI(`/fuentes/${fuenteSlug}`, 'GET')
-      const source: { id: number } | undefined = await response.json()
-      if (!source) return
-      this.filter({ sourceId: source.id })
+      this.filters = { sourceUrl }
       window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
     } catch (error) {
       console.error(error)

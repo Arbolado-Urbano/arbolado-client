@@ -145,6 +145,8 @@ export default class AddTreeForm extends HTMLElement {
 
     this.modal.addEventListener('show.bs.modal', async () => { if (this.step.index === 0) await this.goToFirstStep() })
 
+    this.modal.addEventListener('shown.bs.modal', this.geoInput.resize)
+
     this.addEventListener('arbolado:form/step', (event) => {
       const stepLabel = event.detail.current.label
       if (stepLabel === 'location') {

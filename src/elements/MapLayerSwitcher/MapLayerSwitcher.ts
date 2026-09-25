@@ -1,22 +1,22 @@
-import { IControl, Map } from 'maplibre-gl'
+import { IControl, Map } from 'mapbox-gl'
+
+import { StyleOption, styles } from '../MapElement/MapElement'
 
 import MapLayerSwitcherTemplate from './MapLayerSwitcher.html?raw'
-
-export type BaseLayerId = 'streets' | 'satellite'
 
 export class MapLayerSwitcher implements IControl {
   private map?: Map
   private container?: HTMLElement
-  private active: BaseLayerId
+  private active: StyleOption
 
-  constructor(initialLayer: BaseLayerId = 'streets') {
-    this.active = initialLayer
+  constructor(initialStyle: StyleOption = 'streets') {
+    this.active = initialStyle
   }
 
   onAdd(map: Map): HTMLElement {
     this.map = map
     this.container = document.createElement('div')
-    this.container.className = 'maplibregl-ctrl maplibregl-ctrl-group'
+    this.container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group'
     this.container.setAttribute('role', 'group')
     this.container.setAttribute('aria-label', 'Capa')
 
@@ -24,7 +24,7 @@ export class MapLayerSwitcher implements IControl {
 
     this.container.querySelectorAll('button').forEach(btn => {
       btn.addEventListener('click', () => {
-        this.switchTo(btn.dataset.layer as BaseLayerId)
+        this.switchTo(btn.dataset.style as StyleOption)
       })
     })
 
@@ -36,13 +36,12 @@ export class MapLayerSwitcher implements IControl {
     this.map = undefined
   }
 
-  switchTo(layer: BaseLayerId): void {
-    if (!this.map || layer === this.active) return
-    this.map.setLayoutProperty('streets', 'visibility', layer === 'streets' ? 'visible' : 'none')
-    this.map.setLayoutProperty('satellite', 'visibility', layer === 'satellite' ? 'visible' : 'none')
-    this.active = layer
+  switchTo(style: StyleOption): void {
+    if (!this.map || style === this.active) return
+    this.map.setStyle(styles[style])
+    this.active = style
     this.container?.querySelectorAll('button').forEach(btn => {
-      const isActive = btn.dataset.layer === layer
+      const isActive = btn.dataset.style === style
       if (isActive) {
         btn.classList.add('active')
       } else {

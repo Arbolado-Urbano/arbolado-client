@@ -1,8 +1,5 @@
 import { Modal } from 'bootstrap'
 
-import { setWorkerUrl } from 'maplibre-gl'
-import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
-
 import { ArboladoEventMap } from './types/Events'
 
 import Arbolado from './Arbolado'
@@ -20,8 +17,6 @@ import Alert from './elements/Alert/Alert'
 import TabGroup from './elements/TabGroup'
 import GeoBtn from './elements/GeoBtn/GeoBtn'
 
-setWorkerUrl(workerUrl)
-
 declare global {
   interface Window {
     Arbolado: Arbolado,
@@ -36,7 +31,7 @@ window.Arbolado = new Arbolado()
 
 // Define custom elements
 customElements.define('arbolado-loader', Loader)
-customElements.define('arbolado-map', MapElement)
+customElements.define('arbolado-form', SearchForm)
 customElements.define('arbolado-species-select', SpeciesSelect)
 customElements.define('arbolado-geo-input', GeoInput)
 customElements.define('arbolado-add-tree-form', AddTreeForm)
@@ -45,22 +40,22 @@ customElements.define('arbolado-alert', Alert)
 customElements.define('arbolado-tab-group', TabGroup)
 
 window.Arbolado.ready(() => {
+  // Check to see if a source is selected on the URL
+  window.Arbolado.loadSourceFromURL()
   const mapElement = document.querySelector('[js-arbolado-map]') as MapElement
   const treeDrawer = document.querySelector('[js-tree-drawer]') as TreeDrawer
   const addressLookup = document.querySelector('[js-address-lookup]') as AddressLookup
+  customElements.define('arbolado-map', MapElement)
   mapElement.addEventListener('arbolado:map/loaded', () => {
     mapElement.addEventListener('arbolado:tree/selected', ({ detail }) => treeDrawer.displayTree(detail.id))
     mapElement.addEventListener('arbolado:map/move', ({ detail }) => addressLookup.setBounds(detail.bounds))
     treeDrawer.addEventListener('arbolado:tree/displayed', ({ detail: { tree } }) => mapElement.center({ lat: tree.lat, lng: tree.lng }, 20))
     addressLookup.addEventListener('arbolado:address/selected', ({ detail }) => mapElement.center({ lng: detail.lng, lat: detail.lat }))
-    document.addEventListener('arbolado:search', ({ detail }) => mapElement.filterSpecies(detail.filters))
+    document.addEventListener('arbolado:search', mapElement.loadTrees)
     // Wait for the map to be fully loaded before initializing these components
     customElements.define('arbolado-tree-drawer', TreeDrawer)
     customElements.define('arbolado-address-lookup', AddressLookup)
     customElements.define('arbolado-geo-btn', GeoBtn)
-    customElements.define('arbolado-form', SearchForm)
-    // Check to see if a source is selected on the URL
-    window.Arbolado.loadSourceFromURL()
   })
 
   // Check if the privacy policy modal should be displayed

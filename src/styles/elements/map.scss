@@ -18,7 +18,15 @@
   display: flex;
 }
 
-
 .maplibregl-popup {
   padding-bottom: 1rem;
+}
+
+.mapboxgl-ctrl button.active {
+  background-color: $primary;
+  color: #fff;
+}
+
+.mapboxgl-ctrl button.active:hover {
+  color: #000;
 }

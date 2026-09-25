@@ -58,7 +58,7 @@ export default class SearchForm extends HTMLElement {
     }
   }
 
-  private async updateFormValues() {
+  private updateFormValues() {
     // Set the form field values from the URL query parameters if any
     this.flavors.checked = window.Arbolado.queryParams.get('user_sabores') !== null
     this.species.setSpeciesFromURL()
@@ -76,7 +76,7 @@ export default class SearchForm extends HTMLElement {
     }
   }
 
-  private async search(updateURL: boolean = true) {
+  private search(updateURL: boolean = true) {
     // Validate the form
     if (!window.Arbolado.validateForm(this.form)) return
 
@@ -93,10 +93,10 @@ export default class SearchForm extends HTMLElement {
     this.filtersSidebar.hide()
 
     // Make the search
-    window.Arbolado.filter({
+    window.Arbolado.filters = {
       speciesUrl: this.species.value?.url,
       flavors: this.flavors.checked,
-    })
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
   }
 }

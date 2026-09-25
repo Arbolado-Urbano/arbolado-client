@@ -1,12 +1,11 @@
-import { Map, Marker } from 'maplibre-gl'
-
-import { mapStyles } from '../../constants/mapStyles'
+import { Map, Marker } from 'mapbox-gl'
 
 import GeoBtn from '../GeoBtn/GeoBtn'
 import AddressLookup from '../AddressLookup/AddressLookup'
 import { MapLayerSwitcher } from '../MapLayerSwitcher/MapLayerSwitcher'
 
 import GeoInputTemplate from './GeoInput.html?raw'
+import { styles } from '../MapElement/MapElement'
 
 export default class GeoInput extends HTMLElement {
   _value: string | null = null
@@ -25,11 +24,13 @@ export default class GeoInput extends HTMLElement {
 
     this.map = new Map({
       container: 'geo-input-map',
-      style: mapStyles,
       center: [-58.44, -34.618], // BsAs
       zoom: 14,
       maxZoom: 21,
       minZoom: 5,
+      accessToken: import.meta.env.VITE_MAPBOX_TOKEN,
+      style: styles.streets,
+      language: "es-419",
     })
 
     this.geoBtn.addEventListener('arbolado:geo/searching', () => this.setLoading(true))
@@ -42,7 +43,11 @@ export default class GeoInput extends HTMLElement {
     this.map.on('click', ({ lngLat }) => {
       this.setValue(lngLat)
     })
-    this.map.on('move', () => this.map && this.addressLookup.setBounds(this.map.getBounds()))
+
+    this.map.on('move', () => {
+      const bounds = this.map.getBounds()
+      if (bounds) this.addressLookup.setBounds(bounds)
+    })
 
     // Layer switcher
     this.map.addControl(new MapLayerSwitcher('streets'), 'bottom-right')
@@ -55,7 +60,12 @@ export default class GeoInput extends HTMLElement {
   }
 
   setCenter(lat: number, lng: number) {
-    this.map.panTo({ lat, lng }, { zoom: 12 })
+    this.map.panTo({ lat, lng })
+  }
+
+  resize = () => {
+    console.log("resize")
+    this.map.resize()
   }
 
   static get formAssociated() { return true }
