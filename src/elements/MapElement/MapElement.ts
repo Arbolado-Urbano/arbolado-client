@@ -15,24 +15,24 @@ const SOURCE_ID = "trees"
 const CLUSTER_LAYER_ID = "clusters"
 const ICON_LAYER_ID = "icons"
 const CLUSTER_MAX_ZOOM = 16
+const BEARING = 0
 
 export type StyleOption = keyof typeof styles
 
-const bearing = 0
 
 export default class MapElement extends HTMLElement {
   private iconImage?: ExpressionSpecification | string
+  private zoomOnResults: boolean = true
   private readonly map = new Map({
     accessToken: import.meta.env.VITE_MAPBOX_TOKEN,
     container: "map",
     style: styles.streets,
-    // TODO: remove this center or change the zoom
     center: [-58.44, -34.618], // BsAs
     language: "es-419",
-    zoom: 12,
+    zoom: 2,
     maxZoom: 21,
     minZoom: 2,
-    bearing,
+    bearing: BEARING,
   })
 
   constructor() {
@@ -92,7 +92,7 @@ export default class MapElement extends HTMLElement {
           return
         }
         const zoomLevel = zoom ? zoom + 2 : undefined
-        this.map.easeTo({ center: features[0].toJSON().geometry.coordinates, zoom: zoomLevel, bearing })
+        this.map.easeTo({ center: features[0].toJSON().geometry.coordinates, zoom: zoomLevel, bearing: BEARING })
       })
     })
 
@@ -102,8 +102,9 @@ export default class MapElement extends HTMLElement {
     this.map.on("mouseleave", CLUSTER_LAYER_ID, () => this.map.getCanvas().style.cursor = "")
   }
 
-  center = (center: LngLatLike, zoom: number = 15) => {
-    this.map.flyTo({ center, zoom, bearing })
+  center = (center: LngLatLike, zoom: number = 15, tree: boolean = false) => {
+    this.zoomOnResults = !tree
+    this.map.flyTo({ center, zoom, bearing: BEARING })
   }
 
   loadTrees = async (reCenter: boolean = true) => {
@@ -112,20 +113,27 @@ export default class MapElement extends HTMLElement {
     if (reCenter) {
       this.map.once("idle", () => this.zoomToFilteredResults(trees.features))
     }
-    // TODO: BUG: There is already a source with ID "trees".
-    this.map.addSource(SOURCE_ID, {
-      type: "geojson",
-      data: trees,
-      cluster: true,
-      clusterMaxZoom: CLUSTER_MAX_ZOOM,
-      clusterRadius: 80
-    })
+    const source = this.map.getSource<GeoJSONSource>(SOURCE_ID)
+    if (!source) {
+      this.map.addSource(SOURCE_ID, {
+        type: "geojson",
+        data: trees,
+        cluster: true,
+        clusterMaxZoom: CLUSTER_MAX_ZOOM,
+        clusterRadius: 80
+      })
+    } else {
+      source.setData(trees)
+    }
     window.Arbolado.setLoading(false)
   }
 
   private zoomToFilteredResults = (features: any[]) => {
+    if (!this.zoomOnResults) {
+      this.zoomOnResults = true
+      return
+    }
     if (!features.length) return
-
     const bounds = new LngLatBounds()
     for (const feature of features) {
       bounds.extend(feature.geometry.coordinates as [number, number])
@@ -135,7 +143,7 @@ export default class MapElement extends HTMLElement {
       padding: 60,
       maxZoom: CLUSTER_MAX_ZOOM,
       duration: 800,
-      bearing,
+      bearing: BEARING,
     })
   }
 
