@@ -91,7 +91,8 @@ export default class MapElement extends HTMLElement {
           console.error(error)
           return
         }
-        this.map.easeTo({ center: features[0].toJSON().geometry.coordinates, zoom: zoom ?? undefined })
+        const zoomLevel = zoom ? zoom + 2 : undefined
+        this.map.easeTo({ center: features[0].toJSON().geometry.coordinates, zoom: zoomLevel, bearing })
       })
     })
 
@@ -117,7 +118,7 @@ export default class MapElement extends HTMLElement {
       data: trees,
       cluster: true,
       clusterMaxZoom: CLUSTER_MAX_ZOOM,
-      clusterRadius: 50
+      clusterRadius: 80
     })
     window.Arbolado.setLoading(false)
   }
