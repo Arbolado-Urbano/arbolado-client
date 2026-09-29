@@ -18,18 +18,18 @@
     "@fortawesome/fontawesome-free": "7.3.1",
     "@popperjs/core": "2.11.8",
     "bootstrap": "5.3.8",
-    "mapbox-gl": "3.30.0"
+    "mapbox-gl": "3.31.0"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@types/bootstrap": "5.2.11",
     "@types/cloudflare-turnstile": "0.2.2",
-    "@typescript-eslint/parser": "8.68.0",
-    "eslint": "10.9.1",
+    "@typescript-eslint/parser": "8.70.1",
+    "eslint": "10.11.0",
     "eslint-plugin-react-hooks": "7.1.1",
-    "globals": "17.11.0",
-    "sass": "1.103.1",
+    "globals": "17.12.0",
+    "sass": "1.105.0",
     "typescript": "6.0.3",
-    "vite": "8.2.2"
+    "vite": "8.3.0"
   }
 }
