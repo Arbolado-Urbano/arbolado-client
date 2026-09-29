@@ -237,10 +237,10 @@ export default class AddTreeForm extends HTMLElement {
             window.Arbolado.alert('danger', 'Ocurrió un error. Intenta nuevamente más tarde.')
           }
           if (!token) return
-          const data = new FormData()
-          data.set('captcha', token)
-          data.set('code', this.codeInput.value)
-          const response = await window.Arbolado.fetchAPI('/usuarios', 'POST', data)
+          const body = new FormData()
+          body.set('captcha', token)
+          body.set('code', this.codeInput.value)
+          const response = await window.Arbolado.fetchAPI('/usuarios', { method: 'POST', body })
           if (!response.ok) {
             if (response.status === 500) {
               window.Arbolado.alert('danger', 'Ocurrió un error al validar tu código. Intenta nuevamente más tarde.')
@@ -437,15 +437,15 @@ export default class AddTreeForm extends HTMLElement {
       window.Arbolado.alert('danger', 'Ocurrió un error. Intenta nuevamente más tarde.')
     }
     if (!token) return
-    const data = new FormData()
+    const body = new FormData()
     for (const selectedImage of this.selectedSpeciesImages) {
-      data.append('images[]', selectedImage.image)
-      data.append('types[]', selectedImage.type)
+      body.append('images[]', selectedImage.image)
+      body.append('types[]', selectedImage.type)
     }
-    // Add captcha token to data
-    data.set('captcha', token)
+    // Add captcha token to body
+    body.set('captcha', token)
     try {
-      const response = await window.Arbolado.fetchAPI('/identificar', 'POST', data)
+      const response = await window.Arbolado.fetchAPI('/identificar', { method: 'POST', body })
       const responseData: PlantNetResponse | undefined = await response.json()
       if (responseData) {
         const bestMatchSpecies = responseData.results[0]?.species
@@ -506,40 +506,41 @@ export default class AddTreeForm extends HTMLElement {
     const locationFormData = new FormData(this.steps.location)
     const dataFormData = new FormData(this.steps.data)
 
-    const data = new FormData()
-    if (idFormData.has('code')) data.set('code', idFormData.get('code')!)
-    if (idFormData.has('email')) data.set('email', idFormData.get('email')!)
-    if (idFormData.has('name')) data.set('name', idFormData.get('name')!)
-    if (idFormData.has('website')) data.set('website', idFormData.get('website')!)
-    if (locationFormData.has('block')) data.set('block', locationFormData.get('block')!)
-    if (locationFormData.has('street')) data.set('street', locationFormData.get('street')!)
-    if (locationFormData.has('street-number')) data.set('streetNumber', locationFormData.get('street-number')!)
-    if (this.geoInput.value) data.set('coordinates', this.geoInput.value)
-    if (species) data.set('species', species)
-    if (speciesUrl) data.set('speciesUrl', speciesUrl)
-    if (dataFormData.has('height')) data.set('height', dataFormData.get('height')!)
-    if (dataFormData.has('inclination')) data.set('inclination', dataFormData.get('inclination')!)
-    if (dataFormData.has('diameter-trunk')) data.set('diameterTrunk', dataFormData.get('diameter-trunk')!)
-    if (dataFormData.has('notes')) data.set('notes', dataFormData.get('notes')!)
-    if (dataFormData.has('development')) data.set('development', dataFormData.get('development')!)
-    if (dataFormData.has('health')) data.set('health', dataFormData.get('health')!)
-    data.set('captcha', token)
+    const body = new FormData()
+    if (idFormData.has('code')) body.set('code', idFormData.get('code')!)
+    if (idFormData.has('email')) body.set('email', idFormData.get('email')!)
+    if (idFormData.has('name')) body.set('name', idFormData.get('name')!)
+    if (idFormData.has('website')) body.set('website', idFormData.get('website')!)
+    if (locationFormData.has('block')) body.set('block', locationFormData.get('block')!)
+    if (locationFormData.has('street')) body.set('street', locationFormData.get('street')!)
+    if (locationFormData.has('street-number')) body.set('streetNumber', locationFormData.get('street-number')!)
+    if (this.geoInput.value) body.set('coordinates', this.geoInput.value)
+    if (species) body.set('species', species)
+    if (speciesUrl) body.set('speciesUrl', speciesUrl)
+    if (dataFormData.has('height')) body.set('height', dataFormData.get('height')!)
+    if (dataFormData.has('inclination')) body.set('inclination', dataFormData.get('inclination')!)
+    if (dataFormData.has('diameter-trunk')) body.set('diameterTrunk', dataFormData.get('diameter-trunk')!)
+    if (dataFormData.has('notes')) body.set('notes', dataFormData.get('notes')!)
+    if (dataFormData.has('development')) body.set('development', dataFormData.get('development')!)
+    if (dataFormData.has('health')) body.set('health', dataFormData.get('health')!)
+    body.set('captcha', token)
     for (const image of this.selectedSpeciesImages) {
-      data.append('species-images[]', image.image)
+      body.append('species-images[]', image.image)
     }
     if (this.imagesInput.files) {
       for (const image of this.imagesInput.files) {
-        data.append('images[]', image)
+        body.append('images[]', image)
       }
     }
 
     // Submit
     const requestUrl = `/${this.personalDataTabGroup.currentTab() === 'code' ? 'arboles' : 'aportes'}`
-    const response = await window.Arbolado.fetchAPI(requestUrl, 'POST', data)
+    const response = await window.Arbolado.fetchAPI(requestUrl, { method: 'POST', body })
     if (!response.ok) {
       alert('Ocurrió un error, intentá de nuevo más tarde')
     } else {
       await this.goStep(this.step.index + 1)
+      window.Arbolado.dataSource.syncNewTrees()
     }
   }
 }

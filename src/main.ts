@@ -51,7 +51,8 @@ window.Arbolado.ready(() => {
     mapElement.addEventListener('arbolado:map/move', ({ detail }) => addressLookup.setBounds(detail.bounds))
     treeDrawer.addEventListener('arbolado:tree/displayed', ({ detail: { tree } }) => mapElement.center({ lat: tree.lat, lng: tree.lng }, 20))
     addressLookup.addEventListener('arbolado:address/selected', ({ detail }) => mapElement.center({ lng: detail.lng, lat: detail.lat }))
-    document.addEventListener('arbolado:search', mapElement.loadTrees)
+    document.addEventListener('arbolado:search', () => mapElement.loadTrees())
+    document.addEventListener('arbolado:trees/update', () => mapElement.loadTrees(false))
     // Wait for the map to be fully loaded before initializing these components
     customElements.define('arbolado-tree-drawer', TreeDrawer)
     customElements.define('arbolado-address-lookup', AddressLookup)

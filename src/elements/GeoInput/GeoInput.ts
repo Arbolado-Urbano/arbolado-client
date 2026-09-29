@@ -55,16 +55,15 @@ export default class GeoInput extends HTMLElement {
     this.addressLookup.addEventListener('arbolado:address/selected', ({ detail }) => this.setValue(detail))
   }
 
-  formResetCallback() {
+  formResetCallback = () => {
     this.setValue()
   }
 
-  setCenter(lat: number, lng: number) {
+  setCenter = (lat: number, lng: number) => {
     this.map.panTo({ lat, lng })
   }
 
   resize = () => {
-    console.log("resize")
     this.map.resize()
   }
 
@@ -75,27 +74,12 @@ export default class GeoInput extends HTMLElement {
     window.Arbolado.emitEvent(this, 'change')
   }
 
-  setLoading(loading: boolean) {
-    if (loading) this.classList.add('loading')
-    else this.classList.remove('loading')
-  }
-
-  /**
-   * Re-centers the map around the given coordinates
-   * @param map - The map object
-   * @param latLng - The latlng coordinates
-   */
-  private latlngUpdated(latLng: { lat: number, lng: number }): void {
-    // Re-center the map around the given coordinates
-    this.map?.panTo(latLng)
-    // Set the new coordinates
-  }
-
   /**
   * Sets the given latLng as the current value and sets a marker on the map for those coordinates
+  * 
   * @param latLng - Latitude and longitude coordinates
   */
-  public setValue(latLng?: { lat: number, lng: number }): void {
+  private setValue = (latLng?: { lat: number, lng: number }) => {
     if (!latLng) {
       if (this.marker) this.marker.remove()
       this.value = null
@@ -114,5 +98,22 @@ export default class GeoInput extends HTMLElement {
       // Set the value for the selected coordinates
       this.value = `${latLng.lat},${latLng.lng}`
     }
+  }
+
+  private setLoading = (loading: boolean) => {
+    if (loading) this.classList.add('loading')
+    else this.classList.remove('loading')
+  }
+
+  /**
+   * Re-centers the map around the given coordinates
+   * 
+   * @param map - The map object
+   * @param latLng - The latlng coordinates
+   */
+  private latlngUpdated(latLng: { lat: number, lng: number }) {
+    // Re-center the map around the given coordinates
+    this.map?.panTo(latLng)
+    // Set the new coordinates
   }
 }

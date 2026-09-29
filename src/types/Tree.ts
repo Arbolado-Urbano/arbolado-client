@@ -37,11 +37,12 @@ export type Tree = {
   }[]
 }
 
-export type TreeList = {
+export type Trees = {
   id: number,
   lat: number,
   lng: number,
   species: number,
+  deleted?: string,
 }[]
 
 export type GeoJSONTrees = {

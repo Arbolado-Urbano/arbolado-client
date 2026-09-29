@@ -1,4 +1,4 @@
-import { Offcanvas, Popover } from 'bootstrap'
+import { Offcanvas } from 'bootstrap'
 
 import SearchFormTemplate from './SearchForm.html?raw'
 
@@ -7,8 +7,6 @@ import { EMPTY_PLANTER_URL } from '../../constants/emptyPlanter'
 import SpeciesSelect from '../SpeciesSelect/SpeciesSelect'
 
 export default class SearchForm extends HTMLElement {
-  private searchBtn: HTMLButtonElement
-  private searchBtnPopover: Popover
   private form: HTMLFormElement
   private flavors: HTMLInputElement
   private species: SpeciesSelect
@@ -20,7 +18,6 @@ export default class SearchForm extends HTMLElement {
     this.handleSpeciesChange = this.handleSpeciesChange.bind(this)
     // Init form fields
     this.form = this.querySelector('[js-form]') as HTMLFormElement
-    this.searchBtn = this.querySelector('[js-search-btn]') as HTMLButtonElement
     this.flavors = this.querySelector('[js-input=flavors]') as HTMLInputElement
     this.species = this.querySelector('[js-input=species]') as SpeciesSelect
     this.filtersSidebar = new Offcanvas(document.querySelector('[js-filters-menu]') as HTMLElement)
@@ -37,14 +34,6 @@ export default class SearchForm extends HTMLElement {
     }
     // Update the form values if the user navigates back/forth trough the session's history
     document.addEventListener('arbolado:queryParams/update', () => this.updateFormValues())
-    // Set the popover for the search button that pops up when the search is too big
-    this.searchBtnPopover = new Popover(this.searchBtn, {
-      title: 'Opa, ¡esos son muchos árboles!',
-      content: '<p>Para buscar, empezá marcando un punto en el mapa.</p><p><em>Consejo piola: Podés buscar en toda la ciudad si seleccionás alguna especie.<em></p>',
-      trigger: 'focus',
-      html: true,
-    })
-    this.searchBtnPopover.disable()
     // Disable all filters if empty planter has been selected
     this.species.addEventListener('arbolado:species/change', this.handleSpeciesChange)
   }
@@ -93,7 +82,7 @@ export default class SearchForm extends HTMLElement {
     this.filtersSidebar.hide()
 
     // Make the search
-    window.Arbolado.filters = {
+    window.Arbolado.dataSource.filters = {
       speciesUrl: this.species.value?.url,
       flavors: this.flavors.checked,
     }

@@ -13,7 +13,7 @@ export class MapLayerSwitcher implements IControl {
     this.active = initialStyle
   }
 
-  onAdd(map: Map): HTMLElement {
+  onAdd = (map: Map) => {
     this.map = map
     this.container = document.createElement('div')
     this.container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group'
@@ -31,12 +31,12 @@ export class MapLayerSwitcher implements IControl {
     return this.container
   }
 
-  onRemove(): void {
+  onRemove = () => {
     this.container?.remove()
     this.map = undefined
   }
 
-  switchTo(style: StyleOption): void {
+  private switchTo = (style: StyleOption) => {
     if (!this.map || style === this.active) return
     this.map.setStyle(styles[style])
     this.active = style
