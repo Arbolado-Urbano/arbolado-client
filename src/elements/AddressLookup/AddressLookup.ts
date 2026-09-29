@@ -1,4 +1,4 @@
-import { type LngLatBounds } from 'maplibre-gl'
+import { LngLatBounds } from 'mapbox-gl'
 
 import { type NominatimSearchResult } from '../../types/NominatimResponse'
 

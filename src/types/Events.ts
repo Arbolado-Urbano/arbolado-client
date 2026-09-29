@@ -1,4 +1,4 @@
-import { type LngLatBounds } from "maplibre-gl"
+import { type LngLatBounds } from "mapbox-gl"
 
 import { type Step } from "../elements/AddTreeForm/AddTreeForm"
 import { type Filters } from "./Filters"
@@ -27,4 +27,5 @@ export type ArboladoEventMap = {
   'arbolado:search': CustomEvent<{ filters: Filters }>
   'arbolado:tree/selected': CustomEvent<{ id: string }>
   'arbolado:tree/displayed': CustomEvent<{ tree: Tree }>
+  'arbolado:trees/update': CustomEvent<void>
 }

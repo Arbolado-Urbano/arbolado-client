@@ -1,12 +1,11 @@
-import { Map, Marker } from 'maplibre-gl'
-
-import { mapStyles } from '../../constants/mapStyles'
+import { Map, Marker } from 'mapbox-gl'
 
 import GeoBtn from '../GeoBtn/GeoBtn'
 import AddressLookup from '../AddressLookup/AddressLookup'
 import { MapLayerSwitcher } from '../MapLayerSwitcher/MapLayerSwitcher'
 
 import GeoInputTemplate from './GeoInput.html?raw'
+import { styles } from '../MapElement/MapElement'
 
 export default class GeoInput extends HTMLElement {
   _value: string | null = null
@@ -25,11 +24,13 @@ export default class GeoInput extends HTMLElement {
 
     this.map = new Map({
       container: 'geo-input-map',
-      style: mapStyles,
       center: [-58.44, -34.618], // BsAs
       zoom: 14,
       maxZoom: 21,
       minZoom: 5,
+      accessToken: import.meta.env.VITE_MAPBOX_TOKEN,
+      style: styles.streets,
+      language: "es-419",
     })
 
     this.geoBtn.addEventListener('arbolado:geo/searching', () => this.setLoading(true))
@@ -42,7 +43,11 @@ export default class GeoInput extends HTMLElement {
     this.map.on('click', ({ lngLat }) => {
       this.setValue(lngLat)
     })
-    this.map.on('move', () => this.map && this.addressLookup.setBounds(this.map.getBounds()))
+
+    this.map.on('move', () => {
+      const bounds = this.map.getBounds()
+      if (bounds) this.addressLookup.setBounds(bounds)
+    })
 
     // Layer switcher
     this.map.addControl(new MapLayerSwitcher('streets'), 'bottom-right')
@@ -50,12 +55,16 @@ export default class GeoInput extends HTMLElement {
     this.addressLookup.addEventListener('arbolado:address/selected', ({ detail }) => this.setValue(detail))
   }
 
-  formResetCallback() {
+  formResetCallback = () => {
     this.setValue()
   }
 
-  setCenter(lat: number, lng: number) {
-    this.map.panTo({ lat, lng }, { zoom: 12 })
+  setCenter = (lat: number, lng: number) => {
+    this.map.panTo({ lat, lng })
+  }
+
+  resize = () => {
+    this.map.resize()
   }
 
   static get formAssociated() { return true }
@@ -65,27 +74,12 @@ export default class GeoInput extends HTMLElement {
     window.Arbolado.emitEvent(this, 'change')
   }
 
-  setLoading(loading: boolean) {
-    if (loading) this.classList.add('loading')
-    else this.classList.remove('loading')
-  }
-
-  /**
-   * Re-centers the map around the given coordinates
-   * @param map - The map object
-   * @param latLng - The latlng coordinates
-   */
-  private latlngUpdated(latLng: { lat: number, lng: number }): void {
-    // Re-center the map around the given coordinates
-    this.map?.panTo(latLng)
-    // Set the new coordinates
-  }
-
   /**
   * Sets the given latLng as the current value and sets a marker on the map for those coordinates
+  * 
   * @param latLng - Latitude and longitude coordinates
   */
-  public setValue(latLng?: { lat: number, lng: number }): void {
+  private setValue = (latLng?: { lat: number, lng: number }) => {
     if (!latLng) {
       if (this.marker) this.marker.remove()
       this.value = null
@@ -104,5 +98,22 @@ export default class GeoInput extends HTMLElement {
       // Set the value for the selected coordinates
       this.value = `${latLng.lat},${latLng.lng}`
     }
+  }
+
+  private setLoading = (loading: boolean) => {
+    if (loading) this.classList.add('loading')
+    else this.classList.remove('loading')
+  }
+
+  /**
+   * Re-centers the map around the given coordinates
+   * 
+   * @param map - The map object
+   * @param latLng - The latlng coordinates
+   */
+  private latlngUpdated(latLng: { lat: number, lng: number }) {
+    // Re-center the map around the given coordinates
+    this.map?.panTo(latLng)
+    // Set the new coordinates
   }
 }

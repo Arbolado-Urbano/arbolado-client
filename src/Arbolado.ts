@@ -1,21 +1,24 @@
-import { type LngLatBounds } from 'maplibre-gl'
+import { type LngLatBounds } from 'mapbox-gl'
 
 import { type NominatimSearchResult } from './types/NominatimResponse'
-import { type Filters } from './types/Filters'
 import { type Species } from './types/Species'
 
 import Alert, { AlertType } from './elements/Alert/Alert'
+import { Datasource } from './Datasource'
 
 type EventDetail<T> = T extends CustomEvent<infer D> ? D : T extends Event ? void : never
 
 type OptionalArg<D> = D extends void ? [] : [data: D]
 
+type fetchOptions = { method?: string, body?: BodyInit, headers?: Headers, loadingIndicator?: boolean }
+
 export default class Arbolado {
   overlay: HTMLElement
-  queryParams: URLSearchParams
   callOnEsc: Function[] = []
   bodyScrollHide: number = 0
   species?: Species[]
+  queryParams: URLSearchParams
+  dataSource = new Datasource()
 
   constructor() {
     this.loadSpecies()
@@ -29,37 +32,38 @@ export default class Arbolado {
     this.overlay.addEventListener('click', () => this.emitEvent(document, 'arbolado:overlay/click'))
   }
 
-  ready(fn: () => any) {
+  ready = (fn: () => any) => {
     document.addEventListener('DOMContentLoaded', fn)
   }
 
-  loadTemplate(HTMLContent: string): Node {
+  loadTemplate = (HTMLContent: string): Node => {
     const template = document.createElement('template')
     template.innerHTML = HTMLContent
     return template.content.cloneNode(true)
   }
 
-  emitEvent<T extends keyof HTMLElementEventMap>(element: Node, name: T, ...data: OptionalArg<EventDetail<HTMLElementEventMap[T]>>) {
+  emitEvent = <T extends keyof HTMLElementEventMap>(element: Node, name: T, ...data: OptionalArg<EventDetail<HTMLElementEventMap[T]>>) => {
     element.dispatchEvent(new CustomEvent(name, { detail: data[0] }))
   }
 
-  setLoading(loading: boolean) {
+  setLoading = (loading: boolean) => {
     this.emitEvent(document, 'arbolado:loading', { loading })
   }
 
-  pushURL(path: string) {
+  pushURL = (path: string) => {
     let queryParams = ''
     if (this.queryParams.toString()) queryParams = `?${this.queryParams.toString()}`
     const url = `${window.location.protocol}//${window.location.host}${path}${queryParams}`
     history.pushState(null, '', url)
   }
 
-  pushQueryParams() {
+  pushQueryParams = () => {
     const url = `${window.location.protocol}//${window.location.host}${window.location.pathname}?${this.queryParams.toString()}`
     history.pushState(null, '', url)
   }
 
-  async fetch(url: string, method: string = 'GET', body?: BodyInit, headers?: HeadersInit, loadingIndicator: boolean = true) {
+  fetch = async (url: string, options?: fetchOptions) => {
+    const { method, body, headers, loadingIndicator = true } = { ...options }
     if (loadingIndicator) this.setLoading(true)
     try {
       return await fetch(url, { method, headers, body })
@@ -70,15 +74,19 @@ export default class Arbolado {
     }
   }
 
-  async fetchAPI(path: string, method: string = 'GET', body?: BodyInit, headers: Headers = new Headers(), loadingIndicator: boolean = true) {
-    headers.append('Accept', 'application/json')
-    return await this.fetch(`${import.meta.env.VITE_API_URL}${path}`, method, body, headers, loadingIndicator)
+  fetchAPI = async (path: string, options?: fetchOptions) => {
+    const fetchOptions = { ...options }
+    if (!fetchOptions.headers) {
+      fetchOptions.headers = new Headers()
+    }
+    fetchOptions.headers.append('Accept', 'application/json')
+    return await this.fetch(`${import.meta.env.VITE_API_URL}${path}`, fetchOptions)
   }
 
-  async loadSpecies() {
+  loadSpecies = async () => {
     this.setLoading(true)
     try {
-      const response = await this.fetchAPI('/especies', 'GET', undefined, undefined, false)
+      const response = await this.fetchAPI('/especies', { loadingIndicator: false })
       if (!response.ok) throw new Error(await response.text())
       const species: Species[] | undefined = await response.json()
       this.species = species?.filter(species => !!species.url && !!species.nombre_cientifico) ?? []
@@ -90,14 +98,14 @@ export default class Arbolado {
     this.setLoading(false)
   }
 
-  alert(type: AlertType, content: string, timeout?: number) {
+  alert = (type: AlertType, content: string, timeout?: number) => {
     const alert = new Alert(type, content)
     alert.addEventListener('arbolado:alert/closed', () => alert.remove())
     document.body.append(alert)
     alert.show(timeout)
   }
 
-  validateForm(form: HTMLFormElement): boolean {
+  validateForm = (form: HTMLFormElement): boolean => {
     const inputs = form.elements
     for (const input of inputs) {
       const inputElement = input as HTMLInputElement
@@ -110,29 +118,32 @@ export default class Arbolado {
     return true
   }
 
-  toggleOverlay(show: boolean) {
+  toggleOverlay = (show: boolean) => {
     if (show) this.overlay.classList.add('show')
     else this.overlay.classList.remove('show')
   }
 
-  handleEsc(event: KeyboardEvent) {
+  handleEsc = (event: KeyboardEvent) => {
     if (event.key !== 'Escape') return
     this.callOnEsc.pop()?.()
   }
 
-  callOnEscPush(f: Function) { this.callOnEsc.push(f) }
-  callOnEscRemove(f: Function) {
+  callOnEscPush = (f: Function) => {
+    this.callOnEsc.push(f)
+  }
+
+  callOnEscRemove = (f: Function) => {
     const index = this.callOnEsc.indexOf(f)
     if (index === -1) return
     this.callOnEsc.splice(index, 1)
   }
 
-  hideBodyScroll() {
+  hideBodyScroll = () => {
     this.bodyScrollHide++
     document.body.classList.add('disable-scroll')
   }
 
-  showBodyScroll() {
+  showBodyScroll = () => {
     this.bodyScrollHide--
     if (this.bodyScrollHide < 0) this.bodyScrollHide = 0
     if (this.bodyScrollHide === 0) {
@@ -140,20 +151,13 @@ export default class Arbolado {
     }
   }
 
-  filter(filters: Filters) {
-    window.Arbolado.emitEvent(document, 'arbolado:search', { filters })
-  }
-
-  async loadSourceFromURL() {
+  loadSourceFromURL = () => {
     const path = window.location.pathname.split('/')
     if (path[1] !== 'fuente') return
-    const fuenteSlug = path[2]
-    if (!fuenteSlug) return
+    const sourceUrl = path[2]
+    if (!sourceUrl) return
     try {
-      const response = await this.fetchAPI(`/fuentes/${fuenteSlug}`, 'GET')
-      const source: { id: number } | undefined = await response.json()
-      if (!source) return
-      this.filter({ sourceId: source.id })
+      this.dataSource.filters = { sourceUrl }
       window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll up to the map (for mobile)
     } catch (error) {
       console.error(error)
@@ -161,7 +165,7 @@ export default class Arbolado {
   }
 
   // Looks up an address or place and returns its coordinates.
-  async addressLookup(query: string, bounds?: LngLatBounds): Promise<NominatimSearchResult[] | undefined> {
+  addressLookup = async (query: string, bounds?: LngLatBounds): Promise<NominatimSearchResult[] | undefined> => {
     const { VITE_NOMINATIM_URL } = import.meta.env
     const data = new URLSearchParams({
       'accept-language': 'es',
@@ -173,7 +177,8 @@ export default class Arbolado {
     if (bounds) data.set('viewbox', `${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`)
     const url = `${VITE_NOMINATIM_URL}?${data.toString()}`
     try {
-      const response = await this.fetch(url, 'GET', undefined, { 'Accept': 'application/json' }, false)
+      const headers = new Headers({ 'Accept': 'application/json' })
+      const response = await this.fetch(url, { headers, loadingIndicator: false })
       return await response.json()
     } catch (error) {
       console.error(error)

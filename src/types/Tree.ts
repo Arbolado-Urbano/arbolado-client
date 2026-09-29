@@ -37,9 +37,25 @@ export type Tree = {
   }[]
 }
 
-export type TreeList = {
-  id: number
-  lat: number
-  lng: number
-  species: number
+export type Trees = {
+  id: number,
+  lat: number,
+  lng: number,
+  species: number,
+  deleted?: string,
 }[]
+
+export type GeoJSONTrees = {
+  type: 'FeatureCollection',
+  features: {
+    type: 'Feature',
+    geometry: {
+      type: 'Point',
+      coordinates: [number, number],
+    },
+    properties: {
+      id: number,
+      species: number,
+    },
+  }[],
+}
