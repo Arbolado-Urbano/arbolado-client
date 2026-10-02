@@ -60,7 +60,7 @@ export default class TreeModal extends HTMLElement {
       regiones: { element: this.querySelector('[js-tree-data="regiones"]') as HTMLElement, label: 'Región de origen:' },
       altura: { element: this.querySelector('[js-tree-data="altura"]') as HTMLElement, label: 'Altura:' },
       inclinacion: { element: this.querySelector('[js-tree-data="inclinacion"]') as HTMLElement, label: 'Inclinación:' },
-      diametro_a_p: { element: this.querySelector('[js-tree-data="diametro_a_p"]') as HTMLElement, label: 'Diámetro:' },
+      diametro_a_p: { element: this.querySelector('[js-tree-data="diametro_a_p"]') as HTMLElement, label: 'Diámetro de tronco:' },
       espacio_verde: { element: this.querySelector('[js-tree-data="espacio_verde"]') as HTMLElement },
       calle: { element: this.querySelector('[js-tree-data="calle"]') as HTMLElement },
       nombre: { element: this.querySelector('[js-tree-data="nombre"]') as HTMLElement, label: 'Datos aportados por' },
@@ -182,7 +182,7 @@ export default class TreeModal extends HTMLElement {
 
       if (tree.records[0].altura) tree.records[0].altura += ' m'
       if (tree.records[0].inclinacion) tree.records[0].inclinacion += 'º'
-      if (tree.records[0].diametro_a_p) tree.records[0].diametro_a_p += ' m'
+      if (tree.records[0].diametro_a_p) tree.records[0].diametro_a_p += ' cm'
 
       const treeLink = `/arbol/${tree.id}`
 
