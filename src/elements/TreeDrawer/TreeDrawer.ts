@@ -120,25 +120,11 @@ export default class TreeModal extends HTMLElement {
     sourcesElement.innerHTML = ''
     for (const record of tree.records) {
       const { fecha_creacion } = record
-      const { id, descripcion, nombre, facebook, instagram, twitter, url } = record.source
+      const { descripcion, nombre, facebook, instagram, twitter, url } = record.source
       const sourceElement = window.Arbolado.loadTemplate(SourceAccordionTemplate) as HTMLElement
-      const accordionBtn = sourceElement.querySelector('[js-accordion-btn]') as HTMLButtonElement
-      const accordion = sourceElement.querySelector('[js-accordion]') as HTMLDivElement
+      const sourceHeading = sourceElement.querySelector('[js-source-heading]') as HTMLElement
       const accordionBody = sourceElement.querySelector('[js-accordion-body]') as HTMLDivElement
-      accordion.id = `tree-source-accordion-${id}`
-      accordionBtn.innerText = `${this.formatDate(fecha_creacion)} - ${nombre}`
-      accordionBtn.setAttribute('aria-controls', `#${accordion.id}`)
-      accordionBtn.addEventListener('click', () => {
-        if (accordion.classList.contains('show')) {
-          accordion.classList.remove('show')
-          accordionBtn.classList.add('collapsed')
-          accordionBtn.setAttribute('aria-expanded', 'false')
-        } else {
-          accordion.classList.add('show')
-          accordionBtn.classList.remove('collapsed')
-          accordionBtn.setAttribute('aria-expanded', 'true')
-        }
-      })
+      sourceHeading.innerText = `${this.formatDate(fecha_creacion)} - ${nombre}`
       const descriptionElement = accordionBody.querySelector('[js-source-description]') as HTMLParagraphElement
       const urlElement = accordionBody.querySelector('[js-source-url]') as HTMLAnchorElement
       const facebookElement = accordionBody.querySelector('[js-source-facebook]') as HTMLAnchorElement

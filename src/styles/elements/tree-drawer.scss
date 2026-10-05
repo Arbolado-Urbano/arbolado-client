@@ -23,3 +23,45 @@
   font-size: rem(20px);
   min-width: rem(45px);
 }
+
+.tree-drawer__source-heading::after {
+  display: none;
+}
+
+.tree-drawer__tree-code {
+  align-items: center;
+  background-color: #f1f8f5;
+  border-left: rem(4px) solid $primary;
+  border-radius: rem(4px);
+  display: flex;
+  justify-content: space-between;
+  min-height: rem(60px);
+  padding: rem(12px) rem(16px);
+}
+
+.tree-drawer__tree-code code {
+  color: #245b49;
+  font-size: rem(14px);
+  font-weight: 700;
+  letter-spacing: .04em;
+  overflow-wrap: anywhere;
+}
+
+.tree-drawer__tree-code-link {
+  align-items: center;
+  border: 1px solid rgba($primary, .35);
+  border-radius: rem(4px);
+  color: darken($primary, 18%);
+  display: inline-flex;
+  flex: 0 0 rem(40px);
+  height: rem(40px);
+  justify-content: center;
+  margin-left: rem(12px);
+  text-decoration: none;
+}
+
+.tree-drawer__tree-code-link:hover,
+.tree-drawer__tree-code-link:focus-visible {
+  background-color: $primary;
+  color: $white;
+}
