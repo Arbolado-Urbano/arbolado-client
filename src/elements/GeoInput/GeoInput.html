@@ -1,8 +1,18 @@
-<div id="geo-input-map" class="geo-input__map" style="height: 100%;display: block;"></div>
-<arbolado-address-lookup js-address-lookup class="address-search"></arbolado-address-lookup>
-<arbolado-geo-btn js-geo-btn></arbolado-geo-btn>
-<div class="loader">
-  <div class="spinner-grow absolute" style="width: 3rem; height: 3rem;" role="status">
-    <span class="visually-hidden">Loading...</span>
+<div class="form-check form-switch my-2">
+  <label for="trees-toggle">
+    Mostrar árboles
+  </label>
+  <input class="form-check-input" type="checkbox" id="trees-toggle" role="switch" title="Mostrar árboles" js-trees-toggle>
+</div>
+<div class="geo-input__map-wrapper">
+  <div id="geo-input-map" class="geo-input__map" style="height: 100%;display: block;"></div>
+  <arbolado-address-lookup js-address-lookup class="address-search"></arbolado-address-lookup>
+  <div class="geo-input__overlay">
+    <arbolado-geo-btn js-geo-btn></arbolado-geo-btn>
+  </div>
+  <div class="loader">
+    <div class="spinner-grow absolute" style="width: 3rem; height: 3rem;" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
   </div>
 </div>

@@ -1,10 +1,8 @@
-import { ExpressionSpecification, GeoJSONSource, LngLatBounds, LngLatLike, Map, NavigationControl } from "mapbox-gl"
+import { GeoJSONSource, LngLatBounds, LngLatLike, Map, NavigationControl } from "mapbox-gl"
 
 import GeoBtn from "../GeoBtn/GeoBtn"
 
 import { MapLayerSwitcher } from "../MapLayerSwitcher/MapLayerSwitcher"
-
-import { DEFAULTS, ICON_PATH } from "../../constants/speciesStyles"
 
 export const styles = {
   streets: "mapbox://styles/mapbox/light-v11",
@@ -13,6 +11,7 @@ export const styles = {
 
 const SOURCE_ID = "trees"
 const CLUSTER_LAYER_ID = "clusters"
+const CLUSTER_COUNT_LAYER_ID = "cluster-count"
 const ICON_LAYER_ID = "icons"
 const CLUSTER_MAX_ZOOM = 16
 const BEARING = 0
@@ -21,7 +20,6 @@ export type StyleOption = keyof typeof styles
 
 
 export default class MapElement extends HTMLElement {
-  private iconImage?: ExpressionSpecification | string
   private zoomOnResults: boolean = true
   private readonly map = new Map({
     accessToken: import.meta.env.VITE_MAPBOX_TOKEN,
@@ -72,7 +70,7 @@ export default class MapElement extends HTMLElement {
       }
       this.map.on("style.load", async () => {
         await this.loadTrees(false)
-        this.addLayers()
+        window.Arbolado.dataSource.addLayers(this.map, SOURCE_ID, CLUSTER_LAYER_ID, CLUSTER_COUNT_LAYER_ID, ICON_LAYER_ID)
       })
     })
 
@@ -108,24 +106,10 @@ export default class MapElement extends HTMLElement {
   }
 
   loadTrees = async (reCenter: boolean = true) => {
-    window.Arbolado.setLoading(true)
-    const trees = await window.Arbolado.dataSource.trees
+    const trees = await window.Arbolado.dataSource.loadTrees(this.map, SOURCE_ID, CLUSTER_MAX_ZOOM)
     if (reCenter) {
       this.map.once("idle", () => this.zoomToFilteredResults(trees.features))
     }
-    const source = this.map.getSource<GeoJSONSource>(SOURCE_ID)
-    if (!source) {
-      this.map.addSource(SOURCE_ID, {
-        type: "geojson",
-        data: trees,
-        cluster: true,
-        clusterMaxZoom: CLUSTER_MAX_ZOOM,
-        clusterRadius: 80
-      })
-    } else {
-      source.setData(trees)
-    }
-    window.Arbolado.setLoading(false)
   }
 
   private zoomToFilteredResults = (features: any[]) => {
@@ -147,89 +131,13 @@ export default class MapElement extends HTMLElement {
     })
   }
 
-  private addLayers = async () => {
-    // Cluster layer
-    this.map.addLayer({
-      id: CLUSTER_LAYER_ID,
-      type: "circle",
-      source: SOURCE_ID,
-      filter: ["has", "point_count"],
-      paint: {
-        "circle-color": DEFAULTS.color,
-        "circle-radius": [
-          "step", ["get", "point_count"],
-          16, 50,
-          22, 200,
-          28
-        ]
-      },
-    })
-
-    // Cluster count numbers layer
-    this.map.addLayer({
-      id: "cluster-count",
-      type: "symbol",
-      source: SOURCE_ID,
-      filter: ["has", "point_count"],
-      layout: {
-        "text-field": ["get", "point_count_abbreviated"],
-        "text-size": 12
-      }
-    })
-
-    // Icon layer
-    const species = window.Arbolado.species ?? []
-    const icons: [number, string][] = species.filter(species => species.icono).map(species => [species.id!, species.icono!])
-    this.iconImage = icons.length ? [
-      "match",
-      ["get", "species"],
-      ...icons.flat(),
-      DEFAULTS.icon,
-    ] as unknown as ExpressionSpecification : DEFAULTS.icon
-
-    // Load marker images
-    const uniqueIcons = [...new Set(icons.map(icon => icon[1])), DEFAULTS.icon]
-    await Promise.all(uniqueIcons.map(async (iconName) => {
-      if (!iconName || this.map.hasImage(iconName)) return
-      try {
-        const image = await this.loadImage(`${ICON_PATH}${iconName}`)
-        this.map.addImage(iconName, image)
-      } catch (error) {
-        console.warn(`Failed to load icon: ${iconName}`, error)
-      }
-    }))
-
-    this.map.addLayer({
-      id: ICON_LAYER_ID,
-      type: "symbol",
-      source: SOURCE_ID,
-      filter: ["!", ["has", "point_count"]],
-      layout: {
-        "icon-image": this.iconImage,
-        "icon-size": 1,
-        "icon-anchor": "bottom",
-        "icon-allow-overlap": true,
-        "icon-ignore-placement": true,
-      },
-    })
-  }
-
   private init = async () => {
     try {
       this.map.once("idle", () => window.Arbolado.emitEvent(this, "arbolado:map/loaded"))
       await this.loadTrees()
-      this.addLayers()
+      window.Arbolado.dataSource.addLayers(this.map, SOURCE_ID, CLUSTER_LAYER_ID, CLUSTER_COUNT_LAYER_ID, ICON_LAYER_ID)
     } catch (err) {
       console.error(err)
     }
-  }
-
-  private loadImage = (path: string): Promise<HTMLImageElement | ImageBitmap | ImageData> => {
-    return new Promise((resolve, reject) => {
-      this.map.loadImage(path, (error, result) => {
-        if (error) return reject(error)
-        return resolve(result!)
-      })
-    })
   }
 }

@@ -1,11 +1,17 @@
 .geo-input {
   display: block;
-  height: 500px;
-  margin-top: .5rem;
-  position: relative;
 }
 
-.geo-input arbolado-geo-btn {
+.geo-input__map-wrapper {
+  position: relative;
+  height: 500px;
+  margin-top: .5rem;
+}
+
+.geo-input__overlay {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
   bottom: .5rem;
   position: absolute;
   left: .5rem;

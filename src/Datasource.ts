@@ -1,4 +1,7 @@
+import { ExpressionSpecification, GeoJSONSource, Map as MapboxMap } from "mapbox-gl"
 import { Database, STORE_KEYS, STORE_NAMES } from "./Database"
+
+import { DEFAULTS, ICON_PATH } from "./constants/speciesStyles"
 
 import { Filters } from "./types/Filters"
 import { GeoJSONTrees, Trees } from "./types/Tree"
@@ -8,6 +11,7 @@ type TreeMap = Map<number, Trees[number]>
 const SYNC_INTERVAL = 900000 // 15 minutes
 
 export class Datasource {
+  private iconImage?: ExpressionSpecification | string
   private _filters: Filters = {}
   private _allTrees?: Promise<TreeMap>
   private lastSync?: string
@@ -202,5 +206,100 @@ export class Datasource {
         species: tree.species,
       }
     }
+  }
+
+  public loadTrees = async (map: MapboxMap, sourceId: string, clusterMaxZoom: number) => {
+    window.Arbolado.setLoading(true)
+    const trees = await this.trees
+    const source = map.getSource<GeoJSONSource>(sourceId)
+    if (!source) {
+      map.addSource(sourceId, {
+        type: "geojson",
+        data: trees,
+        cluster: true,
+        clusterMaxZoom,
+        clusterRadius: 80
+      })
+    } else {
+      source.setData(trees)
+    }
+    window.Arbolado.setLoading(false)
+    return trees
+  }
+
+  public addLayers = async (map: MapboxMap, sourceId: string, clusterLayerId: string, clusterCountLayerId: string, iconLayerId: string) => {
+    // Cluster layer
+    map.addLayer({
+      id: clusterLayerId,
+      type: "circle",
+      source: sourceId,
+      filter: ["has", "point_count"],
+      paint: {
+        "circle-color": DEFAULTS.color,
+        "circle-radius": [
+          "step", ["get", "point_count"],
+          16, 50,
+          22, 200,
+          28
+        ]
+      },
+    })
+
+    // Cluster count numbers layer
+    map.addLayer({
+      id: clusterCountLayerId,
+      type: "symbol",
+      source: sourceId,
+      filter: ["has", "point_count"],
+      layout: {
+        "text-field": ["get", "point_count_abbreviated"],
+        "text-size": 12
+      }
+    })
+
+    // Icon layer
+    const species = window.Arbolado.species ?? []
+    const icons: [number, string][] = species.filter(species => species.icono).map(species => [species.id!, species.icono!])
+    this.iconImage = icons.length ? [
+      "match",
+      ["get", "species"],
+      ...icons.flat(),
+      DEFAULTS.icon,
+    ] as unknown as ExpressionSpecification : DEFAULTS.icon
+
+    // Load marker images
+    const uniqueIcons = [...new Set(icons.map(icon => icon[1])), DEFAULTS.icon]
+    await Promise.all(uniqueIcons.map(async (iconName) => {
+      if (!iconName || map.hasImage(iconName)) return
+      try {
+        const image = await this.loadImage(map, `${ICON_PATH}${iconName}`)
+        map.addImage(iconName, image)
+      } catch (error) {
+        console.warn(`Failed to load icon: ${iconName}`, error)
+      }
+    }))
+
+    map.addLayer({
+      id: iconLayerId,
+      type: "symbol",
+      source: sourceId,
+      filter: ["!", ["has", "point_count"]],
+      layout: {
+        "icon-image": this.iconImage,
+        "icon-size": 1,
+        "icon-anchor": "bottom",
+        "icon-allow-overlap": true,
+        "icon-ignore-placement": true,
+      },
+    })
+  }
+
+  private loadImage = (map: MapboxMap, path: string): Promise<HTMLImageElement | ImageBitmap | ImageData> => {
+    return new Promise((resolve, reject) => {
+      map.loadImage(path, (error, result) => {
+        if (error) return reject(error)
+        return resolve(result!)
+      })
+    })
   }
 }

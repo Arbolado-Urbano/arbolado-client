@@ -7,10 +7,17 @@ import { MapLayerSwitcher } from '../MapLayerSwitcher/MapLayerSwitcher'
 import GeoInputTemplate from './GeoInput.html?raw'
 import { styles } from '../MapElement/MapElement'
 
+const SOURCE_ID = "trees"
+const CLUSTER_LAYER_ID = "clusters"
+const CLUSTER_COUNT_LAYER_ID = "cluster-count"
+const ICON_LAYER_ID = "icons"
+const CLUSTER_MAX_ZOOM = 16
+
 export default class GeoInput extends HTMLElement {
   _value: string | null = null
   private addressLookup: AddressLookup
   private geoBtn: GeoBtn
+  private treesToggle: HTMLInputElement
   private map: Map
   private marker?: Marker
 
@@ -21,6 +28,7 @@ export default class GeoInput extends HTMLElement {
 
     this.geoBtn = this.querySelector('[js-geo-btn]') as GeoBtn
     this.addressLookup = this.querySelector('[js-address-lookup]') as AddressLookup
+    this.treesToggle = this.querySelector('[js-trees-toggle]') as HTMLInputElement
 
     this.map = new Map({
       container: 'geo-input-map',
@@ -32,6 +40,8 @@ export default class GeoInput extends HTMLElement {
       style: styles.streets,
       language: "es-419",
     })
+
+    this.treesToggle.addEventListener('change', this.toggleTrees)
 
     this.geoBtn.addEventListener('arbolado:geo/searching', () => this.setLoading(true))
     this.geoBtn.addEventListener('arbolado:geo/error', () => this.setLoading(false))
@@ -49,6 +59,12 @@ export default class GeoInput extends HTMLElement {
       if (bounds) this.addressLookup.setBounds(bounds)
     })
 
+    this.map.on("style.load", async () => {
+      if (this.treesToggle.checked) {
+        await this.toggleTrees()
+      }
+    })
+
     // Layer switcher
     this.map.addControl(new MapLayerSwitcher('streets'), 'bottom-right')
 
@@ -57,6 +73,19 @@ export default class GeoInput extends HTMLElement {
 
   formResetCallback = () => {
     this.setValue()
+  }
+
+  toggleTrees = async () => {
+    if (!this.map.getSource(SOURCE_ID)) {
+      await window.Arbolado.dataSource.loadTrees(this.map, SOURCE_ID, CLUSTER_MAX_ZOOM)
+    }
+    if (this.treesToggle.checked) {
+      await window.Arbolado.dataSource.addLayers(this.map, SOURCE_ID, CLUSTER_LAYER_ID, CLUSTER_COUNT_LAYER_ID, ICON_LAYER_ID)
+    } else {
+      this.map.removeLayer(CLUSTER_COUNT_LAYER_ID)
+      this.map.removeLayer(CLUSTER_LAYER_ID)
+      this.map.removeLayer(ICON_LAYER_ID)
+    }
   }
 
   setCenter = (lat: number, lng: number) => {
