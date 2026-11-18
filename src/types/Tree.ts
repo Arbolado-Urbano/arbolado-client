@@ -1,3 +1,27 @@
+export type TreeRecord = {
+  id: number
+  altura?: string
+  diametro_a_p?: string
+  diametro_copa?: string
+  altura_copa?: string
+  altura_tronco?: string
+  lugar?: string
+  cobertura?: string
+  inclinacion?: string
+  fecha_creacion: string
+  estado_fitosanitario?: string
+  etapa_desarrollo?: string
+  source: {
+    id: number
+    nombre: string
+    descripcion: string
+    facebook?: string
+    instagram?: string
+    twitter?: string
+    url?: string
+  }
+}
+
 export type Tree = {
   id: number
   calle?: string
@@ -17,24 +41,7 @@ export type Tree = {
     family: { id: number, familia: string }
     type: { id: number, tipo: string }
   },
-  records: {
-    id: number
-    altura?: string
-    diametro_a_p?: string
-    inclinacion?: string
-    fecha_creacion: string
-    estado_fitosanitario?: string
-    etapa_desarrollo?: string
-    source: {
-      id: number
-      nombre: string
-      descripcion: string
-      facebook?: string
-      instagram?: string
-      twitter?: string
-      url?: string
-    }
-  }[]
+  records: TreeRecord[]
 }
 
 export type Trees = {

@@ -160,18 +160,16 @@ export default class AddTreeForm extends HTMLElement {
         this.querySelector('[js-input=street]')?.removeAttribute('required')
         this.querySelector('[js-input=street-number]')?.removeAttribute('required')
         // Display or hide additional location inputs if the users is a censist
-        if (this.personalDataTabGroup.currentTab() === 'code') {
-          if (this.censusSlug === 'municip-colon') { // Colón
-            this.querySelector('[js-input-wrapper=street]')?.classList.remove('d-none')
-            this.querySelector('[js-input-wrapper=block]')?.classList.remove('d-none')
-            this.querySelector('[js-input=street]')?.setAttribute('required', 'true')
-            this.querySelector('[js-input=block]')?.setAttribute('required', 'true')
-          } else if (this.censusSlug === '25demayo') { // 25 de mayo
-            this.querySelector('[js-input-wrapper=street]')?.classList.remove('d-none')
-            this.querySelector('[js-input-wrapper=street-number]')?.classList.remove('d-none')
-            this.querySelector('[js-input=street]')?.setAttribute('required', 'true')
-            this.querySelector('[js-input=street-number]')?.setAttribute('required', 'true')
-          }
+        if (this.isCensus('municip-colon')) { // Colón
+          this.querySelector('[js-input-wrapper=street]')?.classList.remove('d-none')
+          this.querySelector('[js-input-wrapper=block]')?.classList.remove('d-none')
+          this.querySelector('[js-input=street]')?.setAttribute('required', 'true')
+          this.querySelector('[js-input=block]')?.setAttribute('required', 'true')
+        } else if (this.isCensus('25demayo')) { // 25 de mayo
+          this.querySelector('[js-input-wrapper=street]')?.classList.remove('d-none')
+          this.querySelector('[js-input-wrapper=street-number]')?.classList.remove('d-none')
+          this.querySelector('[js-input=street]')?.setAttribute('required', 'true')
+          this.querySelector('[js-input=street-number]')?.setAttribute('required', 'true')
         }
       } else if (stepLabel === 'data') {
         // Display or hide additional data inputs based on whether the species is the "emtpy planter" or not
@@ -187,6 +185,13 @@ export default class AddTreeForm extends HTMLElement {
           this.querySelector('[js-input-wrapper=health]')?.classList.remove('d-none')
           this.querySelector('[js-input-wrapper=height]')?.classList.remove('d-none')
           this.querySelector('[js-input-wrapper=diameter]')?.classList.remove('d-none')
+        }
+        // Additional data inputs for CIHE censists
+        const isCihe = this.isCensus('cihe')
+        const isEmptyPlanter = this.speciesSelect.value?.url === EMPTY_PLANTER_URL
+        this.querySelector('[js-input-wrapper=place]')?.classList.toggle('d-none', !isCihe)
+        for (const wrapper of ['diameter-canopy', 'canopy-height', 'trunk-height', 'coverage']) {
+          this.querySelector(`[js-input-wrapper=${wrapper}]`)?.classList.toggle('d-none', !isCihe || isEmptyPlanter)
         }
       }
       this.geoInput.setCenter(this.mapCenter.lat, this.mapCenter.lng) // Center the map input
@@ -300,6 +305,11 @@ export default class AddTreeForm extends HTMLElement {
     this.step = { index, label: this.steps[STEP_LABELS[index]].getAttribute('js-step') as StepLabel }
     window.Arbolado.emitEvent(this, 'arbolado:form/step', { current: this.step, previous })
     this.updateProgress()
+  }
+
+  /** Whether the user is a censist (logged in with a code) of the census with the given slug */
+  private isCensus(slug: string) {
+    return this.personalDataTabGroup.currentTab() === 'code' && this.censusSlug === slug
   }
 
   private updateProgress() {
@@ -543,6 +553,13 @@ export default class AddTreeForm extends HTMLElement {
     if (dataFormData.has('notes')) body.set('notes', dataFormData.get('notes')!)
     if (dataFormData.has('development')) body.set('development', dataFormData.get('development')!)
     if (dataFormData.has('health')) body.set('health', dataFormData.get('health')!)
+    if (this.isCensus('cihe')) {
+      if (dataFormData.has('place')) body.set('place', dataFormData.get('place')!)
+      if (dataFormData.get('diameter-canopy')) body.set('diameterCanopy', dataFormData.get('diameter-canopy')!)
+      if (dataFormData.get('canopy-height')) body.set('canopyHeight', dataFormData.get('canopy-height')!)
+      if (dataFormData.get('trunk-height')) body.set('trunkHeight', dataFormData.get('trunk-height')!)
+      if (dataFormData.has('coverage')) body.set('coverage', dataFormData.get('coverage')!)
+    }
     body.set('captcha', token)
     for (const image of this.selectedSpeciesImages) {
       body.append('species-images[]', image.image)

@@ -1,10 +1,16 @@
 <div class="accordion-item">
   <h2 class="accordion-header">
-    <span class="accordion-button tree-drawer__source-heading" js-source-heading></span>
+    <button type="button" class="accordion-button collapsed" aria-expanded="false" js-record-toggle>
+      <span class="d-grid">
+        <strong js-record-date></strong>
+        <small js-source-name></small>
+      </span>
+    </button>
   </h2>
-  <div class="accordion-collapse collapse show">
-    <div class="accordion-body" js-accordion-body>
-      <p js-source-description></p>
+  <div class="accordion-collapse collapse" js-record-collapse>
+    <div class="accordion-body">
+      <p class="d-grid" js-record-data></p>
+      <p class="small" js-source-description></p>
       <a js-source-url href="" target="_blank" class="tree-drawer__link badge badge-pill badge-secondary me-2">
         <i class="fa-solid text-dark fa-link"></i>
       </a>

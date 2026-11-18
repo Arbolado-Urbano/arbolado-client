@@ -1,7 +1,9 @@
 import TreeDrawerTemplate from './TreeDrawer.html?raw'
-import SourceAccordionTemplate from './SourceAccordion.html?raw'
+import RecordAccordionTemplate from './RecordAccordion.html?raw'
 
-import { Tree } from '../../types/Tree'
+import { Collapse } from 'bootstrap'
+
+import { Tree, TreeRecord } from '../../types/Tree'
 
 type TreeData = {
   id: { element: HTMLElement, label?: string },
@@ -12,9 +14,6 @@ type TreeData = {
   origen: { element: HTMLElement, label?: string },
   procedencia_exotica: { element: HTMLElement, label?: string },
   regiones: { element: HTMLElement, label?: string },
-  altura: { element: HTMLElement, label?: string },
-  inclinacion: { element: HTMLElement, label?: string },
-  diametro_a_p: { element: HTMLElement, label?: string },
   espacio_verde: { element: HTMLElement, label?: string },
   calle: { element: HTMLElement, label?: string },
   nombre: { element: HTMLElement, label?: string },
@@ -30,10 +29,31 @@ type TreeData = {
 type treeDataKey = keyof TreeData
 
 export default class TreeModal extends HTMLElement {
+  private static readonly healthLabels: Record<string, string> = {
+    sano: 'Sano',
+    hongos: 'Hojas con hongos',
+    hueco: 'Tronco ahuecado',
+    plaga: 'Plagado de insectos',
+    otros: 'Enfermo',
+  }
+  private static readonly placeLabels: Record<string, string> = {
+    'plantera': 'Plantera',
+    'cinta verde': 'Cinta verde',
+    'plaza-parque': 'Plaza / Parque',
+  }
+  // Upper bound (in degrees) of each inclination range, same ranges as in the add tree form
+  private static readonly inclinationLabels: [number, string][] = [
+    [5, 'Tronco normal (0º a 5º)'],
+    [15, 'Levemente inclinado (5º a 15º)'],
+    [25, 'Moderadamente inclinado (15º a 25º)'],
+    [35, 'Riesgo de caída (25º a 35º)'],
+    [Infinity, 'Muy riesgoso (más de 35º)'],
+  ]
   private open: boolean = false
   private streetViewUrl: string
   private closeBtn: HTMLButtonElement
   private treeData: TreeData
+  private recordData: HTMLElement
   private previousUrl?: string
 
   constructor() {
@@ -49,6 +69,7 @@ export default class TreeModal extends HTMLElement {
     this.closeBtn = this.querySelector('[js-close]') as HTMLButtonElement
     this.closeBtn.addEventListener('click', () => this.close())
 
+    this.recordData = this.querySelector('[js-record-data]') as HTMLElement
     this.treeData = {
       id: { element: this.querySelector('[js-tree-data="id"]') as HTMLElement },
       nombre_cientifico: { element: this.querySelector('[js-tree-data="nombre_cientifico"]') as HTMLElement },
@@ -58,9 +79,6 @@ export default class TreeModal extends HTMLElement {
       origen: { element: this.querySelector('[js-tree-data="origen"]') as HTMLElement, label: 'Origen:' },
       procedencia_exotica: { element: this.querySelector('[js-tree-data="procedencia_exotica"]') as HTMLElement, label: 'Procedencia:' },
       regiones: { element: this.querySelector('[js-tree-data="regiones"]') as HTMLElement, label: 'Región de origen:' },
-      altura: { element: this.querySelector('[js-tree-data="altura"]') as HTMLElement, label: 'Altura:' },
-      inclinacion: { element: this.querySelector('[js-tree-data="inclinacion"]') as HTMLElement, label: 'Inclinación:' },
-      diametro_a_p: { element: this.querySelector('[js-tree-data="diametro_a_p"]') as HTMLElement, label: 'Diámetro de tronco:' },
       espacio_verde: { element: this.querySelector('[js-tree-data="espacio_verde"]') as HTMLElement },
       calle: { element: this.querySelector('[js-tree-data="calle"]') as HTMLElement },
       nombre: { element: this.querySelector('[js-tree-data="nombre"]') as HTMLElement, label: 'Datos aportados por' },
@@ -115,22 +133,29 @@ export default class TreeModal extends HTMLElement {
     }
   }
 
-  private setTreeSources(tree: Tree) {
-    const sourcesElement = this.querySelector('[js-sources]') as HTMLDivElement
-    sourcesElement.innerHTML = ''
-    for (const record of tree.records) {
-      const { fecha_creacion } = record
+  private setTreeRecords(tree: Tree) {
+    const recordsElement = this.querySelector('[js-sources]') as HTMLDivElement
+    recordsElement.innerHTML = ''
+    tree.records.forEach((record, index) => {
       const { descripcion, nombre, facebook, instagram, twitter, url } = record.source
-      const sourceElement = window.Arbolado.loadTemplate(SourceAccordionTemplate) as HTMLElement
-      const sourceHeading = sourceElement.querySelector('[js-source-heading]') as HTMLElement
-      const accordionBody = sourceElement.querySelector('[js-accordion-body]') as HTMLDivElement
-      sourceHeading.innerText = `${this.formatDate(fecha_creacion)} - ${nombre}`
-      const descriptionElement = accordionBody.querySelector('[js-source-description]') as HTMLParagraphElement
-      const urlElement = accordionBody.querySelector('[js-source-url]') as HTMLAnchorElement
-      const facebookElement = accordionBody.querySelector('[js-source-facebook]') as HTMLAnchorElement
-      const instagramElement = accordionBody.querySelector('[js-source-instagram]') as HTMLAnchorElement
-      const twitterElement = accordionBody.querySelector('[js-source-twitter]') as HTMLAnchorElement
-      descriptionElement.innerText = descripcion
+      const recordElement = window.Arbolado.loadTemplate(RecordAccordionTemplate) as HTMLElement
+      const toggle = recordElement.querySelector('[js-record-toggle]') as HTMLButtonElement
+      const collapseElement = recordElement.querySelector('[js-record-collapse]') as HTMLDivElement
+      const dateElement = recordElement.querySelector('[js-record-date]') as HTMLElement
+      const sourceNameElement = recordElement.querySelector('[js-source-name]') as HTMLElement
+      const descriptionElement = recordElement.querySelector('[js-source-description]') as HTMLParagraphElement
+      const urlElement = recordElement.querySelector('[js-source-url]') as HTMLAnchorElement
+      const facebookElement = recordElement.querySelector('[js-source-facebook]') as HTMLAnchorElement
+      const instagramElement = recordElement.querySelector('[js-source-instagram]') as HTMLAnchorElement
+      const twitterElement = recordElement.querySelector('[js-source-twitter]') as HTMLAnchorElement
+      const collapseId = `tree-record-${record.id}`
+      collapseElement.id = collapseId
+      toggle.setAttribute('aria-controls', collapseId)
+      dateElement.innerText = this.formatDate(record.fecha_creacion)
+      sourceNameElement.innerText = nombre
+      this.renderRecordData(recordElement.querySelector('[js-record-data]') as HTMLElement, record)
+      if (!descripcion) descriptionElement.remove()
+      else descriptionElement.innerText = descripcion
       if (!url) urlElement.remove()
       else urlElement.href = url
       if (!facebook) facebookElement.remove()
@@ -139,8 +164,69 @@ export default class TreeModal extends HTMLElement {
       else instagramElement.href = instagram
       if (!twitter) twitterElement.remove()
       else twitterElement.href = twitter
-      sourcesElement.appendChild(sourceElement)
+
+      // Only the most recent record starts expanded
+      if (index === 0) {
+        collapseElement.classList.add('show')
+        this.setRecordExpanded(toggle, true)
+      }
+      const collapse = new Collapse(collapseElement, { toggle: false })
+      toggle.addEventListener('click', () => collapse.toggle())
+      collapseElement.addEventListener('show.bs.collapse', () => this.setRecordExpanded(toggle, true))
+      collapseElement.addEventListener('hide.bs.collapse', () => this.setRecordExpanded(toggle, false))
+      recordsElement.appendChild(recordElement)
+    })
+  }
+
+  private setRecordExpanded(toggle: HTMLButtonElement, expanded: boolean) {
+    toggle.classList.toggle('collapsed', !expanded)
+    toggle.setAttribute('aria-expanded', expanded.toString())
+  }
+
+  /** Human readable label/value pairs for the data of a record, skipping empty values */
+  private formatRecord(record: TreeRecord): [string, string][] {
+    const { cobertura, etapa_desarrollo, estado_fitosanitario, lugar } = record
+    const data: [string, string | undefined][] = [
+      ['Altura', this.formatMeasure(record.altura, 'm')],
+      ['Inclinación', this.formatInclination(record.inclinacion)],
+      ['Diámetro de tronco', this.formatMeasure(record.diametro_a_p, 'cm')],
+      ['Diámetro de copa', this.formatMeasure(record.diametro_copa, 'm')],
+      ['Altura de copa', this.formatMeasure(record.altura_copa, 'm')],
+      ['Altura de tronco', this.formatMeasure(record.altura_tronco, 'm')],
+      ['Cobertura de copa', cobertura ? `${cobertura.replace('-', '% a ')}%` : undefined],
+      ['Etapa de desarrollo', etapa_desarrollo ? this.capitalize(etapa_desarrollo) : undefined],
+      ['Estado fitosanitario', estado_fitosanitario ? (TreeModal.healthLabels[estado_fitosanitario] ?? this.capitalize(estado_fitosanitario)) : undefined],
+      ['Lugar', lugar ? (TreeModal.placeLabels[lugar] ?? this.capitalize(lugar)) : undefined],
+    ]
+    return data.filter((item): item is [string, string] => !!item[1])
+  }
+
+  private renderRecordData(container: HTMLElement, record?: TreeRecord) {
+    container.innerHTML = ''
+    const data = record ? this.formatRecord(record) : []
+    for (const [label, value] of data) {
+      const element = document.createElement('span')
+      element.innerText = `${label}: ${value}`
+      container.appendChild(element)
     }
+    container.classList.toggle('d-none', !data.length)
+  }
+
+  /** Measures equal to 0 are treated as missing (older censuses stored 0 when there was no value) */
+  private formatMeasure(value: string | undefined, unit: string) {
+    const number = parseFloat(value ?? '')
+    if (!number) return undefined
+    return `${number.toLocaleString('es-AR')} ${unit}`
+  }
+
+  private formatInclination(value?: string) {
+    const degrees = parseFloat(value ?? '')
+    if (isNaN(degrees)) return undefined
+    return TreeModal.inclinationLabels.find(([max]) => degrees <= max)?.[1]
+  }
+
+  private capitalize(value: string) {
+    return value.charAt(0).toUpperCase() + value.slice(1)
   }
 
   private formatDate(dateString: string) {
@@ -166,10 +252,6 @@ export default class TreeModal extends HTMLElement {
         tree.streetview = `${this.streetViewUrl}&location=${tree.lat},${tree.lng}`
       }
 
-      if (tree.records[0].altura) tree.records[0].altura += ' m'
-      if (tree.records[0].inclinacion) tree.records[0].inclinacion += 'º'
-      if (tree.records[0].diametro_a_p) tree.records[0].diametro_a_p += ' cm'
-
       const treeLink = `/arbol/${tree.id}`
 
       this.setTreeValue('nombre_cientifico', tree.species.nombre_cientifico)
@@ -178,15 +260,13 @@ export default class TreeModal extends HTMLElement {
       this.setTreeValue('familia', tree.species.family.familia)
       this.setTreeValue('origen', tree.species.origen)
       this.setTreeValue('procedencia_exotica', tree.species.procedencia_exotica)
-      this.setTreeValue('altura', tree.records[0].altura)
-      this.setTreeValue('inclinacion', tree.records[0].inclinacion)
-      this.setTreeValue('diametro_a_p', tree.records[0].diametro_a_p)
+      this.renderRecordData(this.recordData, tree.records[0])
       this.setTreeValue('espacio_verde', tree.espacio_verde ? `Espacio verde: ${tree.espacio_verde}` : undefined)
       this.setTreeValue('calle', `${tree.calle || ''} ${tree.calle_altura ? tree.calle_altura : 's/n'}`)
       this.setTreeValue('id', tree.id.toString())
       this.setTreeValue('link', treeLink, 'href')
       this.setTreeValue('streetview', tree.streetview, 'src')
-      this.setTreeSources(tree)
+      this.setTreeRecords(tree)
 
       // Open the drawer
       this.classList.add('show')

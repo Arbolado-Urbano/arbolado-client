@@ -201,64 +201,35 @@
         <!-- Paso 5: Datos del árbol -->
         <form novalidate class="d-none" js-step="data">
           <h5>Datos del árbol (opcionales)</h5>
-          <div class="mb-3" js-input-wrapper="height">
-            <label for="form-height" class="form-label">Altura total (m)</label>
-            <input name="height" type="number" step="any" min="0" inputmode="decimal" class="form-control" id="form-height" aria-describedby="form-height-help" js-input="height">
-            <div class="invalid-feedback">
-              Ingresá un número válido (por ejemplo: 4.5).
-            </div>
-            <div id="form-height-help" class="form-text">
-              Ingresá el valor en metros.
-            </div>
-          </div>
-          <div class="mb-3" js-input-wrapper="inclination">
-            <span class="form-label">Inclinación estimada del tronco</span>
+          <div class="mb-3 d-none" js-input-wrapper="place">
+            <span class="form-label">Lugar</span>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="inclination" id="inclination-1" aria-describedby="form-inclination-help" value="0">
-              <label class="form-check-label" for="inclination-1">
-                Tronco normal (0º a 5º)
+              <input class="form-check-input" type="radio" name="place" id="place-1" value="plantera">
+              <label class="form-check-label" for="place-1">
+                Plantera
               </label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="inclination" id="inclination-2" aria-describedby="form-inclination-help" value="10">
-              <label class="form-check-label" for="inclination-2">
-                Levemente inclinado (5º a 15º)
+              <input class="form-check-input" type="radio" name="place" id="place-2" value="cinta verde">
+              <label class="form-check-label" for="place-2">
+                Cinta verde
               </label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="inclination" id="inclination-3" aria-describedby="form-inclination-help" value="20">
-              <label class="form-check-label" for="inclination-3">
-                Moderadamente inclinado (15º a 25º)
+              <input class="form-check-input" type="radio" name="place" id="place-3" value="plaza-parque">
+              <label class="form-check-label" for="place-3">
+                Plaza / Parque
               </label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="inclination" id="inclination-4" aria-describedby="form-inclination-help" value="30">
-              <label class="form-check-label" for="inclination-4">
-                Riesgo de caída (25º a 35º)
-              </label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="inclination" id="inclination-5" aria-describedby="form-inclination-help" value="90">
-              <label class="form-check-label" for="inclination-5">
-                Muy riesgoso (> a 35º)
-              </label>
-            </div>
-            <div id="form-inclination-help" class="form-text">
-              Ingresá el valor en grados con respecto a la vertical.
-            </div>
-          </div>
-          <div class="mb-3" js-input-wrapper="diameter">
-            <label for="form-diameter-trunk" class="form-label">DAP - Diámetro de tronco (cm)</label>
-            <input name="diameter-trunk" type="number" step="any" min="0" inputmode="decimal" class="form-control" id="form-diameter-trunk" aria-describedby="form-diameter-trunk-help" js-input="diameter">
-            <div class="invalid-feedback">
-              Ingresá un número válido (por ejemplo: 25.5).
-            </div>
-            <div id="form-diameter-trunk-help" class="form-text">
-              Tomá el diámetro a la altura del pecho. Por favor, ingresá el valor en centímetros.
             </div>
           </div>
           <div class="mb-3" js-input-wrapper="development">
             <span class="form-label">Etapa de desarrollo</span>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="development" id="development-0" aria-describedby="form-development-help" value="recién plantado">
+              <label class="form-check-label" for="development-0">
+                Recién plantado
+              </label>
+            </div>
             <div class="form-check">
               <input class="form-check-input" type="radio" name="development" id="development-1" aria-describedby="form-development-help" value="joven">
               <label class="form-check-label" for="development-1">
@@ -311,6 +282,119 @@
               <input class="form-check-input" type="radio" name="health" id="health-5" aria-describedby="form-health-help" value="otros">
               <label class="form-check-label" for="health-5">
                 Se lo ve enfermo pero no sé bien de qué se trata
+              </label>
+            </div>
+          </div>
+          <div class="mb-3" js-input-wrapper="inclination">
+            <span class="form-label">Inclinación estimada del tronco</span>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="inclination" id="inclination-1" aria-describedby="form-inclination-help" value="0">
+              <label class="form-check-label" for="inclination-1">
+                Tronco normal (0º a 5º)
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="inclination" id="inclination-2" aria-describedby="form-inclination-help" value="10">
+              <label class="form-check-label" for="inclination-2">
+                Levemente inclinado (5º a 15º)
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="inclination" id="inclination-3" aria-describedby="form-inclination-help" value="20">
+              <label class="form-check-label" for="inclination-3">
+                Moderadamente inclinado (15º a 25º)
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="inclination" id="inclination-4" aria-describedby="form-inclination-help" value="30">
+              <label class="form-check-label" for="inclination-4">
+                Riesgo de caída (25º a 35º)
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="inclination" id="inclination-5" aria-describedby="form-inclination-help" value="90">
+              <label class="form-check-label" for="inclination-5">
+                Muy riesgoso (> a 35º)
+              </label>
+            </div>
+            <div id="form-inclination-help" class="form-text">
+              Ingresá el valor en grados con respecto a la vertical.
+            </div>
+          </div>
+          <div class="mb-3" js-input-wrapper="height">
+            <label for="form-height" class="form-label">Altura total (m)</label>
+            <input name="height" type="number" step="any" min="0" inputmode="decimal" class="form-control" id="form-height" aria-describedby="form-height-help" js-input="height">
+            <div class="invalid-feedback">
+              Ingresá un número válido (por ejemplo: 4.5).
+            </div>
+            <div id="form-height-help" class="form-text">
+              Ingresá el valor en metros.
+            </div>
+          </div>
+          <div class="mb-3" js-input-wrapper="diameter">
+            <label for="form-diameter-trunk" class="form-label">DAP - Diámetro de tronco (cm)</label>
+            <input name="diameter-trunk" type="number" step="any" min="0" inputmode="decimal" class="form-control" id="form-diameter-trunk" aria-describedby="form-diameter-trunk-help" js-input="diameter">
+            <div class="invalid-feedback">
+              Ingresá un número válido (por ejemplo: 25.5).
+            </div>
+            <div id="form-diameter-trunk-help" class="form-text">
+              Tomá el diámetro a la altura del pecho. Por favor, ingresá el valor en centímetros.
+            </div>
+          </div>
+          <div class="mb-3 d-none" js-input-wrapper="diameter-canopy">
+            <label for="form-diameter-canopy" class="form-label">Diámetro de copa (m)</label>
+            <input name="diameter-canopy" type="number" step="any" min="0" inputmode="decimal" class="form-control" id="form-diameter-canopy" aria-describedby="form-diameter-canopy-help">
+            <div class="invalid-feedback">
+              Ingresá un número válido (por ejemplo: 4.5).
+            </div>
+            <div id="form-diameter-canopy-help" class="form-text">
+              Ingresá el valor en metros.
+            </div>
+          </div>
+          <div class="mb-3 d-none" js-input-wrapper="canopy-height">
+            <label for="form-canopy-height" class="form-label">Altura de copa (m)</label>
+            <input name="canopy-height" type="number" step="any" min="0" inputmode="decimal" class="form-control" id="form-canopy-height" aria-describedby="form-canopy-height-help">
+            <div class="invalid-feedback">
+              Ingresá un número válido (por ejemplo: 3.5).
+            </div>
+            <div id="form-canopy-height-help" class="form-text">
+              Ingresá el valor en metros.
+            </div>
+          </div>
+          <div class="mb-3 d-none" js-input-wrapper="trunk-height">
+            <label for="form-trunk-height" class="form-label">Altura de tronco (m)</label>
+            <input name="trunk-height" type="number" step="any" min="0" inputmode="decimal" class="form-control" id="form-trunk-height" aria-describedby="form-trunk-height-help">
+            <div class="invalid-feedback">
+              Ingresá un número válido (por ejemplo: 1.5).
+            </div>
+            <div id="form-trunk-height-help" class="form-text">
+              Ingresá el valor en metros.
+            </div>
+          </div>
+          <div class="mb-3 d-none" js-input-wrapper="coverage">
+            <span class="form-label">Cobertura de la copa</span>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="coverage" id="coverage-1" value="1-25">
+              <label class="form-check-label" for="coverage-1">
+                1% a 25%
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="coverage" id="coverage-2" value="26-50">
+              <label class="form-check-label" for="coverage-2">
+                26% a 50%
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="coverage" id="coverage-3" value="51-75">
+              <label class="form-check-label" for="coverage-3">
+                51% a 75%
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="coverage" id="coverage-4" value="76-100">
+              <label class="form-check-label" for="coverage-4">
+                76% a 100%
               </label>
             </div>
           </div>
