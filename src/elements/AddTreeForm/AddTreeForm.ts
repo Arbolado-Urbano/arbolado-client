@@ -45,6 +45,7 @@ export default class AddTreeForm extends HTMLElement {
   private imagesInput: HTMLInputElement
   private imagesPreviews: HTMLUListElement
   private selectedSpeciesImages: { image: File, type: ImageType }[] = []
+  private selectedImages: File[] = []
   private selectedSpecies?: string
   private autoSpecies: boolean = false
   private speciesAutoInput: HTMLInputElement
@@ -139,7 +140,7 @@ export default class AddTreeForm extends HTMLElement {
     })
 
     this.speciesImagesInput.addEventListener('change', this.processSpeciesImages)
-    this.imagesInput.addEventListener('change', () => this.previewImages(this.imagesInput.files))
+    this.imagesInput.addEventListener('change', () => this.processImages())
 
     this.submitBtn.addEventListener('click', () => this.submit())
 
@@ -355,6 +356,7 @@ export default class AddTreeForm extends HTMLElement {
     this.speciesImagesPreviews.innerHTML = ''
     this.imagesPreviews.innerHTML = ''
     this.selectedSpeciesImages = []
+    this.selectedImages = []
     STEP_LABELS.forEach((stepId, index) => {
       this.steps[stepId].classList.remove('was-validated')
       if (index === 0) { return }
@@ -412,14 +414,26 @@ export default class AddTreeForm extends HTMLElement {
     }
   }
 
-  private previewImages(imageFiles: FileList | null) {
+  private processImages() {
+    const imageFiles = this.imagesInput.files
+    if (imageFiles) this.selectedImages.push(...imageFiles)
+    // Clear the input so the same file can be selected again and new selections add to the existing ones
+    this.imagesInput.value = ''
+    this.renderImages()
+  }
+
+  private renderImages() {
     this.imagesPreviews.innerHTML = ''
-    if (!imageFiles) return
-    for (const imageFile of imageFiles) {
-      const ImageWrapper = window.Arbolado.loadTemplate(ImagePreviewTemplate) as HTMLLIElement
-      const image = ImageWrapper.querySelector('[js-image]') as HTMLImageElement
-      image.src = URL.createObjectURL(imageFile)
-      this.imagesPreviews.append(ImageWrapper)
+    for (let index = 0; index < this.selectedImages.length; index++) {
+      const imageWrapper = window.Arbolado.loadTemplate(ImagePreviewTemplate) as HTMLLIElement
+      const image = imageWrapper.querySelector('[js-image]') as HTMLImageElement
+      image.src = URL.createObjectURL(this.selectedImages[index])
+      image.addEventListener('load', () => URL.revokeObjectURL(image.src), { once: true })
+      imageWrapper.querySelector('[js-remove]')?.addEventListener('click', () => {
+        this.selectedImages.splice(index, 1)
+        this.renderImages()
+      })
+      this.imagesPreviews.append(imageWrapper)
     }
   }
 
@@ -527,10 +541,8 @@ export default class AddTreeForm extends HTMLElement {
     for (const image of this.selectedSpeciesImages) {
       body.append('species-images[]', image.image)
     }
-    if (this.imagesInput.files) {
-      for (const image of this.imagesInput.files) {
-        body.append('images[]', image)
-      }
+    for (const image of this.selectedImages) {
+      body.append('images[]', image)
     }
 
     // Submit
