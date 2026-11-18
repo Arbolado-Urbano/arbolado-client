@@ -21,7 +21,7 @@
                 <button type="button" class="nav-link active" aria-current="page" js-tab-btn="email">Email</button>
               </li>
               <li class="nav-item">
-                <button type="button" class="nav-link" js-tab-btn="code">Código</button>
+                <button type="button" class="nav-link" js-tab-btn="code">Censistas</button>
               </li>
             </ul>
             <div class="border border-top-0 p-3">
@@ -54,6 +54,9 @@
                 </div>
               </div>
               <div js-tab="code" class="d-none flex-column">
+                <div class="text-danger d-none" role="alert" js-census-email-error>
+                  El email ingresado pertenece a una fuente censista. Para cargar árboles ingresá tu código.
+                </div>
                 <div class="mb-3">
                   <label for="form-email" class="form-label">Código (requerido)</label>
                   <input name="code" type="text" class="form-control" id="form-code" js-input="code" aria-describedby="form-code-help">
@@ -61,7 +64,7 @@
                     Por favor ingresá un código válido.
                   </div>
                   <div id="form-code-help" class="form-text">
-                    Si sos un censita y tenés un código ingresalo acá. Si no tenés un código, ingresá tus datos en la pestaña "Email".
+                    Si sos un censista y tenés un código ingresalo acá. Si no tenés un código, ingresá tus datos en la pestaña "Email".
                   </div>
                 </div>
               </div>

@@ -39,6 +39,7 @@ export default class AddTreeForm extends HTMLElement {
   private nameInput: HTMLInputElement
   private websiteInput: HTMLInputElement
   private codeInput: HTMLInputElement
+  private censusEmailError: HTMLDivElement
   private rememberInput: HTMLInputElement
   private speciesImagesInput: HTMLInputElement
   private speciesImagesPreviews: HTMLUListElement
@@ -84,6 +85,7 @@ export default class AddTreeForm extends HTMLElement {
     this.nameInput = this.querySelector('[js-input=name]') as HTMLInputElement
     this.websiteInput = this.querySelector('[js-input=website]') as HTMLInputElement
     this.codeInput = this.querySelector('[js-input=code]') as HTMLInputElement
+    this.censusEmailError = this.querySelector('[js-census-email-error]') as HTMLDivElement
     this.rememberInput = this.querySelector('[js-input=remember]') as HTMLInputElement
     this.speciesAutoInput = this.querySelector('[js-auto-species-input]') as HTMLInputElement
     this.speciesAutoError = this.querySelector('[js-auto-species-error]') as HTMLDivElement
@@ -265,6 +267,7 @@ export default class AddTreeForm extends HTMLElement {
       } else {
         this.mapCenter = AddTreeForm.defaultMapCenter // Restore to default just in case
       }
+      this.censusEmailError.classList.add('d-none')
       this.rememberData()
     }
     // If the user is not a censist then the images step will be skipped
@@ -551,7 +554,12 @@ export default class AddTreeForm extends HTMLElement {
     // Submit
     const requestUrl = `/${this.personalDataTabGroup.currentTab() === 'code' ? 'arboles' : 'aportes'}`
     const response = await window.Arbolado.fetchAPI(requestUrl, { method: 'POST', body })
-    if (!response.ok) {
+    if (response.status === 409) {
+      // The email belongs to a census source: they must use their code instead
+      await this.goStep(0)
+      this.personalDataTabGroup.show('code')
+      this.censusEmailError.classList.remove('d-none')
+    } else if (!response.ok) {
       alert('Ocurrió un error, intentá de nuevo más tarde')
     } else {
       await this.goStep(this.step.index + 1)
