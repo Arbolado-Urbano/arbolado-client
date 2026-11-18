@@ -35,16 +35,17 @@ export class Datasource {
   }
 
   /**
-   * Returns a GeoJSON with a filtered tree list (based on the this.filters filters).
+   * Returns a GeoJSON with a filtered tree list.
    * 
+   * @param filters - Filters to apply. Defaults to the current filters (this.filters).
    * @return Promise that resolves a GeoJSON with all the filtered trees.
    */
-  get trees() {
+  private getTrees = (filters: Filters = this.filters) => {
     return new Promise<GeoJSONTrees>(async (resolve, reject) => {
       let result: GeoJSONTrees = { features: [], type: "FeatureCollection" }
-      if (this.filters.sourceUrl) {
+      if (filters.sourceUrl) {
         try {
-          const response = await window.Arbolado.fetchAPI(`/fuentes/${this.filters.sourceUrl}`)
+          const response = await window.Arbolado.fetchAPI(`/fuentes/${filters.sourceUrl}`)
           if (!response.ok) return reject(new Error('Error al consultar la API: ' + response?.status))
           const trees: Trees = await response.json()
           result.features = trees.map(this.treeToGeoJSONFeature)
@@ -54,17 +55,17 @@ export class Datasource {
       } else {
         const species = window.Arbolado.species?.filter(species => {
           if (!species.url) return false
-          if (this.filters.speciesUrl) {
-            if (species.url !== this.filters.speciesUrl) return false
+          if (filters.speciesUrl) {
+            if (species.url !== filters.speciesUrl) return false
           }
-          if (this.filters.flavors) {
+          if (filters.flavors) {
             if (species.comestible !== 'Sí' && species.medicinal !== 'Sí') return false
           }
           return true
         }).map(species => species.id) ?? []
         try {
           result.features = Array.from((await this.allTrees()).values()).map(this.treeToGeoJSONFeature)
-          if (this.filters.flavors || this.filters.speciesUrl) {
+          if (filters.flavors || filters.speciesUrl) {
             result.features = result.features.filter(feature => {
               if (species?.indexOf(feature.properties.species) === -1) return false
               return true
@@ -208,9 +209,9 @@ export class Datasource {
     }
   }
 
-  public loadTrees = async (map: MapboxMap, sourceId: string, clusterMaxZoom: number) => {
+  public loadTrees = async (map: MapboxMap, sourceId: string, clusterMaxZoom: number, filters: Filters = this.filters) => {
     window.Arbolado.setLoading(true)
-    const trees = await this.trees
+    const trees = await this.getTrees(filters)
     const source = map.getSource<GeoJSONSource>(sourceId)
     if (!source) {
       map.addSource(sourceId, {

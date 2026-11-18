@@ -77,7 +77,9 @@ export default class GeoInput extends HTMLElement {
 
   toggleTrees = async () => {
     if (!this.map.getSource(SOURCE_ID)) {
-      await window.Arbolado.dataSource.loadTrees(this.map, SOURCE_ID, CLUSTER_MAX_ZOOM)
+      // Never show a source's trees on the form map: only trees from the main tree list
+      const { sourceUrl, ...filters } = window.Arbolado.dataSource.filters
+      await window.Arbolado.dataSource.loadTrees(this.map, SOURCE_ID, CLUSTER_MAX_ZOOM, filters)
     }
     if (this.treesToggle.checked) {
       await window.Arbolado.dataSource.addLayers(this.map, SOURCE_ID, CLUSTER_LAYER_ID, CLUSTER_COUNT_LAYER_ID, ICON_LAYER_ID)
