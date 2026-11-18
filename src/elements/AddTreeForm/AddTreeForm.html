@@ -200,7 +200,10 @@
           <h5>Datos del árbol (opcionales)</h5>
           <div class="mb-3" js-input-wrapper="height">
             <label for="form-height" class="form-label">Altura total (m)</label>
-            <input name="height" type="number" class="form-control" id="form-height" aria-describedby="form-height-help" js-input="height">
+            <input name="height" type="number" step="any" min="0" inputmode="decimal" class="form-control" id="form-height" aria-describedby="form-height-help" js-input="height">
+            <div class="invalid-feedback">
+              Ingresá un número válido (por ejemplo: 4.5).
+            </div>
             <div id="form-height-help" class="form-text">
               Ingresá el valor en metros.
             </div>
@@ -243,7 +246,10 @@
           </div>
           <div class="mb-3" js-input-wrapper="diameter">
             <label for="form-diameter-trunk" class="form-label">DAP - Diámetro de tronco (cm)</label>
-            <input name="diameter-trunk" type="number" class="form-control" id="form-diameter-trunk" aria-describedby="form-diameter-trunk-help" js-input="diameter">
+            <input name="diameter-trunk" type="number" step="any" min="0" inputmode="decimal" class="form-control" id="form-diameter-trunk" aria-describedby="form-diameter-trunk-help" js-input="diameter">
+            <div class="invalid-feedback">
+              Ingresá un número válido (por ejemplo: 25.5).
+            </div>
             <div id="form-diameter-trunk-help" class="form-text">
               Tomá el diámetro a la altura del pecho. Por favor, ingresá el valor en centímetros.
             </div>
