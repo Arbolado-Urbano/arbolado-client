@@ -106,6 +106,14 @@ export default class SpeciesSelect extends HTMLElement {
     this.setValue(species)
   }
 
+  /**
+   * Selects a species from the list. The "no selection" option maps to `undefined`.
+   * Uses the species object directly since species added by users may not have a URL.
+   */
+  private chooseSpecies(species?: Species) {
+    this.setValue(!species || species === this.noSelectionElement ? undefined : species)
+  }
+
   private updateActiveDescendant() {
     let index = this.getFocusedSpecies()
     const query = index !== false ? `[js-species-select-item-btn][data-index="${index}"]` : '[js-species-select-item-btn]'
@@ -135,11 +143,7 @@ export default class SpeciesSelect extends HTMLElement {
       if (this.btnElement.classList.contains('show')) {
         event.preventDefault()
         const focusedIndex = this.getFocusedSpecies()
-        if (focusedIndex === false) {
-          this.setValue(this.filtered[0])
-        } else {
-          this.setValue(this.filtered[focusedIndex])
-        }
+        this.chooseSpecies(this.filtered[focusedIndex === false ? 0 : focusedIndex])
         this.btnElement.click()
       }
     } else if ((event.key === 'ArrowUp') || (event.key === 'ArrowDown')) {
@@ -200,7 +204,7 @@ export default class SpeciesSelect extends HTMLElement {
     if (species.url === EMPTY_PLANTER_URL) {
       item.hidden = true
     } else {
-      btn.addEventListener('click', () => this.selectSpecies(species?.url))
+      btn.addEventListener('click', () => this.chooseSpecies(species))
     }
     this.listElement.append(templateClone)
   }

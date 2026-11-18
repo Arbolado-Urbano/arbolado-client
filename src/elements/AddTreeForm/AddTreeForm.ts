@@ -512,8 +512,11 @@ export default class AddTreeForm extends HTMLElement {
       species = this.selectedSpecies ?? ''
     } else if (this.speciesSelect.value === undefined) {
       species = this.speciesManualInput.value
+    } else if (this.speciesSelect.value?.url) {
+      speciesUrl = this.speciesSelect.value.url
     } else {
-      speciesUrl = this.speciesSelect.value?.url
+      // Species added by users don't have a URL, send their name instead
+      species = this.speciesSelect.value?.nombre_cientifico
     }
 
     const idFormData = new FormData(this.steps.id)
