@@ -323,9 +323,9 @@
           </div>
           <div class="mb-3" js-input-wrapper="height">
             <label for="form-height" class="form-label">Altura total (m)</label>
-            <input name="height" type="number" step="any" min="0" inputmode="decimal" class="form-control" id="form-height" aria-describedby="form-height-help" js-input="height">
+            <input name="height" type="text" inputmode="decimal" pattern="[0-9]+([.,][0-9]+)?" class="form-control" id="form-height" aria-describedby="form-height-help" js-input="height">
             <div class="invalid-feedback">
-              Ingresá un número válido (por ejemplo: 4.5).
+              Ingresá un número válido (por ejemplo: 4,5 o 4.5).
             </div>
             <div id="form-height-help" class="form-text">
               Ingresá el valor en metros.
@@ -333,9 +333,9 @@
           </div>
           <div class="mb-3" js-input-wrapper="diameter">
             <label for="form-diameter-trunk" class="form-label">DAP - Diámetro de tronco (cm)</label>
-            <input name="diameter-trunk" type="number" step="any" min="0" inputmode="decimal" class="form-control" id="form-diameter-trunk" aria-describedby="form-diameter-trunk-help" js-input="diameter">
+            <input name="diameter-trunk" type="text" inputmode="decimal" pattern="[0-9]+([.,][0-9]+)?" class="form-control" id="form-diameter-trunk" aria-describedby="form-diameter-trunk-help" js-input="diameter">
             <div class="invalid-feedback">
-              Ingresá un número válido (por ejemplo: 25.5).
+              Ingresá un número válido (por ejemplo: 25,5 o 25.5).
             </div>
             <div id="form-diameter-trunk-help" class="form-text">
               Tomá el diámetro a la altura del pecho. Por favor, ingresá el valor en centímetros.
@@ -343,9 +343,9 @@
           </div>
           <div class="mb-3 d-none" js-input-wrapper="diameter-canopy">
             <label for="form-diameter-canopy" class="form-label">Diámetro de copa (m)</label>
-            <input name="diameter-canopy" type="number" step="any" min="0" inputmode="decimal" class="form-control" id="form-diameter-canopy" aria-describedby="form-diameter-canopy-help">
+            <input name="diameter-canopy" type="text" inputmode="decimal" pattern="[0-9]+([.,][0-9]+)?" class="form-control" id="form-diameter-canopy" aria-describedby="form-diameter-canopy-help">
             <div class="invalid-feedback">
-              Ingresá un número válido (por ejemplo: 4.5).
+              Ingresá un número válido (por ejemplo: 4,5 o 4.5).
             </div>
             <div id="form-diameter-canopy-help" class="form-text">
               Ingresá el valor en metros.
@@ -353,9 +353,9 @@
           </div>
           <div class="mb-3 d-none" js-input-wrapper="canopy-height">
             <label for="form-canopy-height" class="form-label">Altura de copa (m)</label>
-            <input name="canopy-height" type="number" step="any" min="0" inputmode="decimal" class="form-control" id="form-canopy-height" aria-describedby="form-canopy-height-help">
+            <input name="canopy-height" type="text" inputmode="decimal" pattern="[0-9]+([.,][0-9]+)?" class="form-control" id="form-canopy-height" aria-describedby="form-canopy-height-help">
             <div class="invalid-feedback">
-              Ingresá un número válido (por ejemplo: 3.5).
+              Ingresá un número válido (por ejemplo: 3,5 o 3.5).
             </div>
             <div id="form-canopy-height-help" class="form-text">
               Ingresá el valor en metros.
@@ -363,9 +363,9 @@
           </div>
           <div class="mb-3 d-none" js-input-wrapper="trunk-height">
             <label for="form-trunk-height" class="form-label">Altura de tronco (m)</label>
-            <input name="trunk-height" type="number" step="any" min="0" inputmode="decimal" class="form-control" id="form-trunk-height" aria-describedby="form-trunk-height-help">
+            <input name="trunk-height" type="text" inputmode="decimal" pattern="[0-9]+([.,][0-9]+)?" class="form-control" id="form-trunk-height" aria-describedby="form-trunk-height-help">
             <div class="invalid-feedback">
-              Ingresá un número válido (por ejemplo: 1.5).
+              Ingresá un número válido (por ejemplo: 1,5 o 1.5).
             </div>
             <div id="form-trunk-height-help" class="form-text">
               Ingresá el valor en metros.

@@ -507,6 +507,8 @@ export default class AddTreeForm extends HTMLElement {
     }
   }
 
+  private toDecimal = (value: FormDataEntryValue) => value.toString().replace(',', '.')
+
   private async submit() {
     let token
     try {
@@ -547,17 +549,17 @@ export default class AddTreeForm extends HTMLElement {
     if (this.geoInput.value) body.set('coordinates', this.geoInput.value)
     if (species) body.set('species', species)
     if (speciesUrl) body.set('speciesUrl', speciesUrl)
-    if (dataFormData.has('height')) body.set('height', dataFormData.get('height')!)
+    if (dataFormData.has('height')) body.set('height', this.toDecimal(dataFormData.get('height')!))
     if (dataFormData.has('inclination')) body.set('inclination', dataFormData.get('inclination')!)
-    if (dataFormData.has('diameter-trunk')) body.set('diameterTrunk', dataFormData.get('diameter-trunk')!)
+    if (dataFormData.has('diameter-trunk')) body.set('diameterTrunk', this.toDecimal(dataFormData.get('diameter-trunk')!))
     if (dataFormData.has('notes')) body.set('notes', dataFormData.get('notes')!)
     if (dataFormData.has('development')) body.set('development', dataFormData.get('development')!)
     if (dataFormData.has('health')) body.set('health', dataFormData.get('health')!)
     if (this.isCensus('cihe')) {
       if (dataFormData.has('place')) body.set('place', dataFormData.get('place')!)
-      if (dataFormData.get('diameter-canopy')) body.set('diameterCanopy', dataFormData.get('diameter-canopy')!)
-      if (dataFormData.get('canopy-height')) body.set('canopyHeight', dataFormData.get('canopy-height')!)
-      if (dataFormData.get('trunk-height')) body.set('trunkHeight', dataFormData.get('trunk-height')!)
+      if (dataFormData.get('diameter-canopy')) body.set('diameterCanopy', this.toDecimal(dataFormData.get('diameter-canopy')!))
+      if (dataFormData.get('canopy-height')) body.set('canopyHeight', this.toDecimal(dataFormData.get('canopy-height')!))
+      if (dataFormData.get('trunk-height')) body.set('trunkHeight', this.toDecimal(dataFormData.get('trunk-height')!))
       if (dataFormData.has('coverage')) body.set('coverage', dataFormData.get('coverage')!)
     }
     body.set('captcha', token)
