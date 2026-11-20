@@ -69,7 +69,7 @@ export class Database {
         request = fn(tx.objectStore(storeName))
       } catch (e) {
         reject(e)
-        try { tx.abort() } catch { }
+        try { tx.abort() } catch (error) { console.error(error) }
       }
     })
   }

@@ -67,8 +67,6 @@ export default class Arbolado {
     if (loadingIndicator) this.setLoading(true)
     try {
       return await fetch(url, { method, headers, body })
-    } catch (error) {
-      throw error
     } finally {
       if (loadingIndicator) this.setLoading(false)
     }
