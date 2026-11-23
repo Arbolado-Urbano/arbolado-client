@@ -5,6 +5,9 @@ import { Species } from '../../types/Species'
 
 import { EMPTY_PLANTER_URL } from '../../constants/emptyPlanter'
 
+/** Lowercases and strips diacritics (á → a, ñ → n, ü → u) for accent-insensitive search */
+const normalize = (text: string) => text.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase()
+
 export default class SpeciesSelect extends HTMLElement {
   public value: Species | null | undefined = null
   private filtered: Species[] = []
@@ -163,12 +166,12 @@ export default class SpeciesSelect extends HTMLElement {
   }
 
   private handleInput() {
-    const searchTerm = this.inputElement.value.toLowerCase()
+    const searchTerm = normalize(this.inputElement.value)
     this.filtered = window.Arbolado.species?.filter((species) => {
       return (
         species.url !== EMPTY_PLANTER_URL && (
-          species.nombre_comun?.toLowerCase().includes(searchTerm) ||
-          species.nombre_cientifico.toLowerCase().includes(searchTerm)
+          normalize(species.nombre_comun ?? '').includes(searchTerm) ||
+          normalize(species.nombre_cientifico).includes(searchTerm)
         )
       )
     }) ?? []
