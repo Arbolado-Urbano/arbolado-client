@@ -173,22 +173,16 @@ export default class AddTreeForm extends HTMLElement {
         }
       } else if (stepLabel === 'data') {
         // Display or hide additional data inputs based on whether the species is the "emtpy planter" or not
-        if (this.speciesSelect.value?.url === EMPTY_PLANTER_URL) {
-          this.querySelector('[js-input-wrapper=inclination]')?.classList.add('d-none')
-          this.querySelector('[js-input-wrapper=development]')?.classList.add('d-none')
-          this.querySelector('[js-input-wrapper=health]')?.classList.add('d-none')
-          this.querySelector('[js-input-wrapper=height]')?.classList.add('d-none')
-          this.querySelector('[js-input-wrapper=diameter]')?.classList.add('d-none')
-        } else {
-          this.querySelector('[js-input-wrapper=inclination]')?.classList.remove('d-none')
-          this.querySelector('[js-input-wrapper=development]')?.classList.remove('d-none')
-          this.querySelector('[js-input-wrapper=health]')?.classList.remove('d-none')
-          this.querySelector('[js-input-wrapper=height]')?.classList.remove('d-none')
-          this.querySelector('[js-input-wrapper=diameter]')?.classList.remove('d-none')
-        }
+        const isEmptyPlanter = this.speciesSelect.value?.url === EMPTY_PLANTER_URL
         // Additional data inputs for CIHE censists
         const isCihe = this.isCensus('cihe')
-        const isEmptyPlanter = this.speciesSelect.value?.url === EMPTY_PLANTER_URL
+        for (const wrapper of ['development', 'height', 'diameter']) {
+          this.querySelector(`[js-input-wrapper=${wrapper}]`)?.classList.toggle('d-none', isEmptyPlanter)
+        }
+        // CIHE census doesn't record inclination nor health
+        for (const wrapper of ['inclination', 'health']) {
+          this.querySelector(`[js-input-wrapper=${wrapper}]`)?.classList.toggle('d-none', isEmptyPlanter || isCihe)
+        }
         this.querySelector('[js-input-wrapper=place]')?.classList.toggle('d-none', !isCihe)
         for (const wrapper of ['diameter-canopy', 'canopy-height', 'trunk-height', 'coverage']) {
           this.querySelector(`[js-input-wrapper=${wrapper}]`)?.classList.toggle('d-none', !isCihe || isEmptyPlanter)
