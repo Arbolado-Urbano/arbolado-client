@@ -55,6 +55,8 @@ export default class AddTreeForm extends HTMLElement {
   private personalDataTabGroup: TabGroup
   private mapCenter = AddTreeForm.defaultMapCenter
   private censusSlug: string | undefined
+  /** Coordinates of the last tree successfully submitted, used to center the map on the next submission */
+  private lastTreeCenter?: { lat: number, lng: number }
 
   constructor() {
     super()
@@ -188,7 +190,9 @@ export default class AddTreeForm extends HTMLElement {
           this.querySelector(`[js-input-wrapper=${wrapper}]`)?.classList.toggle('d-none', !isCihe || isEmptyPlanter)
         }
       }
-      this.geoInput.setCenter(this.mapCenter.lat, this.mapCenter.lng) // Center the map input
+      // Center the map input on the last submitted tree if any, otherwise on the default/census center
+      const center = this.lastTreeCenter ?? this.mapCenter
+      this.geoInput.setCenter(center.lat, center.lng)
     })
   }
 
@@ -575,6 +579,10 @@ export default class AddTreeForm extends HTMLElement {
     } else if (!response.ok) {
       alert('Ocurrió un error, intentá de nuevo más tarde')
     } else {
+      if (this.geoInput.value) {
+        const [lat, lng] = this.geoInput.value.split(',').map(Number)
+        this.lastTreeCenter = { lat, lng }
+      }
       await this.goStep(this.step.index + 1)
       window.Arbolado.dataSource.syncNewTrees()
     }
