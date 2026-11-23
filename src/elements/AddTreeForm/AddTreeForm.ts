@@ -186,7 +186,7 @@ export default class AddTreeForm extends HTMLElement {
           this.querySelector(`[js-input-wrapper=${wrapper}]`)?.classList.toggle('d-none', isEmptyPlanter || isCihe)
         }
         this.querySelector('[js-input-wrapper=place]')?.classList.toggle('d-none', !isCihe)
-        for (const wrapper of ['diameter-canopy', 'canopy-height', 'trunk-height', 'coverage']) {
+        for (const wrapper of ['diameter-canopy', 'canopy-height', 'trunk-height', 'coverage', 'vitality']) {
           this.querySelector(`[js-input-wrapper=${wrapper}]`)?.classList.toggle('d-none', !isCihe || isEmptyPlanter)
         }
       }
@@ -559,6 +559,7 @@ export default class AddTreeForm extends HTMLElement {
       if (dataFormData.get('canopy-height')) body.set('canopyHeight', this.toDecimal(dataFormData.get('canopy-height')!))
       if (dataFormData.get('trunk-height')) body.set('trunkHeight', this.toDecimal(dataFormData.get('trunk-height')!))
       if (dataFormData.has('coverage')) body.set('coverage', dataFormData.get('coverage')!)
+      if (dataFormData.has('vitality')) body.set('vitality', dataFormData.get('vitality')!)
     }
     body.set('captcha', token)
     for (const image of this.selectedSpeciesImages) {
