@@ -72,6 +72,11 @@ export default class GeoInput extends HTMLElement {
   }
 
   formResetCallback = () => {
+    this.clear()
+  }
+
+  /** Removes the marker from the map and clears the selected coordinates */
+  clear = () => {
     this.setValue()
   }
 

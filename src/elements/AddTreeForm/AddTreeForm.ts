@@ -373,6 +373,8 @@ export default class AddTreeForm extends HTMLElement {
       if (index === 0) { return }
       this.steps[stepId].reset()
     })
+    // Remove the previous tree's pin (the map is still centered on it through lastTreeCenter)
+    this.geoInput.clear()
     await this.goToFirstStep()
   }
 
